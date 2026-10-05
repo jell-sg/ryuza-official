@@ -1180,4 +1180,58 @@ document.querySelectorAll('.replace-dropdown').forEach(box => {
   console.log('[Ryuza Stats] pencarian & download aktif');
 })();
 </script>
+<!-- RYUZA_ACTIVITY_FINAL -->
+<script>
+(function(){
+  if(window.__ryuzaActivityFinal)return; window.__ryuzaActivityFinal=true;
+  const CFG={authDomain:'ryuza-official.firebaseapp.com',databaseURL:'https://ryuza-official-default-rtdb.firebaseio.com',projectId:'ryuza-official'};
+  const get=k=>{try{return localStorage.getItem(k)||''}catch(e){return ''}};
+  const clean=(v,n=160)=>String(v||'').replace(/\s+/g,' ').trim().slice(0,n);
+  let db=null;
+  function start(){
+    try{
+      if(!window.firebase || !firebase.database) return setTimeout(start,500);
+      let app;
+      try{app=firebase.app('ryuza-live-activity')}catch(e){app=firebase.initializeApp(CFG,'ryuza-live-activity')}
+      db=app.database();
+      window.ryuzaLogActivity=function(type,title,detail){
+        const visitorId=get('ryuzaVisitorId');
+        const name=clean(get('ryuzaVisitorName'),40)||'Pengunjung';
+        if(!visitorId)return;
+        return db.ref('searchStats/activityLog').push({
+          visitorId,name,type:clean(type,30),title:clean(title),detail:clean(detail,160),
+          at:firebase.database.ServerValue.TIMESTAMP
+        }).catch(err=>console.warn('[Ryuza Activity]',err));
+      };
+      // Simpan/update nama pengunjung juga.
+      const visitorId=get('ryuzaVisitorId'), name=clean(get('ryuzaVisitorName'),40);
+      if(visitorId && name) db.ref('searchStats/visitors/'+visitorId).update({visitorId,name,lastSeen:firebase.database.ServerValue.TIMESTAMP}).catch(()=>{});
+
+      // Pencarian: hanya saat Enter dan minimal 2 karakter.
+      const q=document.getElementById('q');
+      q?.addEventListener('keydown',function(e){
+        if(e.key==='Enter'){
+          const term=clean(q.value,100);
+          if(term.length>=2) window.ryuzaLogActivity('SEARCH','Pencarian',term);
+        }
+      });
+
+      // Download: event capture supaya tetap tertangkap walau elemen berubah.
+      document.addEventListener('click',function(e){
+        const btn=e.target.closest?.('.replace-download');
+        if(!btn)return;
+        const card=btn.closest('.skin');
+        if(!card)return;
+        const title=clean(card.querySelector('.hero-title-text')?.textContent || card.querySelector('.title')?.textContent || card.dataset.rtdbId || 'Skin');
+        const sel=card.querySelector('.replace-select');
+        const opt=sel?.options?.[sel.selectedIndex];
+        const label=clean(opt?.dataset?.label || opt?.textContent || 'Default',80);
+        window.ryuzaLogActivity('DOWNLOAD',title,label);
+      },true);
+      console.log('[Ryuza Activity] FINAL aktif');
+    }catch(err){console.warn('[Ryuza Activity] init error',err);setTimeout(start,1000)}
+  }
+  start();
+})();
+</script>
 </body></html>
