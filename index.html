@@ -308,6 +308,15 @@ input{background:#0a1321;border-color:#2b405d}input:focus{border-color:#35a7ff;b
 #ryuzaWelcome{position:fixed;top:24px;right:24px;z-index:999999;display:none;align-items:center;gap:12px;max-width:360px;padding:15px 18px;border:1px solid rgba(255,255,255,.14);border-radius:16px;background:rgba(15,15,20,.94);color:#fff;box-shadow:0 14px 40px rgba(0,0,0,.35);backdrop-filter:blur(12px);font-family:inherit;animation:ryuzaWelcomeIn .35s ease both}.ryuzaWelcomeIcon{font-size:25px}.ryuzaWelcomeText{font-size:14px;line-height:1.45}.ryuzaWelcomeText b{display:block;font-size:16px;margin-bottom:2px}@keyframes ryuzaWelcomeIn{from{opacity:0;transform:translateY(-12px) scale(.97)}to{opacity:1;transform:none}}@media(max-width:600px){#ryuzaWelcome{top:14px;left:14px;right:14px;max-width:none}}
 </style>
 
+<style id="ryuza-subscribe-confirm-style">
+.subscribe-channel-step{display:flex;flex-direction:column;gap:7px;width:100%}
+.subscribe-confirm{width:100%;border:1px solid rgba(53,208,127,.35);background:linear-gradient(135deg,#123b29,#0b2118);color:#9ff5bf;border-radius:12px;padding:11px 12px;font-weight:900;font-size:11px;cursor:pointer;transition:.2s;box-shadow:0 7px 20px rgba(0,0,0,.12)}
+.subscribe-confirm:hover{transform:translateY(-1px);filter:brightness(1.08)}
+.subscribe-confirm:active{transform:translateY(0)}
+.subscribe-confirm.ready{animation:confirmPulse 1.4s ease-in-out infinite}
+@keyframes confirmPulse{0%,100%{box-shadow:0 0 0 0 rgba(53,208,127,.08)}50%{box-shadow:0 0 0 6px rgba(53,208,127,0)}}
+@media(prefers-reduced-motion:reduce){.subscribe-confirm{transition:none}.subscribe-confirm.ready{animation:none}}
+</style>
 <style id="ryuza-subscribe-realtime-style">
 #youtubeSubscribe.subscribed,#youtubeSubscribe2.subscribed{opacity:.9;border-color:#35d07f!important;background:linear-gradient(135deg,#123b29,#0b2118)!important;color:#8ff0b7!important}
 #youtubeSubscribe.subscribed,#youtubeSubscribe2.subscribed{box-shadow:0 0 0 1px rgba(53,208,127,.2),0 8px 24px rgba(53,208,127,.08)}
@@ -332,8 +341,14 @@ input{background:#0a1321;border-color:#2b405d}input:focus{border-color:#35a7ff;b
     </div>
     <div class="subscribe-status" id="subscribeStatus">🔒 Subscribe kedua channel untuk membuka akses.</div>
     <div class="subscribe-actions">
-      <a class="popup-action youtube-subscribe" id="youtubeSubscribe" href="https://www.youtube.com/@ryuzaofficiallreal7?sub_confirmation=1" rel="noopener" target="_blank">▶️ SUBSCRIBE CHANNEL 1</a>
-      <a class="popup-action youtube-subscribe youtube-subscribe-2" id="youtubeSubscribe2" href="https://www.youtube.com/@ryuzaofficialr-x5r?sub_confirmation=1" rel="noopener" target="_blank">▶️ SUBSCRIBE CHANNEL 2</a>
+      <div class="subscribe-channel-step">
+        <a class="popup-action youtube-subscribe" id="youtubeSubscribe" href="https://www.youtube.com/@ryuzaofficiallreal7?sub_confirmation=1" rel="noopener" target="_blank">▶️ BUKA CHANNEL 1</a>
+        <button class="subscribe-confirm" id="confirmSubscribe1" type="button" style="display:none">✓ SAYA SUDAH SUBSCRIBE CHANNEL 1</button>
+      </div>
+      <div class="subscribe-channel-step">
+        <a class="popup-action youtube-subscribe youtube-subscribe-2" id="youtubeSubscribe2" href="https://www.youtube.com/@ryuzaofficialr-x5r?sub_confirmation=1" rel="noopener" target="_blank">▶️ BUKA CHANNEL 2</a>
+        <button class="subscribe-confirm" id="confirmSubscribe2" type="button" style="display:none">✓ SAYA SUDAH SUBSCRIBE CHANNEL 2</button>
+      </div>
     </div>
     <div class="subscribe-success" id="subscribeSuccess">
       <div class="subscribe-success-icon">🔓</div>
@@ -388,6 +403,7 @@ q.oninput=search;x.onclick=()=>{q.value='';q.focus();search()};search();
     try{if(sessionStorage.getItem(sessionKey))return;sessionStorage.setItem(sessionKey,'1')}catch(e){}
     const ref=db.ref('searchStats/queries/'+key(term));
     ref.transaction(v=>{v=v&&typeof v==='object'?v:{count:0,term};return {...v,term,count:Number(v.count||0)+1,lastAt:Date.now()}}).catch(()=>{});
+       try{window.ryuzaLogActivity?.('SEARCH','Pencarian',term)}catch(e){}
   };
   q?.addEventListener('keydown',e=>{if(e.key==='Enter')trackSearch()});
   document.addEventListener('click',e=>{
@@ -403,6 +419,7 @@ q.oninput=search;x.onclick=()=>{q.value='';q.focus();search()};search();
     const sel=card.querySelector('.replace-select'),opt=sel?.options?.[sel.selectedIndex],label=(opt?.dataset?.label||opt?.textContent||'Default').trim();
     const optionRef=db.ref('downloadStatsByOption/'+id+'/'+key(label));
     optionRef.transaction(v=>{v=v&&typeof v==='object'?v:{};return {...v,label,count:Number(v.count||0)+1,lastAt:Date.now()}}).catch(()=>{});
+    try{window.ryuzaLogActivity?.('DOWNLOAD',title,label)}catch(e){}
   },true);
 })();
 
@@ -471,6 +488,8 @@ q.oninput=search;x.onclick=()=>{q.value='';q.focus();search()};search();
   const status=document.getElementById('subscribeStatus');
   const subscribeBtn=document.getElementById('youtubeSubscribe');
   const subscribeBtn2=document.getElementById('youtubeSubscribe2');
+  const confirmBtn1=document.getElementById('confirmSubscribe1');
+  const confirmBtn2=document.getElementById('confirmSubscribe2');
   const progressBar=document.getElementById('subscribeProgressBar');
   const progressCount=document.getElementById('subscribeProgressCount');
   const successName=document.getElementById('subscribeWelcomeName');
@@ -481,9 +500,13 @@ q.oninput=search;x.onclick=()=>{q.value='';q.focus();search()};search();
   const UNLOCK_KEY='ryuzaSubscribeUnlockedAt';
   const SUB1_KEY='ryuzaSubscribeClicked1';
   const SUB2_KEY='ryuzaSubscribeClicked2';
+  const VISITED1_KEY='ryuzaSubscribeVisited1At';
+  const VISITED2_KEY='ryuzaSubscribeVisited2At';
+  const CONFIRM_DELAY=7000;
   const SIX_HOURS=6*60*60*1000;
   let countdownTimer=null;
   let autoCloseTimer=null;
+  let confirmTimer1=null,confirmTimer2=null;
 
   function getItem(k){try{return localStorage.getItem(k)||''}catch(e){return ''}}
   function setItem(k,v){try{localStorage.setItem(k,v)}catch(e){}}
@@ -496,7 +519,7 @@ q.oninput=search;x.onclick=()=>{q.value='';q.focus();search()};search();
   function getSub1(){return getItem(SUB1_KEY)==='1'}
   function getSub2(){return getItem(SUB2_KEY)==='1'}
   function setSub(key){setItem(key,'1')}
-  function clearCycle(){removeItem(SUB1_KEY);removeItem(SUB2_KEY);removeItem(UNLOCK_KEY)}
+  function clearCycle(){removeItem(SUB1_KEY);removeItem(SUB2_KEY);removeItem(UNLOCK_KEY);removeItem(VISITED1_KEY);removeItem(VISITED2_KEY);if(confirmBtn1)confirmBtn1.style.display='none';if(confirmBtn2)confirmBtn2.style.display='none';clearTimeout(confirmTimer1);clearTimeout(confirmTimer2)}
   function remaining(){const t=getUnlockTime();return Math.max(0,SIX_HOURS-(Date.now()-t))}
   function formatTime(ms){let sec=Math.ceil(ms/1000);const h=Math.floor(sec/3600);sec%=3600;const m=Math.floor(sec/60);sec%=60;return [h,m,sec].map(v=>String(v).padStart(2,'0')).join(':')}
 
@@ -524,9 +547,11 @@ q.oninput=search;x.onclick=()=>{q.value='';q.focus();search()};search();
     subscribeBtn2.textContent=s2?'✓ SUDAH DIBUKA — CHANNEL 2':'▶️ SUBSCRIBE CHANNEL 2';
     subscribeBtn.classList.toggle('subscribed',s1);
     subscribeBtn2.classList.toggle('subscribed',s2);
-    if(count===0)setStatus('🔒 Subscribe kedua channel untuk membuka akses.',false);
-    else if(count===1)setStatus('🟡 1 dari 2 selesai. Tinggal subscribe channel lainnya.',false);
-    else setStatus('✅ 2 dari 2 selesai. Akses tersimpan otomatis.',true);
+    if(confirmBtn1) confirmBtn1.style.display=s1?'none':(getItem(VISITED1_KEY)?'block':'none');
+    if(confirmBtn2) confirmBtn2.style.display=s2?'none':(getItem(VISITED2_KEY)?'block':'none');
+    if(count===0)setStatus('🔒 Buka kedua channel, subscribe, lalu tekan tombol konfirmasi masing-masing.',false);
+    else if(count===1)setStatus('🟡 1 dari 2 selesai. Tinggal subscribe channel lainnya lalu konfirmasi.',false);
+    else setStatus('✅ 2 dari 2 selesai. Akses siap dibuka.',true);
   }
 
   function showGate(expired){
@@ -567,7 +592,10 @@ q.oninput=search;x.onclick=()=>{q.value='';q.focus();search()};search();
     const name=nameInput.value.trim();
     if(!name){nameInput.focus();setStatus('⚠️ Isi nama terlebih dahulu.',false);return false}
     saveName(name);nameInput.readOnly=true;nameHint.textContent='Nama sudah tersimpan. Kamu tidak perlu mengubahnya.';
-    setSub(key);refreshSubscribeUI();
+    setSub(key);
+    if(key===SUB1_KEY)removeItem(VISITED1_KEY);
+    if(key===SUB2_KEY)removeItem(VISITED2_KEY);
+    refreshSubscribeUI();
     if(getSub1()&&getSub2()){
       saveUnlockTime();
       if(successName)successName.textContent=name;
@@ -577,14 +605,43 @@ q.oninput=search;x.onclick=()=>{q.value='';q.focus();search()};search();
     return true;
   }
 
-  // Simpan tepat saat pengguna menekan tombol subscribe, sebelum browser membuka YouTube.
-  subscribeBtn.addEventListener('pointerdown',()=>{if(!getSub1())markSubscribed(SUB1_KEY)},{capture:true});
-  subscribeBtn2.addEventListener('pointerdown',()=>{if(!getSub2())markSubscribed(SUB2_KEY)},{capture:true});
-  subscribeBtn.addEventListener('click',()=>{if(!getSub1())markSubscribed(SUB1_KEY)});
-  subscribeBtn2.addEventListener('click',()=>{if(!getSub2())markSubscribed(SUB2_KEY)});
+  function prepareConfirmation(key, btn, confirmBtn, timerName){
+    if(getItem(key==='sub1'?VISITED1_KEY:VISITED2_KEY)) return;
+    const visitKey=key==='sub1'?VISITED1_KEY:VISITED2_KEY;
+    setItem(visitKey,String(Date.now()));
+    confirmBtn.style.display='block';
+    confirmBtn.disabled=true;
+    confirmBtn.classList.remove('ready');
+    let left=Math.ceil(CONFIRM_DELAY/1000);
+    const original=confirmBtn.textContent;
+    confirmBtn.textContent='⏳ Tunggu '+left+' detik sebelum konfirmasi';
+    const tick=setInterval(()=>{
+      left--;
+      if(left<=0){
+        clearInterval(tick);
+        confirmBtn.disabled=false;
+        confirmBtn.classList.add('ready');
+        confirmBtn.textContent=original;
+        setStatus('🟡 Channel sudah dibuka. Pastikan benar-benar sudah subscribe, lalu tekan konfirmasi.',false);
+      }else confirmBtn.textContent='⏳ Tunggu '+left+' detik sebelum konfirmasi';
+    },1000);
+    if(timerName==='one')confirmTimer1=tick;else confirmTimer2=tick;
+  }
+
+  // Klik pertama hanya membuka YouTube. Status subscribe TIDAK langsung disimpan.
+  subscribeBtn.addEventListener('click',()=>{
+    if(getSub1())return;
+    prepareConfirmation('sub1',subscribeBtn,confirmBtn1,'one');
+  });
+  subscribeBtn2.addEventListener('click',()=>{
+    if(getSub2())return;
+    prepareConfirmation('sub2',subscribeBtn2,confirmBtn2,'two');
+  });
+  confirmBtn1?.addEventListener('click',()=>{if(!confirmBtn1.disabled)markSubscribed(SUB1_KEY)});
+  confirmBtn2?.addEventListener('click',()=>{if(!confirmBtn2.disabled)markSubscribed(SUB2_KEY)});
 
   window.addEventListener('storage',function(e){
-    if([SUB1_KEY,SUB2_KEY,UNLOCK_KEY,NAME_KEY].includes(e.key)){
+    if([SUB1_KEY,SUB2_KEY,UNLOCK_KEY,NAME_KEY,VISITED1_KEY,VISITED2_KEY].includes(e.key)){
       if(e.key===NAME_KEY&&e.newValue){nameInput.value=e.newValue;nameInput.readOnly=true}
       if(getUnlockTime()&&remaining()>0&&getSub1()&&getSub2()){startCountdown();gate.classList.add('unlocked')}
       refreshSubscribeUI();
@@ -657,6 +714,16 @@ document.querySelectorAll('.replace-dropdown').forEach(function(box){
 });
 </script>
 <script>
+/* ===== LIVE ACTIVITY pengunjung realtime ===== */
+(function(){
+  const CFG={authDomain:'ryuza-official.firebaseapp.com',databaseURL:'https://ryuza-official-default-rtdb.firebaseio.com',projectId:'ryuza-official'};
+  function get(k){try{return localStorage.getItem(k)||''}catch(e){return ''}}
+  function clean(v){return String(v||'').replace(/\s+/g,' ').trim().slice(0,120)}
+  let db=null;
+  try{if(window.firebase){let app;try{app=firebase.app('ryuza-activity')}catch(e){app=firebase.initializeApp(CFG,'ryuza-activity')}db=app.database()}}catch(e){console.warn('[Ryuza Activity] Firebase gagal',e)}
+  window.ryuzaLogActivity=function(type,title,detail){if(!db)return;const visitorId=get('ryuzaVisitorId'),name=clean(get('ryuzaVisitorName'))||'Pengunjung';if(!visitorId)return;db.ref('searchStats/activityLog').push().set({visitorId,name,type:clean(type)||'ACTIVITY',title:clean(title)||'-',detail:clean(detail)||'',at:firebase.database.ServerValue.TIMESTAMP}).catch(()=>{})};
+})();
+
 /* Statistik klik global melalui Firebase Realtime Database. */
 const RTDB_URL = 'https://ryuza-official-default-rtdb.firebaseio.com';
 const numberFormat = n => Number(n || 0).toLocaleString('id-ID');

@@ -31,7 +31,7 @@ input:focus,textarea:focus,select:focus{outline:none;border-color:#4a9eff!import
 
 .visitor-toolbar{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-bottom:12px}.visitor-toolbar input{flex:1;min-width:220px}.visitor-list{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:10px}.visitor-item{padding:13px;border:1px solid #263f58;border-radius:13px;background:#091522}.visitor-head{display:flex;justify-content:space-between;gap:10px;align-items:center}.visitor-name{font-weight:800;font-size:15px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.visitor-meta{margin-top:7px;color:#8fa8bf;font-size:11px;line-height:1.5}.visitor-online{color:#72f0a3;font-weight:700}.visitor-offline{color:#8094a9;font-weight:700}.visitor-count{font-size:28px;font-weight:900;color:#65c9ff}.visitor-empty{text-align:center;padding:28px;color:#8193a6;border:1px dashed #29445e;border-radius:12px}@media(max-width:560px){.visitor-list{grid-template-columns:1fr}}
 </style>
-</head>
+<style>.activity-list{display:flex;flex-direction:column;gap:8px;max-height:620px;overflow:auto}.activity-item{display:grid;grid-template-columns:150px 1fr auto;gap:12px;align-items:center;padding:12px 14px;border:1px solid #20364c;border-radius:12px;background:#091522}.activity-time{font-size:11px;color:#7f98ae}.activity-main{min-width:0}.activity-name{font-weight:800;color:#fff}.activity-detail{font-size:12px;color:#91a8bc;margin-top:4px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.activity-badge{font-size:11px;font-weight:800;padding:5px 8px;border-radius:999px;background:#10283b;color:#75d1ff}@media(max-width:700px){.activity-item{grid-template-columns:1fr}}</style></head>
 <body>
 <div class="wrap">
 <header class="top">
@@ -43,6 +43,7 @@ input:focus,textarea:focus,select:focus{outline:none;border-color:#4a9eff!import
  <button class="tab" data-tab="skins">🎨 Skin & Replace</button>
  <button class="tab" data-tab="settings">⚙️ Pengaturan</button>
  <button class="tab" data-tab="visitors">👥 Nama Pengunjung</button>
+ <button class="tab" data-tab="activity">📡 Live Activity</button>
  <button class="tab" data-tab="backup">💾 Backup</button>
 </nav>
 
@@ -105,6 +106,11 @@ input:focus,textarea:focus,select:focus{outline:none;border-color:#4a9eff!import
  </div>
 </section>
 
+<section id="activity" class="panel">
+ <div class="cards"><div class="stat"><div class="l">AKTIVITAS LIVE</div><div class="v" id="activityTotal">0</div></div><div class="stat"><div class="l">DOWNLOAD</div><div class="v" id="activityDownloads">0</div></div><div class="stat"><div class="l">PENCARIAN</div><div class="v" id="activitySearches">0</div></div></div>
+ <div class="card"><h3 style="margin:0 0 6px">📡 LIVE ACTIVITY</h3><div class="hint" style="margin-bottom:12px">Aktivitas pengunjung masuk realtime dan dikaitkan dengan nama.</div><div class="visitor-toolbar"><input id="activitySearch" placeholder="🔎 Cari nama / skin / aktivitas..."><select id="activityType"><option value="ALL">Semua aktivitas</option><option value="DOWNLOAD">📥 Download</option><option value="SEARCH">🔎 Pencarian</option></select><select id="activityVisitor"><option value="ALL">Semua pengunjung</option></select><span id="activityStatus" class="badge">● Menunggu...</span></div><div id="activityList" class="activity-list"><div class="visitor-empty">Memuat aktivitas...</div></div></div>
+</section>
+
 <section id="backup" class="panel">
  <div class="card"><h3 style="margin-top:0">💾 Backup & Restore</h3><div class="notice">Backup menyimpan <b>siteConfig</b> dan data skin dalam satu file JSON. Jangan membagikan file backup karena dapat berisi konfigurasi website.</div><div class="actions" style="margin-top:12px"><button class="primary" id="exportBtn">⬇️ Download Backup JSON</button><button class="secondary" id="restoreBtn">⬆️ Restore JSON</button><input id="restoreInput" class="file" type="file" accept="application/json,.json"></div><div class="progress"><i id="progress"></i></div></div>
  <div class="card dangerbox"><h3 style="margin-top:0">⚠️ Zona Berbahaya</h3><p class="muted">Reset Subscribe akan menghapus status unlock 6 jam di semua perangkat pengunjung. Mereka akan diminta subscribe ulang.</p><div class="actions"><button class="danger" id="resetAllSubscribe">🔄 Reset Semua Subscribe</button><button class="danger" id="clearSkins">Hapus Semua Skin dari Database</button></div><div class="hint">Perintah reset dikirim <b>REALTIME</b> melalui Firebase settings. Pengunjung yang sedang membuka website akan otomatis kembali ke popup subscribe.</div></div>
@@ -138,6 +144,7 @@ try{app=firebase.initializeApp(CFG,'ryuza-admin-'+Math.random().toString(36).sli
  db.ref('onlineUsers').on('value',s=>{$('statOnline').textContent=Object.keys(s.val()||{}).length});
  db.ref('linkClicks').on('value',s=>{const v=s.val()||{};$('statClicks').textContent=Object.values(v).reduce((n,x)=>n+Number(x?.count||0),0)});
  watchRankings();
+ watchActivity();
  watchVisitors();
 }catch(e){$('status').textContent='Firebase error';$('status').className='badge err';$('systemInfo').textContent=e.message}
 function renderRanking(elId,data,type){
@@ -219,6 +226,13 @@ function watchVisitors(){
  db.ref('onlineUsers').on('value',s=>{onlineVisitorData=s.val()||{};renderVisitors()},e=>{console.warn('Gagal memuat status online:',e.message)});
  setInterval(renderVisitors,10000);
 }
+let activityData={};
+function escActivity(v){return String(v??'').replace(/[&<>\'"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[c]))}
+function activityTime(v){const n=Number(v||0);return n?new Date(n).toLocaleString('id-ID',{day:'2-digit',month:'2-digit',year:'numeric',hour:'2-digit',minute:'2-digit',second:'2-digit'}):'-'}
+function renderActivity(){const el=$('activityList');if(!el)return;const q=String($('activitySearch')?.value||'').toLowerCase().trim(),type=$('activityType')?.value||'ALL',who=$('activityVisitor')?.value||'ALL';let arr=Object.values(activityData||{}).filter(x=>x&&(!type||type==='ALL'||x.type===type)&&(!who||who==='ALL'||x.visitorId===who)&&(!q||[x.name,x.title,x.detail,x.type].some(v=>String(v||'').toLowerCase().includes(q)))).sort((a,b)=>Number(b.at||0)-Number(a.at||0)).slice(0,200);$('activityTotal').textContent=Object.keys(activityData||{}).length.toLocaleString('id-ID');$('activityDownloads').textContent=Object.values(activityData||{}).filter(x=>x?.type==='DOWNLOAD').length.toLocaleString('id-ID');$('activitySearches').textContent=Object.values(activityData||{}).filter(x=>x?.type==='SEARCH').length.toLocaleString('id-ID');if(!arr.length){el.innerHTML='<div class="visitor-empty">Belum ada aktivitas.</div>';return}el.innerHTML=arr.map(x=>`<div class="activity-item"><div class="activity-time">${activityTime(x.at)}</div><div class="activity-main"><div class="activity-name">${escActivity(x.name||'Pengunjung')}</div><div class="activity-detail">${escActivity(x.title||'-')}${x.detail?' • '+escActivity(x.detail):''}</div></div><span class="activity-badge">${x.type==='DOWNLOAD'?'📥 DOWNLOAD':'🔎 SEARCH'}</span></div>`).join('')}
+function loadActivityVisitors(){const sel=$('activityVisitor');if(!sel)return;const cur=sel.value,map={};Object.values(activityData||{}).forEach(x=>{if(x?.visitorId)map[x.visitorId]=x.name||'Pengunjung'});sel.innerHTML='<option value="ALL">Semua pengunjung</option>'+Object.entries(map).sort((a,b)=>a[1].localeCompare(b[1],'id')).map(([id,name])=>`<option value="${escActivity(id)}">${escActivity(name)}</option>`).join('');if([...sel.options].some(o=>o.value===cur))sel.value=cur;renderActivity()}
+function watchActivity(){const st=$('activityStatus');db.ref('searchStats/activityLog').on('value',s=>{activityData=s.val()||{};loadActivityVisitors();if(st){st.textContent='● REALTIME AKTIF';st.className='badge ok'}},e=>{if(st){st.textContent='● Gagal membaca';st.className='badge err'};toast('Gagal memuat LIVE ACTIVITY: '+e.message)});['activitySearch','activityType','activityVisitor'].forEach(id=>$(id)?.addEventListener(id==='activitySearch'?'input':'change',renderActivity))}
+
 async function exportBackup(){const [a,b,c,d,e,f]=await Promise.all([db.ref('siteConfig').once('value'),db.ref('linkClicks').once('value'),db.ref('searchStats').once('value'),db.ref('downloadStats').once('value'),db.ref('downloadStatsByOption').once('value'),db.ref('searchStats/visitors').once('value')]);const data={version:3,exportedAt:new Date().toISOString(),siteConfig:a.val()||{},linkClicks:b.val()||{},searchStats:c.val()||{},downloadStats:d.val()||{},downloadStatsByOption:e.val()||{},visitorNames:f.val()||{}};const blob=new Blob([JSON.stringify(data,null,2)],{type:'application/json'}),url=URL.createObjectURL(blob),aEl=document.createElement('a');aEl.href=url;aEl.download='ryuza-backup-'+new Date().toISOString().slice(0,10)+'.json';aEl.click();URL.revokeObjectURL(url);toast('Backup berhasil dibuat')}
 $('exportBtn').onclick=exportBackup;$('quickBackup').onclick=()=>{switchTab('backup');exportBackup()};$('restoreBtn').onclick=()=>$('restoreInput').click();$('restoreInput').onchange=async e=>{const f=e.target.files?.[0];if(!f)return;try{const d=JSON.parse(await f.text());if(!d.siteConfig)throw Error('Format backup tidak valid');if(!confirm('Restore akan menimpa siteConfig. Lanjutkan?'))return;await db.ref('siteConfig').set(d.siteConfig);if(d.linkClicks)await db.ref('linkClicks').set(d.linkClicks);if(d.searchStats)await db.ref('searchStats').set(d.searchStats);if(d.downloadStats)await db.ref('downloadStats').set(d.downloadStats);if(d.downloadStatsByOption)await db.ref('downloadStatsByOption').set(d.downloadStatsByOption);if(d.visitorNames)await db.ref('searchStats/visitors').set(d.visitorNames);toast('Restore berhasil')}catch(x){toast('Restore gagal: '+x.message)}e.target.value=''};
 $('clearSkins').onclick=async()=>{if(!confirm('Yakin hapus SEMUA skin? Pastikan sudah punya backup.'))return;if(!confirm('Konfirmasi terakhir: semua siteConfig/skins akan dihapus.'))return;await db.ref('siteConfig/skins').remove();toast('Semua skin dihapus')}
