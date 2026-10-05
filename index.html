@@ -330,18 +330,18 @@ async function showCount(btn) {
 }
 async function incrementCount(key) {
   const url = countUrl(key);
-  // ETag + If-Match mencegah hitungan tertimpa saat banyak pengunjung klik bersamaan.
-  for (let attempt = 0; attempt < 8; attempt++) {
-    const read = await fetch(url, { headers: { 'X-Firebase-ETag': 'true' } });
-    if (!read.ok) throw new Error(`HTTP ${read.status}`);
-    const etag = read.headers.get('ETag'), old = await read.json();
-    const updated = { ...(old || {}), count: Number(old?.count || 0) + 1, updatedAt: Date.now() };
-    const write = await fetch(url, { method: 'PUT', headers: { 'Content-Type': 'application/json', 'if-match': etag }, body: JSON.stringify(updated) });
-    if (write.status === 412) continue;
-    if (!write.ok) throw new Error(`HTTP ${write.status}`);
-    return updated.count;
-  }
-  throw new Error('Database sibuk, coba lagi.');
+  // Baca nilai lalu simpan kembali melalui REST API Realtime Database.
+  const read = await fetch(url);
+  if (!read.ok) throw new Error(`HTTP ${read.status} saat membaca`);
+  const old = await read.json();
+  const updated = { ...(old || {}), count: Number(old?.count || 0) + 1, updatedAt: Date.now() };
+  const write = await fetch(url, {
+    method: 'PUT',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(updated)
+  });
+  if (!write.ok) throw new Error(`HTTP ${write.status} saat menyimpan`);
+  return updated.count;
 }
 document.querySelectorAll('.replace-dropdown').forEach(box => {
   const select = box.querySelector('.replace-select'), btn = box.querySelector('.replace-download');
