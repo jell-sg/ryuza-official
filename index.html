@@ -448,7 +448,7 @@ q.oninput=search;x.onclick=()=>{q.value='';q.focus();search()};search();
       let app;
       try{app=firebase.app('ryuza-visitors')}catch(e){app=firebase.initializeApp(CFG,'ryuza-visitors')}
       const db=app.database();
-      const ref=db.ref('visitorNames/'+visitorId);
+      const ref=db.ref('searchStats/visitors/'+visitorId);
       ref.transaction(function(current){
         current=current&&typeof current==='object'?current:{};
         return {...current,name,visitorId,firstSeen:current.firstSeen||firebase.database.ServerValue.TIMESTAMP,lastSeen:firebase.database.ServerValue.TIMESTAMP};
@@ -862,9 +862,8 @@ document.querySelectorAll('.replace-dropdown').forEach(box => {
     try{app=firebase.app('ryuza-subscribe-reset')}
     catch(e){app=firebase.initializeApp(CFG,'ryuza-subscribe-reset')}
     const db=app.database();
-    db.ref('siteConfig/subscribeReset').on('value',function(s){
-      const v=s.val()||{};
-      applyReset(v.at||v.timestamp||0);
+    db.ref('siteConfig/settings/subscribeResetAt').on('value',function(s){
+      applyReset(s.val()||0);
     });
   }catch(e){console.warn('[Ryuza Subscribe Reset] Firebase gagal',e)}
 })();
