@@ -659,4 +659,49 @@ document.querySelectorAll('.replace-dropdown').forEach(box => {
   }
   document.querySelectorAll('.hero-icon').forEach(loadHeroIcon);
 })();
-</script></body></html>
+</script><script id="ryuza-image-fallback">
+(function(){
+  // Fallback gambar lokal-inline: tidak bergantung pada server gambar eksternal.
+  function svgData(svg){ return 'data:image/svg+xml;charset=UTF-8,' + encodeURIComponent(svg); }
+  function esc(v){ return String(v||'').replace(/[&<>\"]/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]}); }
+  function initials(name){
+    const words=String(name||'').trim().split(/\s+/).filter(Boolean);
+    return (words.length>1 ? words.slice(0,2).map(x=>x[0]) : String(name||'?').slice(0,2)).join('').toUpperCase();
+  }
+  function heroFallback(name){
+    const n=esc(name||'Hero');
+    const i=esc(initials(name));
+    return svgData('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 160 160"><defs><linearGradient id="g" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#172b4d"/><stop offset="1" stop-color="#07101f"/></linearGradient></defs><rect width="160" height="160" rx="80" fill="url(#g)"/><circle cx="80" cy="80" r="68" fill="none" stroke="#5bbcff" stroke-opacity=".45" stroke-width="3"/><text x="80" y="91" text-anchor="middle" font-family="Arial,sans-serif" font-size="48" font-weight="900" fill="#fff">'+i+'</text><text x="80" y="125" text-anchor="middle" font-family="Arial,sans-serif" font-size="11" font-weight="700" fill="#8edbff">'+n.slice(0,18)+'</text></svg>');
+  }
+  function bannerFallback(title,sub){
+    const t=esc(title||'RYUZA OFFICIAL'), q=esc(sub||'FEATURED SKIN');
+    return svgData('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 450"><defs><linearGradient id="b" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#07111f"/><stop offset=".55" stop-color="#173d66"/><stop offset="1" stop-color="#0a1628"/></linearGradient><radialGradient id="r"><stop stop-color="#5bbcff" stop-opacity=".35"/><stop offset="1" stop-color="#5bbcff" stop-opacity="0"/></radialGradient></defs><rect width="1200" height="450" fill="url(#b)"/><circle cx="930" cy="170" r="330" fill="url(#r)"/><circle cx="1050" cy="360" r="180" fill="none" stroke="#69c9ff" stroke-opacity=".18" stroke-width="3"/><path d="M0 390 Q300 280 600 390 T1200 330 V450 H0Z" fill="#050b14" fill-opacity=".55"/><text x="65" y="105" font-family="Arial,sans-serif" font-size="24" font-weight="800" letter-spacing="5" fill="#8edbff">'+q+'</text><text x="65" y="190" font-family="Arial,sans-serif" font-size="54" font-weight="900" fill="#fff">'+t+'</text><text x="65" y="240" font-family="Arial,sans-serif" font-size="20" fill="#b8c9dc">RYUZA OFFICIAL • IMAGE FALLBACK</text></svg>');
+  }
+
+  document.querySelectorAll('.hero-icon').forEach(function(img){
+    const hero=(img.dataset.hero||img.alt||'Hero').trim();
+    img.addEventListener('error',function(){
+      if(img.dataset.fallbackApplied)return;
+      img.dataset.fallbackApplied='1';
+      img.src=heroFallback(hero);
+    });
+    // Jika masih berupa placeholder 1x1, jangan biarkan icon kosong saat API gagal.
+    setTimeout(function(){
+      if(!img.dataset.fallbackApplied && /^data:image\/gif;base64,R0lGODlhAQABA/.test(img.src)){
+        img.dataset.fallbackApplied='1';
+        img.src=heroFallback(hero);
+      }
+    },3500);
+  });
+
+  document.querySelectorAll('.ryuza-slide img').forEach(function(img){
+    const title=img.alt||'RYUZA OFFICIAL';
+    img.addEventListener('error',function(){
+      if(img.dataset.fallbackApplied)return;
+      img.dataset.fallbackApplied='1';
+      img.src=bannerFallback(title,'RYUZA OFFICIAL • FEATURED SKIN');
+    });
+  });
+})();
+</script>
+</body></html>
