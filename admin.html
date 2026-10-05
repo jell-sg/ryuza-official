@@ -28,6 +28,8 @@ input:focus,textarea:focus,select:focus{outline:none;border-color:#4a9eff!import
 @keyframes raSweep{0%,65%{transform:translateX(-140%) rotate(18deg)}85%,100%{transform:translateX(300%) rotate(18deg)}}
 @keyframes raToast{from{opacity:0;transform:translateY(8px) scale(.98)}to{opacity:1;transform:translateY(0) scale(1)}}
 @media(prefers-reduced-motion:reduce){*,*:before,*:after{animation:none!important;transition:none!important}}
+
+.visitor-toolbar{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-bottom:12px}.visitor-toolbar input{flex:1;min-width:220px}.visitor-list{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:10px}.visitor-item{padding:13px;border:1px solid #263f58;border-radius:13px;background:#091522}.visitor-head{display:flex;justify-content:space-between;gap:10px;align-items:center}.visitor-name{font-weight:800;font-size:15px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.visitor-meta{margin-top:7px;color:#8fa8bf;font-size:11px;line-height:1.5}.visitor-online{color:#72f0a3;font-weight:700}.visitor-offline{color:#8094a9;font-weight:700}.visitor-count{font-size:28px;font-weight:900;color:#65c9ff}.visitor-empty{text-align:center;padding:28px;color:#8193a6;border:1px dashed #29445e;border-radius:12px}@media(max-width:560px){.visitor-list{grid-template-columns:1fr}}
 </style>
 </head>
 <body>
@@ -40,6 +42,7 @@ input:focus,textarea:focus,select:focus{outline:none;border-color:#4a9eff!import
  <button class="tab active" data-tab="dashboard">📊 Dashboard</button>
  <button class="tab" data-tab="skins">🎨 Skin & Replace</button>
  <button class="tab" data-tab="settings">⚙️ Pengaturan</button>
+ <button class="tab" data-tab="visitors">👥 Nama Pengunjung</button>
  <button class="tab" data-tab="backup">💾 Backup</button>
 </nav>
 
@@ -89,9 +92,22 @@ input:focus,textarea:focus,select:focus{outline:none;border-color:#4a9eff!import
  </div>
 </section>
 
+<section id="visitors" class="panel">
+ <div class="cards">
+  <div class="stat"><div class="l">TOTAL NAMA</div><div class="v" id="visitorTotal">0</div></div>
+  <div class="stat"><div class="l">ONLINE &lt; 5 MENIT</div><div class="v" id="visitorOnline">0</div></div>
+ </div>
+ <div class="card">
+  <h3 style="margin:0 0 6px">👥 Nama yang Terdaftar di Web</h3>
+  <div class="hint" style="margin-bottom:12px">Daftar ini membaca <b>visitorNames</b> dari Firebase secara realtime. Nama baru akan muncul otomatis tanpa refresh.</div>
+  <div class="visitor-toolbar"><input id="visitorSearch" placeholder="🔎 Cari nama pengunjung..."><span id="visitorStatus" class="badge">● Menunggu...</span></div>
+  <div id="visitorList" class="visitor-list"><div class="visitor-empty">Memuat data...</div></div>
+ </div>
+</section>
+
 <section id="backup" class="panel">
  <div class="card"><h3 style="margin-top:0">💾 Backup & Restore</h3><div class="notice">Backup menyimpan <b>siteConfig</b> dan data skin dalam satu file JSON. Jangan membagikan file backup karena dapat berisi konfigurasi website.</div><div class="actions" style="margin-top:12px"><button class="primary" id="exportBtn">⬇️ Download Backup JSON</button><button class="secondary" id="restoreBtn">⬆️ Restore JSON</button><input id="restoreInput" class="file" type="file" accept="application/json,.json"></div><div class="progress"><i id="progress"></i></div></div>
- <div class="card dangerbox"><h3 style="margin-top:0">⚠️ Zona Berbahaya</h3><p class="muted">Menghapus semua skin dari <b>siteConfig/skins</b> tidak bisa dibatalkan kecuali kamu memiliki backup.</p><button class="danger" id="clearSkins">Hapus Semua Skin dari Database</button></div>
+ <div class="card dangerbox"><h3 style="margin-top:0">⚠️ Zona Berbahaya</h3><p class="muted">Reset Subscribe akan menghapus status unlock 6 jam di semua perangkat pengunjung. Mereka akan diminta subscribe ulang.</p><div class="actions"><button class="danger" id="resetAllSubscribe">🔄 Reset Semua Subscribe</button><button class="danger" id="clearSkins">Hapus Semua Skin dari Database</button></div><div class="hint">Perintah reset dikirim <b>REALTIME</b> melalui Firebase. Pengunjung yang sedang membuka website akan otomatis kembali ke popup subscribe.</div></div>
 </section>
 </div>
 <div id="toast" class="toast"></div>
@@ -122,6 +138,7 @@ try{app=firebase.initializeApp(CFG,'ryuza-admin-'+Math.random().toString(36).sli
  db.ref('onlineUsers').on('value',s=>{$('statOnline').textContent=Object.keys(s.val()||{}).length});
  db.ref('linkClicks').on('value',s=>{const v=s.val()||{};$('statClicks').textContent=Object.values(v).reduce((n,x)=>n+Number(x?.count||0),0)});
  watchRankings();
+ watchVisitors();
 }catch(e){$('status').textContent='Firebase error';$('status').className='badge err';$('systemInfo').textContent=e.message}
 function renderRanking(elId,data,type){
  const el=$(elId);if(!el)return;
@@ -172,9 +189,28 @@ $('reloadSettings').onclick=()=>loadSettings();
 async function importIndexText(txt){if(Object.keys(items).length&&!confirm('Database sudah berisi data. Timpa semua skin dengan data dari index.html?'))return false;const doc=new DOMParser().parseFromString(txt,'text/html'),out={};doc.querySelectorAll('.skin').forEach((c,i)=>{const title=cleanTitle(c.querySelector('.hero-title-text')?.textContent||c.querySelector('.title')?.textContent||('Skin '+(i+1)));const iconText=(c.dataset.iconText||'').trim().toUpperCase()||initials(title);let id=title.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'').slice(0,100)||('skin-'+(i+1));if(out[id])id+='-'+i;out[id]={id,title,iconText,options:[...c.querySelectorAll('.replace-select option')].map(o=>({label:o.dataset.label||o.textContent.trim(),url:o.value,selected:o.hasAttribute('selected')})),order:i}});if(!Object.keys(out).length)throw Error('Tidak menemukan .skin');await db.ref('siteConfig/skins').set(out);toast('Berhasil mengimpor '+Object.keys(out).length+' skin');return true}
 $('seedBtn').onclick=async()=>{try{$('seedBtn').disabled=true;$('seedBtn').textContent='Mengambil...';const r=await fetch('./index.html?seed='+Date.now());if(!r.ok)throw Error('index.html tidak bisa dibaca');await importIndexText(await r.text())}catch(e){if(location.protocol==='file:')$('fileInput').click();else toast('Gagal: '+e.message)}finally{$('seedBtn').disabled=false;$('seedBtn').textContent='🔄 Ambil dari index.html'}};
 $('pickBtn').onclick=()=>$('fileInput').click();$('fileInput').onchange=async e=>{const f=e.target.files?.[0];if(!f)return;try{await importIndexText(await f.text())}catch(x){toast('Gagal membaca: '+x.message)}e.target.value=''};
-async function exportBackup(){const [a,b,c,d,e]=await Promise.all([db.ref('siteConfig').once('value'),db.ref('linkClicks').once('value'),db.ref('searchStats').once('value'),db.ref('downloadStats').once('value'),db.ref('downloadStatsByOption').once('value')]);const data={version:2,exportedAt:new Date().toISOString(),siteConfig:a.val()||{},linkClicks:b.val()||{},searchStats:c.val()||{},downloadStats:d.val()||{},downloadStatsByOption:e.val()||{}};const blob=new Blob([JSON.stringify(data,null,2)],{type:'application/json'}),url=URL.createObjectURL(blob),aEl=document.createElement('a');aEl.href=url;aEl.download='ryuza-backup-'+new Date().toISOString().slice(0,10)+'.json';aEl.click();URL.revokeObjectURL(url);toast('Backup berhasil dibuat')}
-$('exportBtn').onclick=exportBackup;$('quickBackup').onclick=()=>{switchTab('backup');exportBackup()};$('restoreBtn').onclick=()=>$('restoreInput').click();$('restoreInput').onchange=async e=>{const f=e.target.files?.[0];if(!f)return;try{const d=JSON.parse(await f.text());if(!d.siteConfig)throw Error('Format backup tidak valid');if(!confirm('Restore akan menimpa siteConfig. Lanjutkan?'))return;await db.ref('siteConfig').set(d.siteConfig);if(d.linkClicks)await db.ref('linkClicks').set(d.linkClicks);if(d.searchStats)await db.ref('searchStats').set(d.searchStats);if(d.downloadStats)await db.ref('downloadStats').set(d.downloadStats);if(d.downloadStatsByOption)await db.ref('downloadStatsByOption').set(d.downloadStatsByOption);toast('Restore berhasil')}catch(x){toast('Restore gagal: '+x.message)}e.target.value=''};
-$('clearSkins').onclick=async()=>{if(!confirm('Yakin hapus SEMUA skin? Pastikan sudah punya backup.'))return;if(!confirm('Konfirmasi terakhir: semua siteConfig/skins akan dihapus.'))return;await db.ref('siteConfig/skins').remove();toast('Semua skin dihapus')};
+let visitorData={};
+function visitorDate(ts){if(!ts)return '-';try{return new Date(Number(ts)).toLocaleString('id-ID',{dateStyle:'medium',timeStyle:'short'})}catch(e){return '-'}}
+function renderVisitors(){
+ const q=String($('visitorSearch')?.value||'').toLowerCase().trim();
+ const now=Date.now();
+ const arr=Object.values(visitorData||{}).filter(x=>x&&x.name).sort((a,b)=>Number(b.lastSeen||0)-Number(a.lastSeen||0));
+ const filtered=arr.filter(x=>!q||String(x.name).toLowerCase().includes(q));
+ const online=arr.filter(x=>now-Number(x.lastSeen||0)<5*60*1000).length;
+ $('visitorTotal').textContent=arr.length.toLocaleString('id-ID');$('visitorOnline').textContent=online.toLocaleString('id-ID');
+ $('visitorStatus').textContent='● REALTIME AKTIF';$('visitorStatus').className='badge ok';
+ const el=$('visitorList');
+ el.innerHTML=filtered.length?filtered.map(x=>{const isOnline=now-Number(x.lastSeen||0)<5*60*1000;return `<div class="visitor-item"><div class="visitor-head"><span class="visitor-name">${esc(x.name)}</span><span class="${isOnline?'visitor-online':'visitor-offline'}">${isOnline?'● ONLINE':'○ OFFLINE'}</span></div><div class="visitor-meta">Pertama terdaftar: ${visitorDate(x.firstSeen)}<br>Terakhir terlihat: ${visitorDate(x.lastSeen)}</div></div>`}).join(''):'<div class="visitor-empty">Tidak ada nama yang cocok.</div>';
+}
+$('visitorSearch').oninput=renderVisitors;
+function watchVisitors(){
+ db.ref('visitorNames').on('value',s=>{visitorData=s.val()||{};renderVisitors()},e=>{const st=$('visitorStatus');if(st){st.textContent='● Gagal membaca';st.className='badge err'};toast('Gagal memuat nama pengunjung: '+e.message)});
+ setInterval(renderVisitors,30000);
+}
+async function exportBackup(){const [a,b,c,d,e,f]=await Promise.all([db.ref('siteConfig').once('value'),db.ref('linkClicks').once('value'),db.ref('searchStats').once('value'),db.ref('downloadStats').once('value'),db.ref('downloadStatsByOption').once('value'),db.ref('visitorNames').once('value')]);const data={version:3,exportedAt:new Date().toISOString(),siteConfig:a.val()||{},linkClicks:b.val()||{},searchStats:c.val()||{},downloadStats:d.val()||{},downloadStatsByOption:e.val()||{},visitorNames:f.val()||{}};const blob=new Blob([JSON.stringify(data,null,2)],{type:'application/json'}),url=URL.createObjectURL(blob),aEl=document.createElement('a');aEl.href=url;aEl.download='ryuza-backup-'+new Date().toISOString().slice(0,10)+'.json';aEl.click();URL.revokeObjectURL(url);toast('Backup berhasil dibuat')}
+$('exportBtn').onclick=exportBackup;$('quickBackup').onclick=()=>{switchTab('backup');exportBackup()};$('restoreBtn').onclick=()=>$('restoreInput').click();$('restoreInput').onchange=async e=>{const f=e.target.files?.[0];if(!f)return;try{const d=JSON.parse(await f.text());if(!d.siteConfig)throw Error('Format backup tidak valid');if(!confirm('Restore akan menimpa siteConfig. Lanjutkan?'))return;await db.ref('siteConfig').set(d.siteConfig);if(d.linkClicks)await db.ref('linkClicks').set(d.linkClicks);if(d.searchStats)await db.ref('searchStats').set(d.searchStats);if(d.downloadStats)await db.ref('downloadStats').set(d.downloadStats);if(d.downloadStatsByOption)await db.ref('downloadStatsByOption').set(d.downloadStatsByOption);if(d.visitorNames)await db.ref('visitorNames').set(d.visitorNames);toast('Restore berhasil')}catch(x){toast('Restore gagal: '+x.message)}e.target.value=''};
+$('clearSkins').onclick=async()=>{if(!confirm('Yakin hapus SEMUA skin? Pastikan sudah punya backup.'))return;if(!confirm('Konfirmasi terakhir: semua siteConfig/skins akan dihapus.'))return;await db.ref('siteConfig/skins').remove();toast('Semua skin dihapus')}
+$('resetAllSubscribe').onclick=async()=>{if(!confirm('Reset SEMUA status subscribe pengunjung? Semua pengunjung akan diminta subscribe ulang.'))return;if(!confirm('Konfirmasi terakhir: reset subscribe 6 jam untuk SEMUA perangkat sekarang?'))return;try{const at=Date.now();await db.ref('siteConfig/subscribeReset').set({at,by:'admin',message:'Reset semua subscribe'});toast('✅ Semua status subscribe berhasil di-reset realtime');}catch(e){toast('❌ Reset subscribe gagal: '+e.message)}};
 $('quickImport').onclick=()=>{$('.tab[data-tab="skins"]').click();$('seedBtn').click()};
 </script>
 </body>

@@ -429,6 +429,39 @@ q.oninput=search;x.onclick=()=>{q.value='';q.focus();search()};search();
     if(isNew){const badge=document.createElement('span');badge.className='new-badge';badge.textContent='BARU';el.appendChild(badge)}
   });
 })();
+/* ===== Registrasi nama pengunjung realtime ===== */
+(function(){
+  const NAME_KEY='ryuzaVisitorName';
+  const ID_KEY='ryuzaVisitorId';
+  const input=document.getElementById('visitorName');
+  if(!input)return;
+  function get(k){try{return localStorage.getItem(k)||''}catch(e){return ''}}
+  function set(k,v){try{localStorage.setItem(k,v)}catch(e){}}
+  let visitorId=get(ID_KEY);
+  if(!visitorId){visitorId='v-'+Date.now().toString(36)+'-'+Math.random().toString(36).slice(2,10);set(ID_KEY,visitorId)}
+  function clean(v){return String(v||'').trim().replace(/\s+/g,' ').slice(0,40)}
+  function syncName(){
+    const name=clean(input.value||get(NAME_KEY));
+    if(!name||!window.firebase)return;
+    try{
+      const CFG={authDomain:'ryuza-official.firebaseapp.com',databaseURL:'https://ryuza-official-default-rtdb.firebaseio.com',projectId:'ryuza-official'};
+      let app;
+      try{app=firebase.app('ryuza-visitors')}catch(e){app=firebase.initializeApp(CFG,'ryuza-visitors')}
+      const db=app.database();
+      const ref=db.ref('visitorNames/'+visitorId);
+      ref.transaction(function(current){
+        current=current&&typeof current==='object'?current:{};
+        return {...current,name,visitorId,firstSeen:current.firstSeen||firebase.database.ServerValue.TIMESTAMP,lastSeen:firebase.database.ServerValue.TIMESTAMP};
+      }).catch(()=>{});
+      set(NAME_KEY,name);
+    }catch(e){}
+  }
+  input.addEventListener('change',syncName);
+  input.addEventListener('blur',syncName);
+  document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='visible')syncName()});
+  window.addEventListener('load',()=>setTimeout(syncName,700));
+  setInterval(()=>{if(document.visibilityState==='visible')syncName()},120000);
+})();
 /* ===== Wajib Subscribe setiap 6 jam ===== */
 (function(){
   const popup=document.getElementById('ryuzaPopup');
@@ -456,7 +489,8 @@ q.oninput=search;x.onclick=()=>{q.value='';q.focus();search()};search();
   function setItem(k,v){try{localStorage.setItem(k,v)}catch(e){}}
   function removeItem(k){try{localStorage.removeItem(k)}catch(e){}}
   function getName(){return getItem(NAME_KEY)}
-  function saveName(v){setItem(NAME_KEY,v)}
+  function saveName(v){setItem(NAME_KEY,v);try{window.dispatchEvent(new CustomEvent('ryuza:name-saved',{detail:{name:v}}))}catch(e){}}
+  window.addEventListener('ryuza:name-saved',function(){try{document.getElementById('visitorName')?.dispatchEvent(new Event('change'))}catch(e){}});
   function getUnlockTime(){return Number(getItem(UNLOCK_KEY)||0)}
   function saveUnlockTime(){setItem(UNLOCK_KEY,String(Date.now()))}
   function getSub1(){return getItem(SUB1_KEY)==='1'}
@@ -805,6 +839,36 @@ document.querySelectorAll('.replace-dropdown').forEach(box => {
 </script>
 <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
 <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
+<script>
+/* ===== Admin realtime reset semua subscribe ===== */
+(function(){
+  const CFG={authDomain:'ryuza-official.firebaseapp.com',databaseURL:'https://ryuza-official-default-rtdb.firebaseio.com',projectId:'ryuza-official'};
+  const RESET_KEY='ryuzaSubscribeRemoteResetAt';
+  const LOCAL_RESET='ryuzaSubscribeLastRemoteResetAt';
+  const SUB1='ryuzaSubscribeClicked1', SUB2='ryuzaSubscribeClicked2', UNLOCK='ryuzaSubscribeUnlockedAt';
+  function lsGet(k){try{return localStorage.getItem(k)||''}catch(e){return ''}}
+  function lsSet(k,v){try{localStorage.setItem(k,String(v))}catch(e){}}
+  function clearSubscribe(){try{localStorage.removeItem(SUB1);localStorage.removeItem(SUB2);localStorage.removeItem(UNLOCK)}catch(e){}}
+  function applyReset(ts){
+    ts=Number(ts||0); if(!ts)return;
+    const old=Number(lsGet(LOCAL_RESET)||0);
+    if(ts<=old)return;
+    lsSet(LOCAL_RESET,ts); clearSubscribe();
+    // Reload agar popup gate langsung kembali ke kondisi awal di semua tab/perangkat.
+    setTimeout(function(){location.reload()},80);
+  }
+  try{
+    let app;
+    try{app=firebase.app('ryuza-subscribe-reset')}
+    catch(e){app=firebase.initializeApp(CFG,'ryuza-subscribe-reset')}
+    const db=app.database();
+    db.ref('siteConfig/subscribeReset').on('value',function(s){
+      const v=s.val()||{};
+      applyReset(v.at||v.timestamp||0);
+    });
+  }catch(e){console.warn('[Ryuza Subscribe Reset] Firebase gagal',e)}
+})();
+</script>
 <script>
 // Penghitung online realtime: setiap tab membuat koneksi dan dihapus otomatis saat terputus.
 (function(){
