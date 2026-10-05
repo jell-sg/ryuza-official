@@ -869,98 +869,44 @@ document.querySelectorAll('.replace-dropdown').forEach(box => {
 })();
 </script>
 <script>
-// Penghitung online realtime: setiap tab membuat koneksi dan dihapus otomatis saat terputus.
+// Pengunjung online realtime berbasis visitorId + onDisconnect.
 (function(){
-  const onlineEl = document.getElementById('onlineCount');
-  if (!onlineEl || !window.firebase) return;
-  try {
-    const appName = 'ryuza-presence-' + Math.random().toString(36).slice(2);
-    const app = firebase.initializeApp({
-      authDomain: 'ryuza-official.firebaseapp.com',
-      databaseURL: 'https://ryuza-official-default-rtdb.firebaseio.com',
-      projectId: 'ryuza-official'
-    }, appName);
-    const presenceRef = app.database().ref('onlineUsers').push();
-    app.database().ref('.info/connected').on('value', function(snap) {
-      if (snap.val() !== true) return;
-      presenceRef.onDisconnect().remove().then(function(){ return presenceRef.set(true); })
-        .catch(function(err){ console.warn('Presence tidak dapat disimpan:', err); });
+  const onlineEl=document.getElementById('onlineCount');
+  if(!window.firebase)return;
+  try{
+    const CFG={authDomain:'ryuza-official.firebaseapp.com',databaseURL:'https://ryuza-official-default-rtdb.firebaseio.com',projectId:'ryuza-official'};
+    const appName='ryuza-presence-'+Math.random().toString(36).slice(2);
+    const app=firebase.initializeApp(CFG,appName),db=app.database();
+    let visitorId='';
+    let visitorName='';
+    try{visitorId=localStorage.getItem('ryuzaVisitorId')||'';visitorName=localStorage.getItem('ryuzaVisitorName')||''}catch(e){}
+    if(!visitorId){visitorId='v-'+Date.now().toString(36)+'-'+Math.random().toString(36).slice(2,10);try{localStorage.setItem('ryuzaVisitorId',visitorId)}catch(e){}}
+    const presenceRef=db.ref('onlineUsers/'+visitorId);
+    db.ref('.info/connected').on('value',function(snap){
+      if(snap.val()!==true)return;
+      presenceRef.onDisconnect().remove().then(function(){
+        return presenceRef.set({visitorId:visitorId,name:String(visitorName||'Pengunjung').slice(0,40),connectedAt:firebase.database.ServerValue.TIMESTAMP});
+      }).catch(function(err){console.warn('Presence tidak dapat disimpan:',err)});
     });
-    // Suara notifikasi ketika jumlah online bertambah/berkurang.
-    // Browser biasanya memblokir suara otomatis sebelum pengguna berinteraksi.
-    let lastOnlineCount = null;
-    let soundReady = false;
-    let audioCtx = null;
-    function prepareOnlineSound(){
-      if (soundReady) return;
-      try {
-        audioCtx = audioCtx || new (window.AudioContext || window.webkitAudioContext)();
-        if (audioCtx.state === 'suspended') audioCtx.resume();
-        soundReady = true;
-      } catch(e) {}
+    function refreshPresenceName(){
+      try{visitorName=localStorage.getItem('ryuzaVisitorName')||visitorName||'Pengunjung'}catch(e){}
+      presenceRef.update({name:String(visitorName||'Pengunjung').slice(0,40),lastSeen:firebase.database.ServerValue.TIMESTAMP}).catch(function(){});
     }
-    function onlineSound(up){
-      if (!soundReady || !audioCtx) return;
-      try {
-        const now = audioCtx.currentTime;
-        const osc = audioCtx.createOscillator();
-        const gain = audioCtx.createGain();
-        osc.type = 'sine';
-        osc.frequency.setValueAtTime(up ? 880 : 520, now);
-        osc.frequency.exponentialRampToValueAtTime(up ? 1180 : 390, now + 0.10);
-        gain.gain.setValueAtTime(0.0001, now);
-        gain.gain.exponentialRampToValueAtTime(0.045, now + 0.015);
-        gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.13);
-        osc.connect(gain); gain.connect(audioCtx.destination);
-        osc.start(now); osc.stop(now + 0.14);
-      } catch(e) {}
-    }
-    ['click','touchstart','keydown'].forEach(function(evt){
-      window.addEventListener(evt, prepareOnlineSound, {once:false, passive:true});
-    });
-    // Total pengunjung kumulatif. Nilai awal dibuat acak di kisaran 5 jutaan,
-    // lalu bertambah +1 setiap kali halaman dikunjungi. Firebase transaction
-    // menjaga penambahan tetap aman saat beberapa pengunjung datang bersamaan.
-    const visitorsEl = document.getElementById('totalVisitors');
-    if (visitorsEl) {
-      const visitorsRef = app.database().ref('siteVisits');
-      visitorsRef.transaction(function(current) {
-        if (current === null || typeof current === 'undefined') {
-          return 5000000 + Math.floor(Math.random() * 1000000);
-        }
-        const n = Number(current);
-        return Number.isFinite(n) ? Math.floor(n) + 1 : 5000001;
-      }).then(function(result) {
-        if (result && result.snapshot) {
-          visitorsEl.textContent = Number(result.snapshot.val() || 0).toLocaleString('id-ID');
-        }
-      }).catch(function(err) {
-        console.warn('Total pengunjung tidak dapat diperbarui:', err);
-        visitorsEl.textContent = '—';
-      });
+    window.addEventListener('storage',refreshPresenceName);
+    document.addEventListener('visibilitychange',function(){if(document.visibilityState==='visible')refreshPresenceName()});
+    setInterval(function(){if(document.visibilityState==='visible')refreshPresenceName()},30000);
 
-      // Ikuti perubahan angka secara realtime tanpa refresh.
-      visitorsRef.on('value', function(snap) {
-        const n = Number(snap.val());
-        if (Number.isFinite(n)) visitorsEl.textContent = Math.floor(n).toLocaleString('id-ID');
-      });
+    const visitorsEl=document.getElementById('totalVisitors');
+    if(visitorsEl){
+      const visitorsRef=db.ref('siteVisits');
+      visitorsRef.transaction(function(current){
+        if(current===null||typeof current==='undefined')return 5000000+Math.floor(Math.random()*1000000);
+        const n=Number(current);return Number.isFinite(n)?Math.floor(n)+1:5000001;
+      }).catch(function(err){console.warn('Total pengunjung tidak dapat diperbarui:',err);visitorsEl.textContent='—'});
+      visitorsRef.on('value',function(snap){const n=Number(snap.val());if(Number.isFinite(n))visitorsEl.textContent=Math.floor(n).toLocaleString('id-ID')});
     }
-
-    app.database().ref('onlineUsers').on('value', function(snap){
-      const count = snap.numChildren();
-      onlineEl.textContent = count;
-      if (lastOnlineCount !== null && count !== lastOnlineCount) {
-        onlineSound(count > lastOnlineCount);
-      }
-      lastOnlineCount = count;
-    }, function(err){
-      console.warn('Tidak bisa membaca jumlah online:', err);
-      onlineEl.textContent = '—';
-    });
-  } catch (err) {
-    console.warn('Penghitung online gagal dimulai:', err);
-    onlineEl.textContent = '—';
-  }
+    db.ref('onlineUsers').on('value',function(snap){if(onlineEl)onlineEl.textContent=snap.numChildren()||0},function(){if(onlineEl)onlineEl.textContent='—'});
+  }catch(err){console.warn('Penghitung online gagal dimulai:',err);if(onlineEl)onlineEl.textContent='—'}
 })();
 </script>
 <script>

@@ -99,8 +99,8 @@ input:focus,textarea:focus,select:focus{outline:none;border-color:#4a9eff!import
  </div>
  <div class="card">
   <h3 style="margin:0 0 6px">👥 Nama yang Terdaftar di Web</h3>
-  <div class="hint" style="margin-bottom:12px">Daftar ini membaca <b>visitorNames</b> dari Firebase secara realtime. Nama baru akan muncul otomatis tanpa refresh.</div>
-  <div class="visitor-toolbar"><input id="visitorSearch" placeholder="🔎 Cari nama pengunjung..."><span id="visitorStatus" class="badge">● Menunggu...</span></div>
+  <div class="hint" style="margin-bottom:12px">Daftar ini membaca <b>searchStats/visitors</b> dan status <b>onlineUsers</b> dari Firebase secara realtime. Nama dan status online berubah otomatis tanpa refresh.</div>
+  <div class="visitor-toolbar"><input id="visitorSearch" placeholder="🔎 Cari nama pengunjung..."><span id="visitorStatus" class="badge">● Menunggu...</span><button class="danger" id="clearVisitors">🗑️ Hapus Semua Nama</button></div>
   <div id="visitorList" class="visitor-list"><div class="visitor-empty">Memuat data...</div></div>
  </div>
 </section>
@@ -190,22 +190,34 @@ async function importIndexText(txt){if(Object.keys(items).length&&!confirm('Data
 $('seedBtn').onclick=async()=>{try{$('seedBtn').disabled=true;$('seedBtn').textContent='Mengambil...';const r=await fetch('./index.html?seed='+Date.now());if(!r.ok)throw Error('index.html tidak bisa dibaca');await importIndexText(await r.text())}catch(e){if(location.protocol==='file:')$('fileInput').click();else toast('Gagal: '+e.message)}finally{$('seedBtn').disabled=false;$('seedBtn').textContent='🔄 Ambil dari index.html'}};
 $('pickBtn').onclick=()=>$('fileInput').click();$('fileInput').onchange=async e=>{const f=e.target.files?.[0];if(!f)return;try{await importIndexText(await f.text())}catch(x){toast('Gagal membaca: '+x.message)}e.target.value=''};
 let visitorData={};
+let onlineVisitorData={};
 function visitorDate(ts){if(!ts)return '-';try{return new Date(Number(ts)).toLocaleString('id-ID',{dateStyle:'medium',timeStyle:'short'})}catch(e){return '-'}}
 function renderVisitors(){
  const q=String($('visitorSearch')?.value||'').toLowerCase().trim();
- const now=Date.now();
- const arr=Object.values(visitorData||{}).filter(x=>x&&x.name).sort((a,b)=>Number(b.lastSeen||0)-Number(a.lastSeen||0));
+ const arr=Object.entries(visitorData||{}).map(([id,x])=>({id,...(x||{})})).filter(x=>x&&x.name).sort((a,b)=>Number(b.lastSeen||0)-Number(a.lastSeen||0));
  const filtered=arr.filter(x=>!q||String(x.name).toLowerCase().includes(q));
- const online=arr.filter(x=>now-Number(x.lastSeen||0)<5*60*1000).length;
- $('visitorTotal').textContent=arr.length.toLocaleString('id-ID');$('visitorOnline').textContent=online.toLocaleString('id-ID');
+ const onlineIds=new Set(Object.keys(onlineVisitorData||{}));
+ const online=arr.filter(x=>onlineIds.has(x.id)).length;
+ $('visitorTotal').textContent=arr.length.toLocaleString('id-ID');
+ $('visitorOnline').textContent=online.toLocaleString('id-ID');
  $('visitorStatus').textContent='● REALTIME AKTIF';$('visitorStatus').className='badge ok';
  const el=$('visitorList');
- el.innerHTML=filtered.length?filtered.map(x=>{const isOnline=now-Number(x.lastSeen||0)<5*60*1000;return `<div class="visitor-item"><div class="visitor-head"><span class="visitor-name">${esc(x.name)}</span><span class="${isOnline?'visitor-online':'visitor-offline'}">${isOnline?'● ONLINE':'○ OFFLINE'}</span></div><div class="visitor-meta">Pertama terdaftar: ${visitorDate(x.firstSeen)}<br>Terakhir terlihat: ${visitorDate(x.lastSeen)}</div></div>`}).join(''):'<div class="visitor-empty">Tidak ada nama yang cocok.</div>';
+ el.innerHTML=filtered.length?filtered.map(x=>{
+   const isOnline=onlineIds.has(x.id);
+   return `<div class="visitor-item"><div class="visitor-head"><span class="visitor-name">${esc(x.name)}</span><span class="${isOnline?'visitor-online':'visitor-offline'}">${isOnline?'● ONLINE':'○ OFFLINE'}</span></div><div class="visitor-meta">ID: ${esc(x.id)}<br>Pertama terdaftar: ${visitorDate(x.firstSeen)}<br>Terakhir terlihat: ${visitorDate(x.lastSeen)}</div></div>`
+ }).join(''):'<div class="visitor-empty">Tidak ada nama yang cocok.</div>';
 }
 $('visitorSearch').oninput=renderVisitors;
+$('clearVisitors').onclick=async()=>{
+ if(!confirm('Yakin hapus SEMUA nama pengunjung dari database?'))return;
+ if(!confirm('Konfirmasi terakhir: semua daftar nama akan dihapus. Data skin dan statistik lain tidak dihapus.'))return;
+ try{await db.ref('searchStats/visitors').remove();toast('🗑️ Semua nama pengunjung berhasil dihapus');}
+ catch(e){toast('❌ Gagal menghapus nama: '+e.message)}
+};
 function watchVisitors(){
  db.ref('searchStats/visitors').on('value',s=>{visitorData=s.val()||{};renderVisitors()},e=>{const st=$('visitorStatus');if(st){st.textContent='● Gagal membaca';st.className='badge err'};toast('Gagal memuat nama pengunjung: '+e.message)});
- setInterval(renderVisitors,30000);
+ db.ref('onlineUsers').on('value',s=>{onlineVisitorData=s.val()||{};renderVisitors()},e=>{console.warn('Gagal memuat status online:',e.message)});
+ setInterval(renderVisitors,10000);
 }
 async function exportBackup(){const [a,b,c,d,e,f]=await Promise.all([db.ref('siteConfig').once('value'),db.ref('linkClicks').once('value'),db.ref('searchStats').once('value'),db.ref('downloadStats').once('value'),db.ref('downloadStatsByOption').once('value'),db.ref('searchStats/visitors').once('value')]);const data={version:3,exportedAt:new Date().toISOString(),siteConfig:a.val()||{},linkClicks:b.val()||{},searchStats:c.val()||{},downloadStats:d.val()||{},downloadStatsByOption:e.val()||{},visitorNames:f.val()||{}};const blob=new Blob([JSON.stringify(data,null,2)],{type:'application/json'}),url=URL.createObjectURL(blob),aEl=document.createElement('a');aEl.href=url;aEl.download='ryuza-backup-'+new Date().toISOString().slice(0,10)+'.json';aEl.click();URL.revokeObjectURL(url);toast('Backup berhasil dibuat')}
 $('exportBtn').onclick=exportBackup;$('quickBackup').onclick=()=>{switchTab('backup');exportBackup()};$('restoreBtn').onclick=()=>$('restoreInput').click();$('restoreInput').onchange=async e=>{const f=e.target.files?.[0];if(!f)return;try{const d=JSON.parse(await f.text());if(!d.siteConfig)throw Error('Format backup tidak valid');if(!confirm('Restore akan menimpa siteConfig. Lanjutkan?'))return;await db.ref('siteConfig').set(d.siteConfig);if(d.linkClicks)await db.ref('linkClicks').set(d.linkClicks);if(d.searchStats)await db.ref('searchStats').set(d.searchStats);if(d.downloadStats)await db.ref('downloadStats').set(d.downloadStats);if(d.downloadStatsByOption)await db.ref('downloadStatsByOption').set(d.downloadStatsByOption);if(d.visitorNames)await db.ref('searchStats/visitors').set(d.visitorNames);toast('Restore berhasil')}catch(x){toast('Restore gagal: '+x.message)}e.target.value=''};
