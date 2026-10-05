@@ -704,4 +704,54 @@ document.querySelectorAll('.replace-dropdown').forEach(box => {
   });
 
 })();
-</script></body></html>
+</script><script id="ryuza-admin-config">
+/* Ryuza Admin Config: link/skin dapat diubah dari admin.html tanpa mengedit daftar skin di file ini. */
+(()=>{
+ const DB='https://ryuza-official-default-rtdb.firebaseio.com';
+ const slug=x=>String(x||'').replace(/📌|🆕|BARU|No Password/gi,' ').replace(/\s+/g,' ').trim().toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'').slice(0,100);
+ const esc=x=>String(x??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+ async function getConfig(){const r=await fetch(DB+'/siteConfig.json',{cache:'no-store'});if(!r.ok)throw Error('HTTP '+r.status);return await r.json()||{}}
+ function applySettings(s){
+   const links=[...document.querySelectorAll('.top-nav a')];
+   const find=t=>links.find(a=>a.textContent.toLowerCase().includes(t));
+   if(s.requestFree&&find('request free'))find('request free').href=s.requestFree;
+   if(s.requestPaid&&find('request berbayar'))find('request berbayar').href=s.requestPaid;
+   if(s.youtube&&find('youtube'))find('youtube').href=s.youtube;
+   const tut=document.querySelector('.tutorial a.btn');if(tut&&s.tutorial)tut.href=s.tutorial;
+   const wa=document.querySelector('#reportWhatsApp');
+   if(wa&&s.whatsapp){
+     const update=()=>{const skin=document.getElementById('reportSkin')?.value.trim()||'Nolan 11.11';const rep=document.getElementById('reportReplace')?.value.trim()||'Default';const note=document.getElementById('reportNote')?.value.trim()||'Link error / tidak bisa dibuka';wa.href='https://wa.me/'+String(s.whatsapp).replace(/\D/g,'')+'?text='+encodeURIComponent(`Halo Ryuza Official, saya mau report link error.\nSkin: ${skin}\nReplace: ${rep}\nKeterangan: ${note}`)};
+     window.updateReportWhatsApp=update;update();
+   }
+   if(s.channel){document.querySelectorAll('.popup-action').forEach(a=>{if(a.textContent.includes('WHATSAPP'))a.href=s.channel})}
+   const skip=document.querySelector('.skip');
+   if(skip){skip.style.display=s.skipEnabled===false?'none':'';const price=skip.querySelector('.price');if(price&&s.skipPrice)price.innerHTML=s.skipPrice+' <span>/ Replace</span>'}
+   if(s.notice){const n=document.getElementById('uploadNotice');if(n){const first=n.firstChild;if(first)first.textContent=s.notice}}
+   if(s.skipPrice){document.querySelectorAll('#paymentPopup b').forEach(b=>{if(b.textContent.includes('Rp'))b.textContent=s.skipPrice+' per replace'})}
+ }
+ function setCard(card,data){
+   if(data.active===false){card.style.display='none';return}
+   card.style.display='';
+   const sel=card.querySelector('.replace-select'),btn=card.querySelector('.replace-download');if(!sel||!btn)return;
+   sel.innerHTML='';(data.replaces||[]).forEach((r,i)=>{const o=document.createElement('option');o.dataset.label=r.label||('Replace '+(i+1));o.textContent=r.label||('Replace '+(i+1));o.value=r.url||'';if(i===0)o.selected=true;sel.appendChild(o)});
+   const update=()=>{const o=sel.options[sel.selectedIndex];if(!o)return;btn.href=o.value;btn.textContent='⬇️ DOWNLOAD '+(o.dataset.label||o.textContent).toUpperCase()};
+   sel.onchange=update;update();
+   if(data.new){let title=card.querySelector('.hero-title-text');if(title&&!title.querySelector('.new-badge')){const b=document.createElement('span');b.className='new-badge';b.textContent='BARU';title.appendChild(b)}}
+ }
+ function addCard(data){
+   if(data.active===false)return;
+   const list=document.getElementById('list');if(!list)return;
+   const card=document.createElement('div');card.className='card skin';card.dataset.search=(data.name+' '+(data.replaces||[]).map(x=>x.label).join(' ')).toLowerCase();
+   const icon=data.icon||'';const hero=data.hero||data.name.split(' ')[0];
+   card.innerHTML=`<div class="title"><div class="hero-title"><a class="hero-icon-link" href="https://mobile-legends.fandom.com/wiki/${encodeURIComponent(hero.replace(/ /g,'_'))}" rel="noopener" target="_blank"><img alt="${esc(hero)}" class="hero-icon" data-hero="${esc(hero)}" loading="lazy" src="${esc(icon)}"></a><span class="hero-title-text">📌 ${esc(data.name)}</span></div></div><div class="replace-dropdown" style="margin-top:12px"><label style="display:block;font-size:13px;font-weight:bold;margin-bottom:6px">🔗 Pilih Replace</label><select class="replace-select" style="width:100%;padding:11px;border-radius:9px;border:1px solid #35445a;background:#080d15;color:#fff;font-size:14px"></select><a class="btn replace-download" href="#" rel="noopener" style="display:block;margin-top:10px;text-align:center" target="_blank">⬇️ DOWNLOAD</a></div>`;
+   list.appendChild(card);setCard(card,data);
+   if(data.new){const title=card.querySelector('.hero-title-text');const b=document.createElement('span');b.className='new-badge';b.textContent='BARU';title.appendChild(b)}
+   // Statistik klik untuk kartu baru.
+   const sel=card.querySelector('.replace-select'),btn=card.querySelector('.replace-download');
+   btn.addEventListener('click',async e=>{e.preventDefault();const label=sel.options[sel.selectedIndex]?.dataset.label||'download';const key=(data.name+'-'+label).toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'').slice(0,140);const dest=btn.href;window.open(dest,'_blank','noopener');try{const u=DB+'/linkClicks/'+encodeURIComponent(key)+'.json';const r=await fetch(u);const old=await r.json()||{};await fetch(u,{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify({...old,count:Number(old.count||0)+1,updatedAt:Date.now()})})}catch(err){console.warn('Klik belum tersimpan',err)}});
+ }
+ async function init(){try{const cfg=await getConfig();applySettings(cfg.settings||{});const skins=cfg.skins||{};const cards=[...document.querySelectorAll('.card.skin')];const used={};cards.forEach(card=>{const raw=card.querySelector('.hero-title-text')?.textContent||card.querySelector('.title')?.textContent||'';const base=slug(raw);used[base]=(used[base]||0)+1;const id=used[base]===1?base:base+'-'+used[base];if(skins[id])setCard(card,skins[id]);});const existing=new Set(cards.map(card=>{const raw=card.querySelector('.hero-title-text')?.textContent||'';return slug(raw)}));Object.values(skins).forEach(data=>{if(!existing.has(data.id.replace(/-\d+$/,''))&&data.active!==false)addCard(data)});const q=document.getElementById('q');if(q)q.dispatchEvent(new Event('input',{bubbles:true}));}catch(e){console.warn('Admin config tidak dimuat; halaman memakai data bawaan.',e)}}
+ if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init);else init();
+})();
+</script>
+</body></html>
