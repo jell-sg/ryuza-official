@@ -49,6 +49,7 @@ input:focus,textarea:focus,select:focus{outline:none;border-color:#4a9eff!import
  <button class="tab" data-tab="backup">💾 Backup</button>
  <button class="tab" data-tab="analytics">📈 Analytics</button>
  <button class="tab" data-tab="indexFeatures">🎛️ Index Features</button>
+ <button class="tab" data-tab="requests">📨 Request Script <span id="requestCountBadge" class="badge" style="display:none;margin-left:5px">0</span></button>
 </nav>
 
 <section id="dashboard" class="panel active">
@@ -121,6 +122,27 @@ input:focus,textarea:focus,select:focus{outline:none;border-color:#4a9eff!import
  <div class="analytics-grid"><div class="card"><h3 style="margin:0 0 8px">🔥 Skin Trending</h3><div id="trendingList" class="trend-list"><div class="visitor-empty">Memuat...</div></div></div><div class="card"><h3 style="margin:0 0 8px">🔔 Notifikasi Realtime</h3><div id="notificationList" class="notification-list"><div class="visitor-empty">Memuat...</div></div></div></div>
  <div class="card"><h3 style="margin:0 0 8px">👤 Detail Pengunjung</h3><div class="visitor-toolbar"><select id="detailVisitor"><option value="">Pilih pengunjung...</option></select></div><div id="visitorDetail" class="detail-box">Pilih nama untuk melihat statistik pengunjung.</div></div>
 </section>
+
+
+<section id="requests" class="panel">
+ <div class="cards">
+  <div class="stat"><div class="l">REQUEST MENUNGGU</div><div class="v" id="requestPendingCount">0</div></div>
+  <div class="stat"><div class="l">STATUS</div><div class="v" style="font-size:18px" id="requestConnection">MENUNGGU</div></div>
+ </div>
+ <div class="card">
+  <div style="display:flex;justify-content:space-between;gap:10px;align-items:center;flex-wrap:wrap">
+   <div><h3 style="margin:0 0 5px">📨 Request Script Skin</h3><div class="hint">Request dari pengunjung tampil realtime. Klik <b>SELESAI</b> untuk mengirim notifikasi ke kotak masuk pengunjung.</div></div>
+   <button class="secondary" id="requestReloadBtn">↻ Muat Ulang</button>
+  </div>
+  <div id="requestAdminMsg" class="notice" style="margin-top:12px">Menunggu koneksi request...</div>
+  <div id="requestList" class="request-admin-list" style="display:grid;gap:10px;margin-top:12px"><div class="visitor-empty">Belum ada request.</div></div>
+ </div>
+</section>
+<style>
+.request-item{padding:15px;border:1px solid #29415d;border-radius:16px;background:linear-gradient(145deg,#0d1928,#0a1320)}
+.request-item:hover{border-color:#4476a4}
+.request-head{display:flex;justify-content:space-between;gap:10px;align-items:flex-start}.request-name,.request-email{font-weight:900;color:#fff}.request-time{font-size:10px;color:#71859b;margin-top:4px}.request-status{padding:5px 8px;border-radius:999px;background:#5b4012;color:#ffd779;font-size:9px;font-weight:900;white-space:nowrap}.request-content{margin-top:11px;padding:11px;border-radius:12px;background:#09121e;color:#bfd0e2;font-size:12px;line-height:1.6;white-space:pre-wrap}.request-meta{margin-top:8px;color:#7f95aa;font-size:10px}.request-actions{display:flex;gap:8px;margin-top:11px;flex-wrap:wrap}.request-actions button{border:1px solid #34516e;border-radius:10px;padding:9px 12px;background:#112238;color:#fff;font-weight:900;font-size:11px;cursor:pointer}.request-actions .req-done{background:linear-gradient(135deg,#176b50,#114b3a);border-color:#2b966e}.request-actions .req-delete{background:#321722;border-color:#6a3142}.request-admin-note{width:100%;min-height:52px;resize:vertical;border:1px solid #2a4662;border-radius:10px;background:#08131f;color:#fff;padding:9px;font:inherit;font-size:11px;outline:none}.request-admin-note:focus{border-color:#4da5df}
+</style>
 
 <section id="indexFeatures" class="panel">
  <div class="card">
@@ -340,6 +362,43 @@ $('exportBtn').onclick=exportBackup;$('quickBackup').onclick=()=>{switchTab('bac
 $('clearSkins').onclick=async()=>{if(!confirm('Yakin hapus SEMUA skin? Pastikan sudah punya backup.'))return;if(!confirm('Konfirmasi terakhir: semua siteConfig/skins akan dihapus.'))return;await db.ref('siteConfig/skins').remove();toast('Semua skin dihapus')}
 $('resetAllSubscribe').onclick=async()=>{if(!confirm('Reset SEMUA status subscribe pengunjung? Semua pengunjung akan diminta subscribe ulang.'))return;if(!confirm('Konfirmasi terakhir: reset subscribe 6 jam untuk SEMUA perangkat sekarang?'))return;try{const at=Date.now();await db.ref('siteConfig/settings/subscribeResetAt').set(at);toast('✅ Semua status subscribe berhasil di-reset realtime');}catch(e){toast('❌ Reset subscribe gagal: '+e.message)}};
 $('quickImport').onclick=()=>{$('.tab[data-tab="skins"]').click();$('seedBtn').click()};
+
+/* ===== RYUZA_REQUEST_ADMIN_FINAL ===== */
+(function(){
+ const list=$('requestList'),msg=$('requestAdminMsg'),count=$('requestPendingCount'),conn=$('requestConnection'),badge=$('requestCountBadge');
+ if(!list||!db)return;
+ let cache={}; let bound=false;
+ const escReq=v=>String(v??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
+ const time=v=>v?new Date(Number(v)).toLocaleString('id-ID',{dateStyle:'medium',timeStyle:'short'}):'-';
+ function render(){
+   const arr=Object.entries(cache).map(([key,data])=>({key,data:data||{}})).filter(x=>x.data.status!=='selesai').sort((a,b)=>Number(b.data.createdAt||0)-Number(a.data.createdAt||0));
+   count.textContent=arr.length.toLocaleString('id-ID'); badge.textContent=arr.length>9?'9+':arr.length; badge.style.display=arr.length?'inline-flex':'none';
+   if(!arr.length){list.innerHTML='<div class="visitor-empty">🎉 Tidak ada request baru.</div>';msg.textContent='Tidak ada request yang menunggu.';return}
+   msg.textContent=arr.length+' request menunggu.';
+   list.innerHTML=arr.map(({key,data})=>`<div class="request-item" data-request-id="${escReq(key)}">
+    <div class="request-head"><div><div class="request-name">👤 ${escReq(data.name||'Pengunjung')}</div><div class="request-time">${time(data.createdAt)} · ID: ${escReq(data.visitorId||'-')}</div></div><span class="request-status">BARU</span></div>
+    <div class="request-meta">Skin: <b>${escReq(data.skin||'-')}</b>${data.replace?' · Replace: <b>'+escReq(data.replace)+'</b>':''}</div>
+    <div class="request-content">${escReq(data.message||'Request script skin')}</div>
+    <textarea class="request-admin-note" data-note placeholder="Pesan untuk pengunjung (opsional), contoh: Script sudah selesai, silakan cek kotak masuk."></textarea>
+    <div class="request-actions"><button class="req-done">✓ SELESAI & KIRIM NOTIFIKASI</button><button class="req-delete">🗑️ HAPUS</button></div>
+   </div>`).join('');
+   list.querySelectorAll('.req-done').forEach(btn=>btn.onclick=async()=>{
+     const box=btn.closest('.request-item'),key=box.dataset.requestId,note=box.querySelector('[data-note]').value.trim();
+     btn.disabled=true;btn.textContent='⏳ MENYIMPAN...';
+     try{await db.ref('scriptRequests/'+key).update({status:'selesai',adminMessage:note||'Admin sudah menyelesaikan request kamu.',updatedAt:firebase.database.ServerValue.TIMESTAMP,updatedBy:auth.currentUser?.email||'admin'});toast('✅ Request selesai. Notifikasi dikirim ke kotak masuk pengunjung.')}catch(e){btn.disabled=false;btn.textContent='✓ SELESAI & KIRIM NOTIFIKASI';toast('❌ Gagal: '+e.message)}
+   });
+   list.querySelectorAll('.req-delete').forEach(btn=>btn.onclick=async()=>{const box=btn.closest('.request-item'),key=box.dataset.requestId;if(!confirm('Hapus request ini?'))return;try{await db.ref('scriptRequests/'+key).remove();toast('🗑️ Request dihapus')}catch(e){toast('❌ Gagal: '+e.message)}});
+ }
+ function start(){
+   if(bound)return;bound=true;
+   conn.textContent='REALTIME';conn.style.color='#79efb8';
+   db.ref('scriptRequests').on('value',snap=>{cache=snap.val()||{};render()},e=>{conn.textContent='GAGAL';conn.style.color='#ff718c';msg.textContent='Firebase request gagal: '+e.message;toast('❌ Request Script: '+e.message)});
+ }
+ $('requestReloadBtn')?.addEventListener('click',()=>{db.ref('scriptRequests').once('value').then(s=>{cache=s.val()||{};render();toast('↻ Request dimuat ulang')}).catch(e=>toast('❌ '+e.message))});
+ const oldSwitch=window.switchTab;
+ // Mulai juga saat panel request dibuka; listener realtime tetap aktif setelahnya.
+ start();
+})();
 </script>
 </body>
 </html>
