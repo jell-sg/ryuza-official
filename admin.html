@@ -385,7 +385,7 @@ $('quickImport').onclick=()=>{$('.tab[data-tab="skins"]').click();$('seedBtn').c
    list.querySelectorAll('.req-done').forEach(btn=>btn.onclick=async()=>{
      const box=btn.closest('.request-item'),key=box.dataset.requestId,note=box.querySelector('[data-note]').value.trim();
      btn.disabled=true;btn.textContent='⏳ MENYIMPAN...';
-     try{await db.ref('scriptRequests/'+key).update({status:'selesai',adminMessage:note||'Admin sudah menyelesaikan request kamu.',updatedAt:firebase.database.ServerValue.TIMESTAMP,updatedBy:auth.currentUser?.email||'admin'});toast('✅ Request selesai. Notifikasi dikirim ke kotak masuk pengunjung.')}catch(e){btn.disabled=false;btn.textContent='✓ SELESAI & KIRIM NOTIFIKASI';toast('❌ Gagal: '+e.message)}
+     try{await db.ref('scriptRequests/'+key).update({status:'selesai',adminMessage:note||'Admin sudah menyelesaikan request kamu.',updatedAt:firebase.database.ServerValue.TIMESTAMP,updatedBy:'admin'});toast('✅ Request selesai. Notifikasi dikirim ke kotak masuk pengunjung.')}catch(e){btn.disabled=false;btn.textContent='✓ SELESAI & KIRIM NOTIFIKASI';toast('❌ Gagal: '+e.message)}
    });
    list.querySelectorAll('.req-delete').forEach(btn=>btn.onclick=async()=>{const box=btn.closest('.request-item'),key=box.dataset.requestId;if(!confirm('Hapus request ini?'))return;try{await db.ref('scriptRequests/'+key).remove();toast('🗑️ Request dihapus')}catch(e){toast('❌ Gagal: '+e.message)}});
  }
