@@ -907,6 +907,35 @@ document.querySelectorAll('.replace-dropdown').forEach(box => {
 <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
 <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
 <script>
+/* ===== LIVE ACTIVITY FIX - aktif setelah Firebase siap ===== */
+(function(){
+  const CFG={authDomain:'ryuza-official.firebaseapp.com',databaseURL:'https://ryuza-official-default-rtdb.firebaseio.com',projectId:'ryuza-official'};
+  const get=k=>{try{return localStorage.getItem(k)||''}catch(e){return ''}};
+  const clean=v=>String(v||'').replace(/\s+/g,' ').trim().slice(0,160);
+  function init(){
+    try{
+      let app;
+      try{app=firebase.app('ryuza-activity-fixed')}catch(e){app=firebase.initializeApp(CFG,'ryuza-activity-fixed')}
+      const db=app.database();
+      window.ryuzaLogActivity=function(type,title,detail){
+        const visitorId=get('ryuzaVisitorId'),name=clean(get('ryuzaVisitorName'))||'Pengunjung';
+        if(!visitorId)return Promise.resolve();
+        const data={visitorId,name,type:clean(type)||'ACTIVITY',title:clean(title)||'-',detail:clean(detail)||'',at:firebase.database.ServerValue.TIMESTAMP};
+        return db.ref('searchStats/activityLog').push(data).catch(err=>console.warn('[Ryuza Activity] gagal:',err));
+      };
+      window.ryuzaSyncVisitorName=function(){
+        const visitorId=get('ryuzaVisitorId'),name=clean(get('ryuzaVisitorName'));
+        if(!visitorId||!name)return;
+        db.ref('searchStats/visitors/'+visitorId).update({visitorId,name,lastSeen:firebase.database.ServerValue.TIMESTAMP}).catch(()=>{});
+      };
+      window.ryuzaSyncVisitorName();
+      console.log('[Ryuza Activity] aktif');
+    }catch(e){console.warn('[Ryuza Activity] init gagal',e);setTimeout(init,1000)}
+  }
+  if(window.firebase)init();else setTimeout(init,500);
+})();
+</script>
+<script>
 /* ===== Admin realtime reset semua subscribe ===== */
 (function(){
   const CFG={authDomain:'ryuza-official.firebaseapp.com',databaseURL:'https://ryuza-official-default-rtdb.firebaseio.com',projectId:'ryuza-official'};
