@@ -758,4 +758,62 @@ document.querySelectorAll('.replace-dropdown').forEach(box => {
   ref.on('value',snap=>apply(snap.val()),err=>console.error('[Ryuza RTDB] gagal membaca siteConfig/skins:',err));
 })();
 </script>
+
+<script id="ryuza-site-settings">
+(function(){
+  const CFG={authDomain:'ryuza-official.firebaseapp.com',databaseURL:'https://ryuza-official-default-rtdb.firebaseio.com',projectId:'ryuza-official'};
+  if(!window.firebase)return;
+  let app;
+  try{app=firebase.app('ryuza-site-settings');}catch(e){try{app=firebase.initializeApp(CFG,'ryuza-site-settings')}catch(err){console.error('[Ryuza Settings] init gagal',err);return;}}
+  const db=app.database();
+  const clean=s=>String(s||'').replace(/^[\s📌•·—–:-]+/,'').replace(/\s+/g,' ').trim();
+  const initials=name=>{const t=clean(name).replace(/[^\p{L}\p{N}\s]/gu,' ').trim();if(!t)return 'R';const a=t.split(/\s+/).filter(Boolean);return (a.length===1?a[0].slice(0,2):a.slice(0,2).map(x=>x[0])).join('').toUpperCase().slice(0,2)};
+  const esc=s=>String(s??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
+  function iconSvg(text){const v=esc(text||'R');return 'data:image/svg+xml;charset=UTF-8,'+encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 160 160"><defs><linearGradient id="g" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#17365a"/><stop offset="1" stop-color="#0a1220"/></linearGradient></defs><rect width="160" height="160" rx="80" fill="url(#g)"/><circle cx="80" cy="80" r="58" fill="none" stroke="#69c9ff" stroke-width="3" opacity=".9"/><text x="80" y="95" text-anchor="middle" font-family="Arial,sans-serif" font-size="42" font-weight="800" fill="#fff">${v}</text></svg>`)}
+  function applyIconMode(settings){
+    const mode=settings?.iconMode||'initials';
+    document.querySelectorAll('.skin').forEach(card=>{
+      const img=card.querySelector('.hero-icon'), title=clean(card.querySelector('.hero-title-text')?.textContent||card.querySelector('.title')?.textContent||'Skin');
+      if(!img)return;
+      const custom=card.dataset.iconText||'';
+      if(mode==='hero'){
+        img.style.display='';
+        if(img.dataset.originalSrc)img.src=img.dataset.originalSrc;
+      }else{
+        if(!img.dataset.originalSrc)img.dataset.originalSrc=img.src;
+        img.src=iconSvg(custom||initials(title));
+        img.alt=custom||initials(title);
+        img.closest('.hero-icon-link')?.removeAttribute('href');
+        img.closest('.hero-icon-link')?.setAttribute('title',custom||initials(title));
+      }
+    });
+  }
+  function renderBanner(settings){
+    const root=document.querySelector('.ryuza-banner'); if(!root)return;
+    const list=Array.isArray(settings?.banners)?settings.banners.filter(x=>x&&x.image):[];
+    if(!list.length)return;
+    const slides=list.map((b,i)=>`<div class="ryuza-slide${i===0?' active':''}"><a href="${esc(b.link||'#')}" target="_blank" rel="noopener" style="display:block;position:absolute;inset:0"><img alt="${esc(b.title||'Ryuza Official')}" loading="lazy" src="${esc(b.image)}" style="width:100%;height:100%;object-fit:cover;object-position:center 35%;display:block"/></a><div class="ryuza-slide-shade"></div><div class="ryuza-slide-caption"><span>${esc(b.kicker||'RYUZA OFFICIAL')}</span><h2>${esc(b.title||'Ryuza Official')}</h2></div></div>`).join('');
+    root.querySelector('.ryuza-slides').innerHTML=slides; root.querySelector('.ryuza-dots').innerHTML='';
+    const ss=[...root.querySelectorAll('.ryuza-slide')], dots=root.querySelector('.ryuza-dots'); let idx=0,timer;
+    ss.forEach((_,i)=>{const d=document.createElement('button');d.type='button';d.className='ryuza-dot'+(i===0?' active':'');d.setAttribute('aria-label','Tampilkan banner '+(i+1));d.onclick=()=>show(i,true);dots.appendChild(d)});
+    const show=(n,manual)=>{idx=(n+ss.length)%ss.length;ss.forEach((x,i)=>x.classList.toggle('active',i===idx));[...dots.children].forEach((x,i)=>x.classList.toggle('active',i===idx));if(manual)restart()};
+    const restart=()=>{clearInterval(timer);if(ss.length>1)timer=setInterval(()=>show(idx+1),5000)};
+    root.querySelector('.prev').onclick=()=>show(idx-1,true);root.querySelector('.next').onclick=()=>show(idx+1,true);show(0);restart();
+  }
+  db.ref('siteConfig/settings').on('value',snap=>{
+    const st=snap.val()||{};
+    if(st.siteTitle){const h=document.querySelector('.header h1');if(h)h.textContent=st.siteTitle}
+    if(st.siteSubtitle){const p=document.querySelector('.header p');if(p)p.textContent=st.siteSubtitle}
+    if(st.bannerEnabled===false){const b=document.querySelector('.ryuza-banner');if(b)b.style.display='none'}else{const b=document.querySelector('.ryuza-banner');if(b)b.style.display=''}
+    renderBanner(st); applyIconMode(st);
+    document.title=st.pageTitle||document.title;
+  },err=>console.warn('[Ryuza Settings] gagal membaca:',err));
+  db.ref('siteConfig/skins').on('value',snap=>{
+    const data=snap.val()||{};
+    Object.entries(data).forEach(([id,item])=>{const card=document.querySelector(`.skin[data-rtdb-id="${CSS.escape(id)}"]`);if(card&&item?.iconText)card.dataset.iconText=item.iconText});
+    db.ref('siteConfig/settings').once('value').then(s=>applyIconMode(s.val()||{})).catch(()=>{});
+  });
+})();
+</script>
+
 </body></html>
