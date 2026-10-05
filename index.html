@@ -289,6 +289,40 @@ const q=document.getElementById('q'),x=document.getElementById('x'),c=document.g
 function search(){const cards=[...document.querySelectorAll('.skin')];let v=q.value.toLowerCase().trim(),n=0;cards.forEach(a=>{let ok=!v||String(a.dataset.search||'').includes(v);a.style.display=ok?'block':'none';if(ok)n++});x.style.display=v?'block':'none';c.textContent=v?n+' skin ditemukan':cards.length+' skin tersedia';e.style.display=n?'none':'block'}
 q.oninput=search;x.onclick=()=>{q.value='';q.focus();search()};search();
 
+/* Statistik pencarian & download Ryuza */
+(function(){
+  const CFG={authDomain:'ryuza-official.firebaseapp.com',databaseURL:'https://ryuza-official-default-rtdb.firebaseio.com',projectId:'ryuza-official'};
+  if(!window.firebase)return;
+  let app;
+  try{app=firebase.app('ryuza-stats');}catch(e){try{app=firebase.initializeApp(CFG,'ryuza-stats')}catch(err){console.warn('[Ryuza Stats] Firebase gagal',err);return;}}
+  const db=app.database();
+  const clean=s=>String(s||'').toLowerCase().trim().replace(/\s+/g,' ');
+  const key=s=>encodeURIComponent(clean(s)).replace(/\./g,'%2E');
+  const trackSearch=()=>{
+    const term=clean(q?.value||'');
+    if(term.length<2)return;
+    const sessionKey='ryuza-search-'+term;
+    try{if(sessionStorage.getItem(sessionKey))return;sessionStorage.setItem(sessionKey,'1')}catch(e){}
+    const ref=db.ref('searchStats/queries/'+key(term));
+    ref.transaction(v=>{v=v&&typeof v==='object'?v:{count:0,term};return {...v,term,count:Number(v.count||0)+1,lastAt:Date.now()}}).catch(()=>{});
+  };
+  q?.addEventListener('keydown',e=>{if(e.key==='Enter')trackSearch()});
+  document.addEventListener('click',e=>{
+    const btn=e.target.closest?.('.replace-download');
+    if(!btn)return;
+    const card=btn.closest('.skin');
+    if(!card)return;
+    const id=card.getAttribute('data-rtdb-id')||'';
+    const title=(card.querySelector('.hero-title-text')?.textContent||card.querySelector('.title')?.textContent||id).trim();
+    if(!id)return;
+    const ref=db.ref('downloadStats/'+id);
+    ref.transaction(v=>{v=v&&typeof v==='object'?v:{};return {...v,title,count:Number(v.count||0)+1,lastAt:Date.now()}}).catch(()=>{});
+    const sel=card.querySelector('.replace-select'),opt=sel?.options?.[sel.selectedIndex],label=(opt?.dataset?.label||opt?.textContent||'Default').trim();
+    const optionRef=db.ref('downloadStatsByOption/'+id+'/'+key(label));
+    optionRef.transaction(v=>{v=v&&typeof v==='object'?v:{};return {...v,label,count:Number(v.count||0)+1,lastAt:Date.now()}}).catch(()=>{});
+  },true);
+})();
+
 // Rapikan nama hero/skin agar konsisten dan mudah dibaca.
 (function cleanSkinNames(){
   const keepUpper=new Set(['KOF','JJK','AOT','YSS','M1','M2','M3','M4','M5','M6','M7','MPL','MSC','FMVP','515','11.11','S2','S3','S4','S5']);
