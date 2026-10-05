@@ -266,6 +266,7 @@ input{background:#0a1321;border-color:#2b405d}input:focus{border-color:#35a7ff;b
 <div class="stat-card"><div class="stat-icon">🟢</div><div><div class="stat-label">ONLINE SEKARANG</div><div class="stat-value" id="onlineCount">1</div><div class="stat-sub">pengguna yang sedang online</div></div></div>
 <div class="stat-card"><div class="stat-icon">⬇️</div><div><div class="stat-label">TOTAL DOWNLOAD</div><div class="stat-value" id="totalDownloads">7.483.217</div><div class="stat-sub">download tercatat</div></div></div>
 <div class="stat-card"><div class="stat-icon">📊</div><div><div class="stat-label">TOTAL SEMUA KLIK</div><div class="stat-value" id="totalAllClicks">0</div><div class="stat-sub">semua klik download</div></div></div>
+<div class="stat-card"><div class="stat-icon">👥</div><div><div class="stat-label">TOTAL PENGUNJUNG</div><div class="stat-value" id="totalVisitors">5.000.000</div><div class="stat-sub">yang mengunjungi situs</div></div></div>
 </div>
 <section aria-label="Skin paling banyak diklik" id="skinLeaderboard" style="margin:10px 0;padding:10px 12px;border:1px solid #29364b;border-radius:12px;background:#0c1422;color:#eef5ff"><div style="display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap"><div><h2 style="margin:0;font-size:14px">🏆 Skin &amp; Replace Terpopuler</h2><p style="margin:3px 0 0;color:#aab9cf;font-size:11px">Peringkat berdasarkan jumlah klik download yang tercatat.</p></div><button id="refreshSkinRanking" style="padding:5px 9px;font-size:11px;border:1px solid #456080;border-radius:8px;background:#14243a;color:#fff;cursor:pointer" type="button">↻ Perbarui</button></div><div style="display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;margin-top:8px"><ol id="skinRankingLeft" style="margin:0;padding-left:22px;display:grid;align-content:start;gap:4px"><li style="color:#aab9cf">Memuat peringkat...</li></ol><ol id="skinRankingRight" start="6" style="margin:0;padding-left:22px;display:grid;align-content:start;gap:4px"></ol></div></section>
 <div id="list"><div class="card skin" data-search="paquito kof revamp no password default basic starlight manny pacquiao spesial fmvp collector spesial mpl">
@@ -581,6 +582,34 @@ document.querySelectorAll('.replace-dropdown').forEach(box => {
     ['click','touchstart','keydown'].forEach(function(evt){
       window.addEventListener(evt, prepareOnlineSound, {once:false, passive:true});
     });
+    // Total pengunjung kumulatif. Nilai awal dibuat acak di kisaran 5 jutaan,
+    // lalu bertambah +1 setiap kali halaman dikunjungi. Firebase transaction
+    // menjaga penambahan tetap aman saat beberapa pengunjung datang bersamaan.
+    const visitorsEl = document.getElementById('totalVisitors');
+    if (visitorsEl) {
+      const visitorsRef = app.database().ref('siteVisits');
+      visitorsRef.transaction(function(current) {
+        if (current === null || typeof current === 'undefined') {
+          return 5000000 + Math.floor(Math.random() * 1000000);
+        }
+        const n = Number(current);
+        return Number.isFinite(n) ? Math.floor(n) + 1 : 5000001;
+      }).then(function(result) {
+        if (result && result.snapshot) {
+          visitorsEl.textContent = Number(result.snapshot.val() || 0).toLocaleString('id-ID');
+        }
+      }).catch(function(err) {
+        console.warn('Total pengunjung tidak dapat diperbarui:', err);
+        visitorsEl.textContent = '—';
+      });
+
+      // Ikuti perubahan angka secara realtime tanpa refresh.
+      visitorsRef.on('value', function(snap) {
+        const n = Number(snap.val());
+        if (Number.isFinite(n)) visitorsEl.textContent = Math.floor(n).toLocaleString('id-ID');
+      });
+    }
+
     app.database().ref('onlineUsers').on('value', function(snap){
       const count = snap.numChildren();
       onlineEl.textContent = count;
