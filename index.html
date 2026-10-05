@@ -321,6 +321,7 @@ input{background:#0a1321;border-color:#2b405d}input:focus{border-color:#35a7ff;b
 #youtubeSubscribe.subscribed,#youtubeSubscribe2.subscribed{opacity:.9;border-color:#35d07f!important;background:linear-gradient(135deg,#123b29,#0b2118)!important;color:#8ff0b7!important}
 #youtubeSubscribe.subscribed,#youtubeSubscribe2.subscribed{box-shadow:0 0 0 1px rgba(53,208,127,.2),0 8px 24px rgba(53,208,127,.08)}
 </style>
+<style id="ryuza-banner-custom-fix">.ryuza-slide>a{background:radial-gradient(circle at 70% 30%,#244b75 0,#101c31 48%,#070b12 100%)!important}.ryuza-slide.banner-image-error>a:after{content:"Banner belum dapat dimuat";position:absolute;inset:0;display:flex;align-items:center;justify-content:center;color:#fff;font-size:clamp(14px,2vw,22px);font-weight:800;opacity:.72}.ryuza-slide-caption{z-index:2}</style>
 </head><body>
 <div class="upload-notice" id="uploadNotice">🆕 Paquito KOF Revamp baru saja di-upload!<small>No Password • 8 pilihan Replace tersedia</small></div>
 <div aria-labelledby="popupTitle" aria-modal="true" class="popup-overlay" id="ryuzaPopup" role="dialog">
@@ -1190,8 +1191,9 @@ document.querySelectorAll('.replace-dropdown').forEach(box => {
     const root=document.querySelector('.ryuza-banner'); if(!root)return;
     const list=Array.isArray(settings?.banners)?settings.banners.filter(x=>x&&x.image):[];
     if(!list.length)return;
-    const slides=list.map((b,i)=>`<div class="ryuza-slide${i===0?' active':''}"><a href="${esc(b.link||'#')}" target="_blank" rel="noopener" style="display:block;position:absolute;inset:0"><img alt="${esc(b.title||'Ryuza Official')}" loading="lazy" src="${esc(b.image)}" style="width:100%;height:100%;object-fit:cover;object-position:center 35%;display:block"/></a><div class="ryuza-slide-shade"></div><div class="ryuza-slide-caption"><span>${esc(b.kicker||'RYUZA OFFICIAL')}</span><h2>${esc(b.title||'Ryuza Official')}</h2></div></div>`).join('');
+    const slides=list.map((b,i)=>{const title=esc(b.title||'Ryuza Official'), image=esc(b.image||'');return `<div class="ryuza-slide${i===0?' active':''}"><a href="${esc(b.link||'#')}" target="_blank" rel="noopener" style="display:block;position:absolute;inset:0;background:radial-gradient(circle at 70% 30%,#244b75 0,#101c31 48%,#070b12 100%)"><img alt="${title}" loading="lazy" src="${image}" data-banner-title="${title}" style="width:100%;height:100%;object-fit:cover;object-position:center 35%;display:block" onerror="this.style.display='none';this.parentElement.classList.add('banner-image-error')"/></a><div class="ryuza-slide-shade"></div><div class="ryuza-slide-caption"><span>${esc(b.kicker||'RYUZA OFFICIAL')}</span><h2>${title}</h2></div></div>`}).join('');
     root.querySelector('.ryuza-slides').innerHTML=slides; root.querySelector('.ryuza-dots').innerHTML='';
+    root.querySelectorAll('.ryuza-slide img').forEach(img=>{const fallback=()=>{img.style.display='none';img.parentElement.classList.add('banner-image-error')};img.addEventListener('error',fallback);if(img.complete&&img.naturalWidth===0)fallback()});
     const ss=[...root.querySelectorAll('.ryuza-slide')], dots=root.querySelector('.ryuza-dots'); let idx=0,timer;
     ss.forEach((_,i)=>{const d=document.createElement('button');d.type='button';d.className='ryuza-dot'+(i===0?' active':'');d.setAttribute('aria-label','Tampilkan banner '+(i+1));d.onclick=()=>show(i,true);dots.appendChild(d)});
     const show=(n,manual)=>{idx=(n+ss.length)%ss.length;ss.forEach((x,i)=>x.classList.toggle('active',i===idx));[...dots.children].forEach((x,i)=>x.classList.toggle('active',i===idx));if(manual)restart()};
