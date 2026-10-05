@@ -1180,7 +1180,18 @@ document.querySelectorAll('.replace-dropdown').forEach(box => {
   console.log('[Ryuza Stats] pencarian & download aktif');
 })();
 </script>
-<!-- RYUZA_ACTIVITY_FINAL -->
+<!-- RYUZA ADVANCED SKIN BADGES --><style>
+.ryuza-skin-badges{position:absolute;top:10px;right:10px;z-index:4;display:flex;gap:5px;flex-wrap:wrap;justify-content:flex-end}.ryuza-skin-badge{font-size:10px;font-weight:900;padding:5px 8px;border-radius:999px;background:#10283b;border:1px solid #315878;box-shadow:0 4px 12px #0005}.ryuza-skin-badge.featured{background:#3a2b0b;border-color:#9b7a25;color:#ffd86b}.ryuza-skin-badge.new{background:#0b3a29;border-color:#24845c;color:#75f0a5}.skin{position:relative}
+</style><script>
+(function(){
+ if(window.__ryuzaAdvancedBadges)return;window.__ryuzaAdvancedBadges=true;
+ const CFG={authDomain:'ryuza-official.firebaseapp.com',databaseURL:'https://ryuza-official-default-rtdb.firebaseio.com',projectId:'ryuza-official'};
+ function esc(v){return String(v??'').replace(/[&<>\"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','\"':'&quot;',"'":'&#39;'}[c]))}
+ function apply(data){Object.entries(data||{}).forEach(([id,x])=>{const card=document.querySelector('.skin[data-rtdb-id="'+CSS.escape(id)+'"]');if(!card)return;let box=card.querySelector('.ryuza-skin-badges');if(!box){box=document.createElement('div');box.className='ryuza-skin-badges';card.appendChild(box)}box.innerHTML=(x?.featured?'<span class="ryuza-skin-badge featured">⭐ PILIHAN ADMIN</span>':'')+(x?.isNew?'<span class="ryuza-skin-badge new">🆕 NEW</span>':'')})}
+ function start(){try{if(!window.firebase||!firebase.database)return setTimeout(start,500);let app;try{app=firebase.app('ryuza-badges')}catch(e){app=firebase.initializeApp(CFG,'ryuza-badges')}app.database().ref('siteConfig/skins').on('value',s=>apply(s.val()||{}));}catch(e){setTimeout(start,1000)}}
+ start();
+})();
+</script><!-- RYUZA_ACTIVITY_FINAL -->
 <script>
 (function(){
   if(window.__ryuzaActivityFinal)return; window.__ryuzaActivityFinal=true;
