@@ -714,7 +714,7 @@ document.querySelectorAll('.replace-dropdown').forEach(box => {
   const db=app.database(), ref=db.ref('siteConfig/skins');
   const slug=text=>String(text||'').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'').slice(0,100);
   const esc=text=>String(text??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
-  const skinWrap=()=>document.querySelector('.container');
+  const skinWrap=()=>document.getElementById('list');
   function updateCard(card,item){
     if(!item) return false;
     const select=card.querySelector('.replace-select'),btn=card.querySelector('.replace-download');
