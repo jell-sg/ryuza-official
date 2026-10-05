@@ -296,99 +296,67 @@ document.querySelectorAll('.replace-dropdown').forEach(function(box){
 });
 </script>
 
-<script type="module">
-/* Statistik klik global menggunakan Firebase Firestore.
-   Isi firebaseConfig dengan konfigurasi project Firebase milik Anda. */
-import { initializeApp } from 'https://ryuza-official-default-rtdb.firebaseio.com/';
-import { getFirestore, doc, getDoc, runTransaction, increment, setDoc } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js';
-
-const firebaseConfig = {
-  apiKey: "ISI_API_KEY",
-  authDomain: "ISI_PROJECT_ID.firebaseapp.com",
-  projectId: "ISI_PROJECT_ID",
-  storageBucket: "ISI_PROJECT_ID.appspot.com",
-  messagingSenderId: "ISI_MESSAGING_SENDER_ID",
-  appId: "ISI_APP_ID"
-};
-
-const CONFIG_READY = firebaseConfig.apiKey !== 'ISI_API_KEY' && firebaseConfig.projectId !== 'ISI_PROJECT_ID';
-let db = null;
-if (CONFIG_READY) {
-  const app = initializeApp(firebaseConfig);
-  db = getFirestore(app);
-} else {
-  console.warn('Firebase belum dikonfigurasi. Isi firebaseConfig untuk mengaktifkan statistik global.');
-}
-
+<script>
+/* Statistik klik global melalui Firebase Realtime Database. */
+const RTDB_URL = 'https://ryuza-official-default-rtdb.firebaseio.com';
 const numberFormat = n => Number(n || 0).toLocaleString('id-ID');
 function stableKey(card, label) {
   const title = card.querySelector('.title')?.textContent.trim() || 'skin';
-  return (title + '-' + label).toLowerCase()
-    .normalize('NFD').replace(/[\u0300-\u036f]/g, '')
+  return (title + '-' + label).toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '')
     .replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '').slice(0, 140);
 }
 function getCountElement(btn) {
   let el = btn.nextElementSibling;
   if (!el || !el.classList.contains('link-click-count')) {
-    el = document.createElement('div');
-    el.className = 'link-click-count loading';
-    el.innerHTML = '👁️ <strong>Memuat klik...</strong>';
-    btn.insertAdjacentElement('afterend', el);
+    el = document.createElement('div'); el.className = 'link-click-count loading';
+    el.textContent = '👁️ Memuat klik...'; btn.insertAdjacentElement('afterend', el);
   }
   return el;
 }
+const countUrl = key => `${RTDB_URL}/linkClicks/${encodeURIComponent(key)}.json`;
 async function showCount(btn) {
-  const card = btn.closest('.skin');
-  if (!card) return;
+  const card = btn.closest('.skin'); if (!card) return;
   const select = card.querySelector('.replace-select');
-  const label = select ? select.options[select.selectedIndex].dataset.label || select.value : 'download';
-  const key = stableKey(card, label);
-  const el = getCountElement(btn);
-  el.dataset.key = key;
-  if (!db) { el.classList.remove('loading'); el.innerHTML = '👁️ <strong>— klik</strong> <span>(atur Firebase)</span>'; return; }
+  const label = select ? (select.options[select.selectedIndex].dataset.label || select.value) : 'download';
+  const key = stableKey(card, label), el = getCountElement(btn); el.dataset.key = key;
   try {
-    const snap = await getDoc(doc(db, 'linkClicks', key));
-    if (el.dataset.key !== key) return;
-    el.classList.remove('loading');
-    el.innerHTML = `👁️ <strong>${numberFormat(snap.exists() ? snap.data().count : 0)} klik</strong>`;
+    const res = await fetch(countUrl(key)); if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    const data = await res.json(); if (el.dataset.key !== key) return;
+    el.classList.remove('loading'); el.innerHTML = `👁️ <strong>${numberFormat(data?.count)} klik</strong>`;
   } catch (err) {
-    console.error('Gagal memuat statistik klik:', err);
-    el.classList.remove('loading'); el.innerHTML = '👁️ <strong>Statistik tidak tersedia</strong>';
+    console.error('Gagal memuat statistik:', err); el.classList.remove('loading');
+    el.innerHTML = '👁️ <strong>Statistik tidak tersedia</strong>';
   }
 }
-
-// Setiap tombol download (termasuk tombol yang berubah saat memilih replace) dihitung terpisah.
+async function incrementCount(key) {
+  const url = countUrl(key);
+  // ETag + If-Match mencegah hitungan tertimpa saat banyak pengunjung klik bersamaan.
+  for (let attempt = 0; attempt < 8; attempt++) {
+    const read = await fetch(url, { headers: { 'X-Firebase-ETag': 'true' } });
+    if (!read.ok) throw new Error(`HTTP ${read.status}`);
+    const etag = read.headers.get('ETag'), old = await read.json();
+    const updated = { ...(old || {}), count: Number(old?.count || 0) + 1, updatedAt: Date.now() };
+    const write = await fetch(url, { method: 'PUT', headers: { 'Content-Type': 'application/json', 'if-match': etag }, body: JSON.stringify(updated) });
+    if (write.status === 412) continue;
+    if (!write.ok) throw new Error(`HTTP ${write.status}`);
+    return updated.count;
+  }
+  throw new Error('Database sibuk, coba lagi.');
+}
 document.querySelectorAll('.replace-dropdown').forEach(box => {
-  const select = box.querySelector('.replace-select');
-  const btn = box.querySelector('.replace-download');
-  const refresh = () => showCount(btn);
-  select.addEventListener('change', refresh);
-  refresh();
+  const select = box.querySelector('.replace-select'), btn = box.querySelector('.replace-download');
+  select?.addEventListener('change', () => showCount(btn)); showCount(btn);
   btn.addEventListener('click', async event => {
     const card = btn.closest('.skin');
     const label = select.options[select.selectedIndex].dataset.label || select.value;
-    const key = stableKey(card, label);
-    const destination = btn.href;
-    // Buka link langsung agar tidak diblokir browser; pencatatan berjalan di latar belakang.
-    event.preventDefault();
-    window.open(destination, '_blank', 'noopener');
-    if (!db) return;
-    const el = getCountElement(btn);
-    el.classList.add('loading');
+    const key = stableKey(card, label), destination = btn.href;
+    event.preventDefault(); window.open(destination, '_blank', 'noopener');
+    const el = getCountElement(btn); el.classList.add('loading');
     try {
-      const ref = doc(db, 'linkClicks', key);
-      await runTransaction(db, async tx => {
-        const snap = await tx.get(ref);
-        if (snap.exists()) tx.update(ref, { count: increment(1), updatedAt: new Date() });
-        else tx.set(ref, { count: 1, updatedAt: new Date() });
-      });
-      const snap = await getDoc(ref);
-      el.dataset.key = key;
-      el.classList.remove('loading');
-      el.innerHTML = `👁️ <strong>${numberFormat(snap.data().count)} klik</strong>`;
+      const count = await incrementCount(key); el.dataset.key = key; el.classList.remove('loading');
+      el.innerHTML = `👁️ <strong>${numberFormat(count)} klik</strong>`;
     } catch (err) {
-      console.error('Gagal menyimpan klik:', err);
-      el.classList.remove('loading');
+      console.error('Gagal menyimpan klik:', err); el.classList.remove('loading');
       el.innerHTML = '👁️ <strong>Klik belum tersimpan</strong>';
     }
   });
