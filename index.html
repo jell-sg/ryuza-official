@@ -918,16 +918,35 @@ function reportVisitorId(){try{return localStorage.getItem('ryuzaVisitorId')||'u
 function reportVisitorName(){try{return(localStorage.getItem('ryuzaVisitorName')||'Pengunjung').trim().slice(0,40)}catch(e){return'Pengunjung'}}
 function openReport(){if(reportPopup)reportPopup.style.display='flex'}
 function closeReport(){if(reportPopup)reportPopup.style.display='none'}
+let reportSending=false;
 async function submitReport(){
- const skin=reportSkin?.value.trim()||'Skin tidak diketahui',replace=reportReplace?.value.trim()||'Default',note=reportNote?.value.trim()||'Link error / tidak bisa dibuka',btn=reportWhatsApp;
- if(!ryuzaReportDB && !initReportFirebase()){alert('Koneksi admin belum siap. Silakan tunggu sebentar lalu coba lagi.');return}
+ const skin=reportSkin?.value.trim()||'Skin tidak diketahui';
+ const replace=reportReplace?.value.trim()||'Default';
+ const note=reportNote?.value.trim()||'Link error / tidak bisa dibuka';
+ const btn=reportWhatsApp;
+ if(reportSending)return;
  if(btn){btn.disabled=true;btn.textContent='⏳ MENGIRIM...'}
+ reportSending=true;
  try{
-  const ref=ryuzaReportDB.ref('scriptRequests').push();
-  await ref.set({type:'link_error',status:'menunggu',name:reportVisitorName(),visitorId:reportVisitorId(),skin,replace,message:note,createdAt:firebase.database.ServerValue.TIMESTAMP,updatedAt:firebase.database.ServerValue.TIMESTAMP});
+  let db=ryuzaReportDB;
+  if(!db){
+   if(!initReportFirebase()) throw new Error('Firebase belum siap. Silakan muat ulang halaman lalu coba lagi.');
+   db=ryuzaReportDB;
+  }
+  if(!db)throw new Error('Koneksi Firebase tidak tersedia.');
+  const ref=db.ref('scriptRequests').push();
+  await Promise.race([
+   ref.set({type:'link_error',status:'menunggu',name:reportVisitorName(),visitorId:reportVisitorId(),skin,replace,message:note,createdAt:firebase.database.ServerValue.TIMESTAMP,updatedAt:firebase.database.ServerValue.TIMESTAMP}),
+   new Promise((_,reject)=>setTimeout(()=>reject(new Error('Waktu pengiriman habis. Periksa Firebase Rules dan koneksi internet.')),10000))
+  ]);
   if(btn)btn.textContent='✅ TERKIRIM KE ADMIN';
-  setTimeout(()=>{closeReport();if(btn){btn.disabled=false;btn.textContent='📨 KIRIM REPORT KE ADMIN'}},700);
- }catch(e){console.error(e);if(btn){btn.disabled=false;btn.textContent='❌ GAGAL, COBA LAGI'}alert('Report gagal dikirim: '+e.message);setTimeout(()=>{if(btn)btn.textContent='📨 KIRIM REPORT KE ADMIN'},1600)}
+  setTimeout(()=>{closeReport();if(btn){btn.disabled=false;btn.textContent='📨 KIRIM REPORT KE ADMIN'}reportSending=false},900);
+ }catch(e){
+  console.error('[Ryuza Report]',e);
+  if(btn){btn.disabled=false;btn.textContent='❌ GAGAL, COBA LAGI'}
+  reportSending=false;
+  alert('Report gagal dikirim: '+(e?.message||'Kesalahan tidak diketahui'));
+ }
 }
 const openReportBtn=document.getElementById('openReport'),reportCloseBtn=document.getElementById('reportClose'),reportCancelBtn=document.getElementById('reportCancel');
 if(openReportBtn)openReportBtn.addEventListener('click',openReport);
