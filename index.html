@@ -353,7 +353,7 @@ input{background:#0a1321;border-color:#2b405d}input:focus{border-color:#35a7ff;b
 .ryuza-arrow{z-index:5;width:42px;height:42px;border-color:rgba(150,210,255,.35);background:rgba(6,16,29,.72);box-shadow:0 8px 20px rgba(0,0,0,.3);transition:.2s ease}.ryuza-arrow:hover{background:#17314d;border-color:#68cfff;transform:translateY(-50%) scale(1.06)}
 .ryuza-dots{z-index:5;bottom:16px;right:22px;padding:6px 8px;border:1px solid rgba(255,255,255,.12);border-radius:99px;background:rgba(4,10,18,.52);backdrop-filter:blur(6px)}
 @media(max-width:600px){.ryuza-banner{aspect-ratio:4/2.9;min-height:205px;border-radius:18px}.ryuza-slide-caption{left:16px;bottom:32px;padding:9px 11px;max-width:80%}.ryuza-slide-caption h2{font-size:22px}.ryuza-arrow{width:34px;height:34px}.ryuza-dots{right:12px;bottom:11px}}
-</style>
+.whatsapp-follow{border-color:rgba(61,220,151,.45)!important}.whatsapp-follow:hover{border-color:rgba(61,220,151,.9)!important;box-shadow:0 10px 28px rgba(37,211,102,.18)}</style>
 </head><body>
 <div class="upload-notice" id="uploadNotice">🆕 Paquito KOF Revamp baru saja di-upload!<small>No Password • 8 pilihan Replace tersedia</small></div>
 <div aria-labelledby="popupTitle" aria-modal="true" class="popup-overlay" id="ryuzaPopup" role="dialog">
@@ -381,6 +381,10 @@ input{background:#0a1321;border-color:#2b405d}input:focus{border-color:#35a7ff;b
       <div class="subscribe-channel-step">
         <a class="popup-action youtube-subscribe youtube-subscribe-2" id="youtubeSubscribe2" href="https://www.youtube.com/@ryuzaofficialr-x5r?sub_confirmation=1" rel="noopener" target="_blank">▶️ BUKA CHANNEL 2</a>
         <button class="subscribe-confirm" id="confirmSubscribe2" type="button" style="display:none">✓ SAYA SUDAH SUBSCRIBE CHANNEL 2</button>
+      </div>
+      <div class="subscribe-channel-step">
+        <a class="popup-action youtube-subscribe whatsapp-follow" id="whatsappFollow" href="https://whatsapp.com/channel/0029VbAR6qO8kyyWG2te832B" rel="noopener" target="_blank">💬 IKUTI SALURAN WHATSAPP</a>
+        <button class="subscribe-confirm" id="confirmWhatsapp" type="button" style="display:none">✓ SAYA SUDAH IKUTI SALURAN WA</button>
       </div>
     </div>
     <div class="subscribe-success" id="subscribeSuccess">
@@ -670,23 +674,27 @@ q.oninput=search;x.onclick=()=>{q.value='';q.focus();search()};search();
   const subscribeBtn2=document.getElementById('youtubeSubscribe2');
   const confirmBtn1=document.getElementById('confirmSubscribe1');
   const confirmBtn2=document.getElementById('confirmSubscribe2');
+  const whatsappBtn=document.getElementById('whatsappFollow');
+  const confirmWhatsapp=document.getElementById('confirmWhatsapp');
   const progressBar=document.getElementById('subscribeProgressBar');
   const progressCount=document.getElementById('subscribeProgressCount');
   const successName=document.getElementById('subscribeWelcomeName');
   const countdown=document.getElementById('subscribeCountdown');
-  if(!popup||!gate||!nameInput||!status||!subscribeBtn||!subscribeBtn2||!progressBar||!progressCount)return;
+  if(!popup||!gate||!nameInput||!status||!subscribeBtn||!subscribeBtn2||!whatsappBtn||!progressBar||!progressCount)return;
 
   const NAME_KEY='ryuzaVisitorName';
   const UNLOCK_KEY='ryuzaSubscribeUnlockedAt';
   const SUB1_KEY='ryuzaSubscribeClicked1';
   const SUB2_KEY='ryuzaSubscribeClicked2';
+  const WA_KEY='ryuzaSubscribeClickedWA';
   const VISITED1_KEY='ryuzaSubscribeVisited1At';
   const VISITED2_KEY='ryuzaSubscribeVisited2At';
+  const WAWA_VISITED_KEY='ryuzaSubscribeVisitedWAAt';
   const CONFIRM_DELAY=7000;
   const SIX_HOURS=6*60*60*1000;
   let countdownTimer=null;
   let autoCloseTimer=null;
-  let confirmTimer1=null,confirmTimer2=null;
+  let confirmTimer1=null,confirmTimer2=null,confirmTimerWA=null;
 
   function getItem(k){try{return localStorage.getItem(k)||''}catch(e){return ''}}
   function setItem(k,v){try{localStorage.setItem(k,v)}catch(e){}}
@@ -698,8 +706,9 @@ q.oninput=search;x.onclick=()=>{q.value='';q.focus();search()};search();
   function saveUnlockTime(){setItem(UNLOCK_KEY,String(Date.now()))}
   function getSub1(){return getItem(SUB1_KEY)==='1'}
   function getSub2(){return getItem(SUB2_KEY)==='1'}
+  function getWA(){return getItem(WA_KEY)==='1'}
   function setSub(key){setItem(key,'1')}
-  function clearCycle(){removeItem(SUB1_KEY);removeItem(SUB2_KEY);removeItem(UNLOCK_KEY);removeItem(VISITED1_KEY);removeItem(VISITED2_KEY);if(confirmBtn1)confirmBtn1.style.display='none';if(confirmBtn2)confirmBtn2.style.display='none';clearTimeout(confirmTimer1);clearTimeout(confirmTimer2)}
+  function clearCycle(){removeItem(SUB1_KEY);removeItem(SUB2_KEY);removeItem(WA_KEY);removeItem(UNLOCK_KEY);removeItem(VISITED1_KEY);removeItem(VISITED2_KEY);removeItem(WAWA_VISITED_KEY);if(confirmBtn1)confirmBtn1.style.display='none';if(confirmBtn2)confirmBtn2.style.display='none';if(confirmWhatsapp)confirmWhatsapp.style.display='none';clearTimeout(confirmTimer1);clearTimeout(confirmTimer2);clearTimeout(confirmTimerWA)}
   function remaining(){const t=getUnlockTime();return Math.max(0,SIX_HOURS-(Date.now()-t))}
   function formatTime(ms){let sec=Math.ceil(ms/1000);const h=Math.floor(sec/3600);sec%=3600;const m=Math.floor(sec/60);sec%=60;return [h,m,sec].map(v=>String(v).padStart(2,'0')).join(':')}
 
@@ -720,18 +729,21 @@ q.oninput=search;x.onclick=()=>{q.value='';q.focus();search()};search();
   }
 
   function refreshSubscribeUI(){
-    const s1=getSub1(),s2=getSub2(),count=(s1?1:0)+(s2?1:0);
-    progressCount.textContent=count+' / 2';
-    progressBar.style.width=(count*50)+'%';
+    const s1=getSub1(),s2=getSub2(),wa=getWA(),count=(s1?1:0)+(s2?1:0)+(wa?1:0);
+    progressCount.textContent=count+' / 3';
+    progressBar.style.width=(count*33.3333)+'%';
     subscribeBtn.textContent=s1?'✓ SUDAH DIBUKA — CHANNEL 1':'▶️ SUBSCRIBE CHANNEL 1';
     subscribeBtn2.textContent=s2?'✓ SUDAH DIBUKA — CHANNEL 2':'▶️ SUBSCRIBE CHANNEL 2';
+     whatsappBtn.textContent=wa?'✓ SUDAH DIIKUTI — SALURAN WA':'💬 IKUTI SALURAN WHATSAPP';
     subscribeBtn.classList.toggle('subscribed',s1);
     subscribeBtn2.classList.toggle('subscribed',s2);
+     whatsappBtn.classList.toggle('subscribed',wa);
     if(confirmBtn1) confirmBtn1.style.display=s1?'none':(getItem(VISITED1_KEY)?'block':'none');
     if(confirmBtn2) confirmBtn2.style.display=s2?'none':(getItem(VISITED2_KEY)?'block':'none');
-    if(count===0)setStatus('🔒 Buka kedua channel, subscribe, lalu tekan tombol konfirmasi masing-masing.',false);
-    else if(count===1)setStatus('🟡 1 dari 2 selesai. Tinggal subscribe channel lainnya lalu konfirmasi.',false);
-    else setStatus('✅ 2 dari 2 selesai. Akses siap dibuka.',true);
+    if(confirmWhatsapp) confirmWhatsapp.style.display=wa?'none':(getItem(WAWA_VISITED_KEY)?'block':'none');
+    if(count===0)setStatus('🔒 Subscribe 2 channel YouTube + ikuti saluran WhatsApp untuk membuka akses.',false);
+    else if(count<3)setStatus('🟡 '+count+' dari 3 selesai. Selesaikan channel yang masih tersisa lalu konfirmasi.',false);
+    else setStatus('✅ 3 dari 3 selesai. Akses siap dibuka.',true);
   }
 
   function showGate(expired){
@@ -776,7 +788,7 @@ q.oninput=search;x.onclick=()=>{q.value='';q.focus();search()};search();
     if(key===SUB1_KEY)removeItem(VISITED1_KEY);
     if(key===SUB2_KEY)removeItem(VISITED2_KEY);
     refreshSubscribeUI();
-    if(getSub1()&&getSub2()){
+    if(getSub1()&&getSub2()&&getWA()){
       saveUnlockTime();
       if(successName)successName.textContent=name;
       setStatus('🎉 Semua selesai! Akses 6 jam langsung aktif.',true);
@@ -819,18 +831,33 @@ q.oninput=search;x.onclick=()=>{q.value='';q.focus();search()};search();
   });
   confirmBtn1?.addEventListener('click',()=>{if(!confirmBtn1.disabled)markSubscribed(SUB1_KEY)});
   confirmBtn2?.addEventListener('click',()=>{if(!confirmBtn2.disabled)markSubscribed(SUB2_KEY)});
+  whatsappBtn.addEventListener('click',()=>{
+    if(getWA())return;
+    const name=nameInput.value.trim();
+    if(!name){nameInput.focus();setStatus('⚠️ Isi nama terlebih dahulu.',false);return}
+    saveName(name);nameInput.readOnly=true;nameHint.textContent='Nama sudah tersimpan. Kamu tidak perlu mengubahnya.';
+    if(getItem(WAWA_VISITED_KEY))return;
+    setItem(WAWA_VISITED_KEY,String(Date.now()));
+    if(!confirmWhatsapp)return;
+    confirmWhatsapp.style.display='block';confirmWhatsapp.disabled=true;confirmWhatsapp.classList.remove('ready');
+    let left=Math.ceil(CONFIRM_DELAY/1000),original=confirmWhatsapp.textContent;
+    confirmWhatsapp.textContent='⏳ Tunggu '+left+' detik sebelum konfirmasi';
+    const tick=setInterval(()=>{left--;if(left<=0){clearInterval(tick);confirmWhatsapp.disabled=false;confirmWhatsapp.classList.add('ready');confirmWhatsapp.textContent=original;setStatus('🟡 Saluran WhatsApp sudah dibuka. Pastikan sudah mengikuti, lalu tekan konfirmasi.',false)}else confirmWhatsapp.textContent='⏳ Tunggu '+left+' detik sebelum konfirmasi'},1000);
+    confirmTimerWA=tick;
+  });
+  confirmWhatsapp?.addEventListener('click',()=>{if(!confirmWhatsapp.disabled)markSubscribed(WA_KEY)});
 
   window.addEventListener('storage',function(e){
-    if([SUB1_KEY,SUB2_KEY,UNLOCK_KEY,NAME_KEY,VISITED1_KEY,VISITED2_KEY].includes(e.key)){
+    if([SUB1_KEY,SUB2_KEY,WA_KEY,UNLOCK_KEY,NAME_KEY,VISITED1_KEY,VISITED2_KEY,WAWA_VISITED_KEY].includes(e.key)){
       if(e.key===NAME_KEY&&e.newValue){nameInput.value=e.newValue;nameInput.readOnly=true}
-      if(getUnlockTime()&&remaining()>0&&getSub1()&&getSub2()){startCountdown();gate.classList.add('unlocked')}
+      if(getUnlockTime()&&remaining()>0&&getSub1()&&getSub2()&&getWA()){startCountdown();gate.classList.add('unlocked')}
       refreshSubscribeUI();
     }
   });
 
   popup.addEventListener('click',e=>{if(e.target===popup)e.stopPropagation()});
   refreshSubscribeUI();
-  if(getUnlockTime()&&remaining()>0&&getSub1()&&getSub2()){
+  if(getUnlockTime()&&remaining()>0&&getSub1()&&getSub2()&&getWA()){
     startCountdown();popup.style.display='none';document.body.style.overflow='';
   }else{
     if(getUnlockTime()&&remaining()<=0)clearCycle();
@@ -1121,10 +1148,10 @@ document.querySelectorAll('.replace-dropdown').forEach(box => {
   const CFG={authDomain:'ryuza-official.firebaseapp.com',databaseURL:'https://ryuza-official-default-rtdb.firebaseio.com',projectId:'ryuza-official'};
   const RESET_KEY='ryuzaSubscribeRemoteResetAt';
   const LOCAL_RESET='ryuzaSubscribeLastRemoteResetAt';
-  const SUB1='ryuzaSubscribeClicked1', SUB2='ryuzaSubscribeClicked2', UNLOCK='ryuzaSubscribeUnlockedAt';
+  const SUB1='ryuzaSubscribeClicked1', SUB2='ryuzaSubscribeClicked2', WA='ryuzaSubscribeClickedWA', UNLOCK='ryuzaSubscribeUnlockedAt';
   function lsGet(k){try{return localStorage.getItem(k)||''}catch(e){return ''}}
   function lsSet(k,v){try{localStorage.setItem(k,String(v))}catch(e){}}
-  function clearSubscribe(){try{localStorage.removeItem(SUB1);localStorage.removeItem(SUB2);localStorage.removeItem(UNLOCK)}catch(e){}}
+  function clearSubscribe(){try{localStorage.removeItem(SUB1);localStorage.removeItem(SUB2);localStorage.removeItem(WA);localStorage.removeItem(UNLOCK)}catch(e){}}
   function applyReset(ts){
     ts=Number(ts||0); if(!ts)return;
     const old=Number(lsGet(LOCAL_RESET)||0);
