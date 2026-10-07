@@ -40,7 +40,10 @@ input:focus,textarea:focus,select:focus{outline:none;border-color:#4a9eff!import
 .skin-pagination button{min-width:38px}.skin-pagination button.active{background:linear-gradient(135deg,#087cff,#00b7ff);border-color:transparent}
 body:before{animation:none!important}body{background-attachment:initial!important}.card,.stat,.panel,.sidebar,.topbar{transition:none!important}.card:hover,.stat:hover{transform:none!important}
 @media(max-width:560px){.skin-pagination{gap:5px}.skin-pagination button{padding:8px 10px}}
-</style></head>
+</style>
+<style>
+.github-publish-panel{border:1px solid rgba(64,211,140,.28);background:linear-gradient(135deg,rgba(10,31,25,.9),rgba(8,18,28,.96))}.github-grid input{width:100%;box-sizing:border-box}.github-publish-panel .primary{background:linear-gradient(135deg,#19b968,#0b8f4c);border-color:#27d47b}.github-publish-panel .badge.ok{color:#67f3aa;border-color:#1c8f59}.github-publish-panel .badge.err{color:#ff7f8d;border-color:#9d3040}@media(max-width:700px){.github-grid{grid-template-columns:1fr!important}.github-grid input,.github-grid label{grid-column:1/-1!important}}</style>
+</head>
 <body>
 <div class="wrap">
 <header class="top">
@@ -66,15 +69,47 @@ body:before{animation:none!important}body{background-attachment:initial!importan
   <div class="stat"><div class="l">TOTAL KLIK</div><div class="v" id="statClicks">0</div></div>
   <div class="stat"><div class="l">ONLINE</div><div class="v" id="statOnline">0</div></div>
  </div>
- <div class="card"><h3 style="margin:0 0 7px">⚡ Kontrol cepat</h3><div class="actions"><button class="primary" id="quickAdd">＋ Tambah Skin</button><button class="secondary" id="quickImport">🔄 Sinkron dari index.html</button><button class="secondary" id="quickBackup">💾 Backup Database</button></div><div class="hint">Perubahan skin disimpan ke Firebase Realtime Database dan dipantau secara realtime.</div></div>
+ <div class="card"><h3 style="margin:0 0 7px">⚡ Kontrol cepat</h3><div class="actions"><button class="primary" id="quickAdd">＋ Tambah Skin</button><button class="secondary" id="quickImport">🚀 Publish ke index.html</button><button class="secondary" id="quickBackup">💾 Backup Database</button></div><div class="hint">Perubahan skin disimpan ke Firebase Realtime Database dan dipantau secara realtime.</div></div>
+ <div class="card github-publish-panel"><h3 style="margin:0 0 7px">🚀 Publish langsung ke index.html</h3><div class="hint">Atur GitHub sekali. Setelah itu perubahan Admin dapat dipublish langsung ke <b>index.html</b>, tanpa perlu sinkron/ambil ulang dari index. Token hanya disimpan di browser ini.</div><div class="github-grid" style="display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin-top:12px"><input id="ghOwner" placeholder="GitHub Owner, contoh: jell-sg"><input id="ghRepo" placeholder="Repository, contoh: ryuza-official"><input id="ghBranch" placeholder="Branch, contoh: main" value="main"><input id="ghPath" placeholder="Path file, contoh: index.html" value="index.html"><input id="ghToken" type="password" placeholder="Fine-grained Token — Contents: Read and Write" style="grid-column:1/-1"><label style="display:flex;align-items:center;gap:8px;grid-column:1/-1"><input id="ghAuto" type="checkbox" checked> Publish otomatis setelah perubahan disimpan</label></div><div class="actions" style="margin-top:10px"><button class="secondary" id="ghSaveConfig">Simpan Konfigurasi</button><button class="primary" id="ghPublish">Publish Sekarang</button><span id="ghStatus" class="badge">● Belum dikonfigurasi</span></div></div>
  <div class="card"><h3 style="margin:0 0 8px">📡 Status Sistem</h3><div id="systemInfo" class="notice">Menunggu koneksi Firebase...</div></div>
  <div class="ranking-grid" style="grid-template-columns:repeat(3,minmax(0,1fr))"><div class="card"><h3 style="margin:0 0 8px">🔎 Pencarian Terbanyak</h3><ol id="topSearches" class="rank-list"><li class="muted">Memuat...</li></ol></div><div class="card"><h3 style="margin:0 0 8px">⬇️ Download Terbanyak</h3><ol id="topDownloads" class="rank-list"><li class="muted">Memuat...</li></ol></div><div class="card"><h3 style="margin:0 0 8px">👆 Peringkat Klik</h3><ol id="topClicks" class="rank-list"><li class="muted">Memuat...</li></ol></div></div>
 </section>
 
 <section id="skins" class="panel">
  <div class="card">
-  <div class="toolbar"><button class="primary" id="addBtn">＋ Tambah Skin</button><button class="secondary" id="seedBtn">🔄 Sinkron Skin Baru dari index</button><button class="secondary" id="pickBtn">📁 Pilih index.html</button><input id="fileInput" class="file" type="file" accept=".html,text/html"><input id="search" placeholder="🔎 Cari nama skin atau Replace..."></div>
-  <div class="hint">Klik Simpan pada kartu untuk memperbarui data. Perubahan tersimpan realtime ke Firebase dan otomatis diterapkan ke index. Sinkron dari index hanya menambahkan skin yang belum ada, tidak menimpa pengaturan Admin.</div>
+  <div class="toolbar"><button class="primary" id="addBtn">＋ Tambah Skin</button><button class="secondary" id="seedBtn">🚀 Publish ke index.html</button><button class="secondary" id="pickBtn">📁 Pilih index.html</button><input id="fileInput" class="file" type="file" accept=".html,text/html"><input id="search" placeholder="🔎 Cari nama skin atau Replace..."></div>
+  <div class="hint">Klik Simpan pada kartu untuk memperbarui data. Jika GitHub sudah dikonfigurasi, perubahan akan dipublish langsung ke index.html. Firebase tetap dipakai untuk data realtime lainnya.</div>
+ </div>
+ <div class="card github-publish-panel" id="githubSkinPanel">
+  <div style="display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap">
+   <div><h3 style="margin:0 0 5px">🚀 GitHub Publish</h3><div class="hint">Pengaturan GitHub bisa diisi langsung dari halaman Skin &amp; Replace.</div></div>
+   <span id="ghSkinStatus" class="badge">● Belum dikonfigurasi</span>
+  </div>
+  <div class="github-grid" style="display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin-top:12px">
+   <input id="ghSkinOwner" placeholder="GitHub Owner — contoh: jell-sg">
+   <input id="ghSkinRepo" placeholder="Repository — contoh: ryuza-official">
+   <input id="ghSkinBranch" placeholder="Branch — main" value="main">
+   <input id="ghSkinPath" placeholder="Path file — index.html" value="index.html">
+   <input id="ghSkinToken" type="password" placeholder="Fine-grained Token — Contents: Read and write" style="grid-column:1/-1">
+  </div>
+  <div class="actions" style="margin-top:10px">
+   <button class="secondary" id="ghSkinSave">💾 Simpan GitHub</button>
+   <button class="primary" id="ghSkinPublish">🚀 Publish Sekarang</button>
+   <button class="secondary" id="ghSkinTest">🔎 Tes Koneksi</button>
+  </div>
+ </div>
+ <div class="card github-publish-panel" id="githubAdminPanel">
+  <div style="display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap">
+   <div><h3 style="margin:0 0 5px">🛠️ Upload Admin langsung ke GitHub</h3><div class="hint">Tidak perlu membuka GitHub. Pilih file <b>admin.html</b> dari komputer lalu panel ini akan mengganti file Admin di repository GitHub.</div></div>
+   <span id="ghAdminStatus" class="badge">● Belum ada file</span>
+  </div>
+  <div class="toolbar" style="margin-top:12px">
+   <button class="secondary" id="pickAdminBtn">📁 Pilih admin.html</button>
+   <input id="adminFileInput" class="file" type="file" accept=".html,text/html">
+   <button class="primary" id="uploadAdminBtn">🚀 Upload &amp; Publish Admin</button>
+  </div>
+  <div id="adminFileName" class="hint" style="margin-top:8px">Belum memilih file.</div>
+  <div class="hint" style="margin-top:6px">Target: <b id="adminTargetPath">admin.html</b> • Branch: <b id="adminTargetBranch">main</b>. Konfigurasi memakai Owner/Repository/Token GitHub yang sudah disimpan di panel ini.</div>
  </div>
  <div id="list" class="grid"><div class="empty">Memuat database...</div></div><div id="skinPagination" class="skin-pagination" aria-label="Paginasi skin"></div>
 </section>
@@ -204,7 +239,7 @@ body:before{animation:none!important}body{background-attachment:initial!importan
 <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
 <script>
 const CFG={authDomain:'ryuza-official.firebaseapp.com',databaseURL:'https://ryuza-official-default-rtdb.firebaseio.com',projectId:'ryuza-official'};
-let app,db,items={},settings={};
+let app,db,items={},settings={}; window.__RYUZA_ADMIN_ITEMS__=items; window.__RYUZA_ADMIN_SETTINGS__=settings;
 const $=id=>document.getElementById(id);
 function esc(s){return String(s??'').replace(/[&<>\"]/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','\\':'&#92;','"':'&quot;'}[m]));}
 function cleanTitle(s){return String(s??'').replace(/^[\s📌•·—–:-]+/,'').replace(/\s+/g,' ').trim()}function initials(name){const t=cleanTitle(name).replace(/[^\p{L}\p{N}\s]/gu,' ').trim();if(!t)return 'R';const a=t.split(/\s+/).filter(Boolean);return (a.length===1?a[0].slice(0,2):a.slice(0,2).map(x=>x[0])).join('').toUpperCase().slice(0,3)}
@@ -218,9 +253,9 @@ $('list').innerHTML=arr.map(([id,x],idx)=>{const title=cleanTitle(x.title||id);c
 const pg=$('skinPagination');if(pg){if(totalPages<=1)pg.innerHTML='';else{let h='<button class="secondary" '+(skinPage===1?'disabled':'')+' data-page="prev">‹</button>';const from=Math.max(1,skinPage-2),to=Math.min(totalPages,skinPage+2);if(from>1)h+='<button class="secondary" data-page="1">1</button><span class="page-info">…</span>';for(let p=from;p<=to;p++)h+='<button class="'+(p===skinPage?'active':'secondary')+'" data-page="'+p+'">'+p+'</button>';if(to<totalPages)h+='<span class="page-info">…</span><button class="secondary" data-page="'+totalPages+'">'+totalPages+'</button>';h+='<button class="secondary" '+(skinPage===totalPages?'disabled':'')+' data-page="next">›</button><span class="page-info">'+(start+1)+'–'+Math.min(start+SKINS_PER_PAGE,allArr.length)+' dari '+allArr.length+'</span>';pg.innerHTML=h;pg.querySelectorAll('[data-page]').forEach(b=>b.onclick=()=>{const v=b.dataset.page;skinPage=v==='prev'?skinPage-1:v==='next'?skinPage+1:Number(v);render()})}}
 bind();updateStats();document.querySelectorAll('.titleInput').forEach(inp=>inp.addEventListener('input',()=>{const card=inp.closest('.skin');const p=card?.querySelector('.preview b');if(p)p.textContent=''+(cleanTitle(inp.value)||'Nama Skin');const icon=card?.querySelector('.iconInput'),prev=card?.querySelector('.iconPreview');if(icon&&prev&&!icon.value)prev.textContent=initials(inp.value)}));document.querySelectorAll('.iconInput').forEach(inp=>inp.addEventListener('input',()=>{inp.value=inp.value.toUpperCase().replace(/[^A-Z0-9]/g,'').slice(0,3);const p=inp.closest('.skin')?.querySelector('.iconPreview');if(p)p.textContent=inp.value||'R'}));}
 function updateStats(){const arr=Object.values(items);$('statSkins').textContent=arr.length;$('statReplace').textContent=arr.reduce((n,x)=>n+(x.options||[]).length,0)}
-async function saveSkin(id,card){const btn=card.querySelector('.save');const old=items[id]||{};const x={...old,id,title:cleanTitle(card.querySelector('.titleInput').value)||'Skin Baru',iconText:(card.querySelector('.iconInput')?.value.trim()||initials(card.querySelector('.titleInput').value)).slice(0,3).toUpperCase(),options:[...card.querySelectorAll('.row')].map(r=>({label:r.querySelector('.label').value.trim()||'Replace',url:r.querySelector('.url').value.trim(),selected:false})),order:old.order??Object.keys(items).length,featured:!!card.querySelector('.featuredInput')?.checked,isNew:!!card.querySelector('.newInput')?.checked,createdAt:old.createdAt||Date.now(),updatedAt:Date.now()};if(x.options[0])x.options[0].selected=true;try{btn.disabled=true;btn.textContent='⏳ Menyimpan...';await db.ref('siteConfig/skins/'+id).set(x);items[id]=x;btn.textContent='✅ Tersimpan';toast('Skin berhasil disimpan ke Firebase');setTimeout(()=>{if(btn)btn.textContent='💾 Simpan'},1300)}catch(e){btn.textContent='❌ Gagal';toast('Gagal menyimpan: '+e.message);setTimeout(()=>{if(btn)btn.textContent='💾 Simpan'},1500)}finally{btn.disabled=false}}
-function bind(){document.querySelectorAll('.skin').forEach(card=>{const id=card.dataset.id;card.querySelector('.addOpt').onclick=()=>{items[id].options=items[id].options||[];items[id].options.push({label:'Replace Baru',url:'',selected:false});render()};card.querySelectorAll('.delOpt').forEach(b=>b.onclick=()=>{items[id].options.splice(+b.dataset.i,1);render()});card.querySelector('.save').onclick=()=>saveSkin(id,card);card.querySelector('.delSkin').onclick=async()=>{if(confirm('Hapus skin ini dari Firebase?')){await db.ref('siteConfig/skins/'+id).remove();toast('Skin dihapus')}};card.querySelector('.up').onclick=()=>moveSkin(id,-1);card.querySelector('.down').onclick=()=>moveSkin(id,1)})}
-async function moveSkin(id,dir){const arr=normalizeOrders();const i=arr.findIndex(x=>x[0]===id),j=i+dir;if(i<0||j<0||j>=arr.length)return;const a=arr[i][1],b=arr[j][1],ao=a.order??i,bo=b.order??j;await db.ref('siteConfig/skins/'+arr[i][0]+'/order').set(bo);await db.ref('siteConfig/skins/'+arr[j][0]+'/order').set(ao);toast('Urutan diperbarui')}
+async function saveSkin(id,card){const btn=card.querySelector('.save');const old=items[id]||{};const x={...old,id,title:cleanTitle(card.querySelector('.titleInput').value)||'Skin Baru',iconText:(card.querySelector('.iconInput')?.value.trim()||initials(card.querySelector('.titleInput').value)).slice(0,3).toUpperCase(),options:[...card.querySelectorAll('.row')].map(r=>({label:r.querySelector('.label').value.trim()||'Replace',url:r.querySelector('.url').value.trim(),selected:false})),order:old.order??Object.keys(items).length,featured:!!card.querySelector('.featuredInput')?.checked,isNew:!!card.querySelector('.newInput')?.checked,createdAt:old.createdAt||Date.now(),updatedAt:Date.now()};if(x.options[0])x.options[0].selected=true;try{btn.disabled=true;btn.textContent='⏳ Menyimpan...';await db.ref('siteConfig/skins/'+id).set(x);items[id]=x;btn.textContent='✅ Tersimpan';toast('Skin berhasil disimpan ke Firebase');document.dispatchEvent(new CustomEvent('ryuza-admin-data-changed'));setTimeout(()=>{if(btn)btn.textContent='💾 Simpan'},1300)}catch(e){btn.textContent='❌ Gagal';toast('Gagal menyimpan: '+e.message);setTimeout(()=>{if(btn)btn.textContent='💾 Simpan'},1500)}finally{btn.disabled=false}}
+function bind(){document.querySelectorAll('.skin').forEach(card=>{const id=card.dataset.id;card.querySelector('.addOpt').onclick=()=>{items[id].options=items[id].options||[];items[id].options.push({label:'Replace Baru',url:'',selected:false});render()};card.querySelectorAll('.delOpt').forEach(b=>b.onclick=()=>{items[id].options.splice(+b.dataset.i,1);render()});card.querySelector('.save').onclick=()=>saveSkin(id,card);card.querySelector('.delSkin').onclick=async()=>{if(confirm('Hapus skin ini dari Firebase?')){await db.ref('siteConfig/skins/'+id).remove();toast('Skin dihapus');document.dispatchEvent(new CustomEvent('ryuza-admin-data-changed'))}};card.querySelector('.up').onclick=()=>moveSkin(id,-1);card.querySelector('.down').onclick=()=>moveSkin(id,1)})}
+async function moveSkin(id,dir){const arr=normalizeOrders();const i=arr.findIndex(x=>x[0]===id),j=i+dir;if(i<0||j<0||j>=arr.length)return;const a=arr[i][1],b=arr[j][1],ao=a.order??i,bo=b.order??j;await db.ref('siteConfig/skins/'+arr[i][0]+'/order').set(bo);await db.ref('siteConfig/skins/'+arr[j][0]+'/order').set(ao);toast('Urutan diperbarui');document.dispatchEvent(new CustomEvent('ryuza-admin-data-changed'))}
 $('search').oninput=()=>{skinPage=1;render()};
 $('addBtn').onclick=()=>{const id='skin-'+Date.now();items[id]={id,title:'Skin Baru',iconText:'S',options:[{label:'Default',url:'',selected:true}],order:Object.keys(items).length};skinPage=Math.ceil(Object.keys(items).length/SKINS_PER_PAGE);render();document.querySelector(`.skin[data-id="${id}"]`)?.scrollIntoView({behavior:'smooth',block:'center'});document.querySelector(`.skin[data-id="${id}"] .titleInput`)?.focus();toast('Skin baru dibuat. Isi data lalu klik Simpan.')};
 $('quickAdd').onclick=()=>{$('.tab[data-tab="skins"]').click();$('addBtn').click()};
@@ -251,12 +286,12 @@ function loadIndexFeatures(){
 }
 async function saveIndexFeatures(){
  const f={trending:$('idxTrending').checked,featured:$('idxFeatured').checked,newest:$('idxNew').checked,recent:$('idxRecent').checked,favorite:$('idxFavorite').checked,stats:$('idxStats').checked,bottomNav:$('idxBottom').checked,trendingLimit:Math.max(3,Math.min(20,Number($('idxTrendingLimit').value)||8)),sectionLimit:Math.max(3,Math.min(20,Number($('idxSectionLimit').value)||8)),updatedAt:Date.now()};
- try{await db.ref('siteConfig/indexFeatures').set(f);settings.indexFeatures=f;$('idxSaveStatus').textContent='● Tersimpan REALTIME';$('idxSaveStatus').className='badge ok';toast('✅ Pengaturan fitur Index tersimpan');}catch(e){$('idxSaveStatus').textContent='● Gagal menyimpan';$('idxSaveStatus').className='badge err';toast('❌ Gagal: '+e.message)}
+ try{await db.ref('siteConfig/indexFeatures').set(f);settings.indexFeatures=f;window.__RYUZA_ADMIN_FEATURES__=f;$('idxSaveStatus').textContent='● Tersimpan REALTIME';$('idxSaveStatus').className='badge ok';toast('✅ Pengaturan fitur Index tersimpan');document.dispatchEvent(new CustomEvent('ryuza-admin-data-changed'));}catch(e){$('idxSaveStatus').textContent='● Gagal menyimpan';$('idxSaveStatus').className='badge err';toast('❌ Gagal: '+e.message)}
 }
 $('saveIndexFeatures').onclick=saveIndexFeatures; $('reloadIndexFeatures').onclick=loadIndexFeatures; $('refreshIndexStats').onclick=()=>{watchRankings();toast('↻ Statistik direfresh')}; $('clearIndexFavorites').onclick=async()=>{if(!confirm('Reset penanda favorit global pada perangkat pengunjung?'))return;try{await db.ref('siteConfig/indexFeatures/favoriteResetAt').set(Date.now());toast('✅ Perintah reset favorit dikirim realtime')}catch(e){toast('❌ Gagal: '+e.message)}};
 try{app=firebase.initializeApp(CFG,'ryuza-admin-'+Math.random().toString(36).slice(2));db=app.database();
  db.ref('siteConfig/skins').on('value',s=>{items=s.val()||{};renderFeaturedPicker();$('status').textContent='● REALTIME AKTIF';$('status').className='badge ok';$('systemInfo').innerHTML='<b class="ok">Terhubung ke Firebase Realtime Database</b><br><span class="small">Path skin: siteConfig/skins • Perubahan dipantau realtime.</span>';render()},e=>{$('status').textContent='Firebase gagal: '+e.message;$('status').className='badge err';$('systemInfo').textContent='Firebase gagal: '+e.message});
- db.ref('siteConfig/settings').on('value',s=>{settings=s.val()||{};loadSettings();loadIndexFeatures()});
+ db.ref('siteConfig/settings').on('value',s=>{settings=s.val()||{};window.__RYUZA_ADMIN_SETTINGS__=settings;loadSettings();loadIndexFeatures()});
 db.ref('siteConfig/indexFeatures').on('value',s=>{settings.indexFeatures=s.val()||{};loadIndexFeatures()});
  db.ref('onlineUsers').on('value',s=>{$('statOnline').textContent=Object.keys(s.val()||{}).length});
  db.ref('linkClicks').on('value',s=>{const v=s.val()||{};$('statClicks').textContent=Object.values(v).reduce((n,x)=>n+Number(x?.count||0),0)});
@@ -304,7 +339,7 @@ function scheduleLiveSave(){
 async function saveSettingsRealtime(){
   const banners=[...$('bannerFields').children].map(r=>({image:r.querySelector('.bannerImage').value.trim(),title:r.querySelector('.bannerTitle').value.trim(),kicker:r.querySelector('.bannerKicker').value.trim()||'RYUZA OFFICIAL',link:r.querySelector('.bannerLink').value.trim()}));
   const x={...settings,pageTitle:$('setPageTitle').value.trim(),name:$('setName').value.trim(),siteTitle:$('setName').value.trim(),subtitle:$('setSubtitle').value.trim(),youtube:$('setYoutube').value.trim(),youtube1:$('setYoutube').value.trim(),youtube2:($('setYoutube2')?.value||'').trim(),requestFree:$('setFree').value.trim(),requestPaid:$('setPaid').value.trim(),defaultDownload:$('setDownload').value.trim(),announcement:$('setAnnouncement').value,maintenance:$('setMaintenance').checked,showAnnouncement:$('setShowAnnouncement').checked,bannerEnabled:$('setBannerEnabled').checked,iconMode:'initials',banners,updatedAt:Date.now()};
-  try{await db.ref('siteConfig/settings').set(x);settings=x;const st=$('liveSaveStatus');if(st){st.textContent='● Tersimpan REALTIME';st.className='badge ok'}}catch(e){const st=$('liveSaveStatus');if(st){st.textContent='● Gagal menyimpan';st.className='badge err'};toast('Gagal menyimpan: '+e.message)}
+  try{await db.ref('siteConfig/settings').set(x);settings=x;window.__RYUZA_ADMIN_SETTINGS__=x;const st=$('liveSaveStatus');document.dispatchEvent(new CustomEvent('ryuza-admin-data-changed'));if(st){st.textContent='● Tersimpan REALTIME';st.className='badge ok'}}catch(e){const st=$('liveSaveStatus');if(st){st.textContent='● Gagal menyimpan';st.className='badge err'};toast('Gagal menyimpan: '+e.message)}
 }
 function bindRealtimeSetting(id,type='input'){const el=$(id);if(!el)return;el.addEventListener(type,scheduleLiveSave)}
 ['setPageTitle','setName','setSubtitle','setYoutube','setYoutube2','setFree','setPaid','setDownload','setAnnouncement'].forEach(id=>bindRealtimeSetting(id));
@@ -348,7 +383,7 @@ async function importIndexText(txt){
     throw e;
   }
 }
-$('seedBtn').onclick=async()=>{try{$('seedBtn').disabled=true;$('seedBtn').textContent='Mengambil...';const r=await fetch('./index.html?seed='+Date.now());if(!r.ok)throw Error('index.html tidak bisa dibaca');await importIndexText(await r.text())}catch(e){if(location.protocol==='file:')$('fileInput').click();else toast('Gagal: '+e.message)}finally{$('seedBtn').disabled=false;$('seedBtn').textContent='🔄 Sinkron Skin Baru dari index'}};
+$('seedBtn').onclick=async()=>{if(window.ryuzaPublishIndex){await window.ryuzaPublishIndex();return;}try{$('seedBtn').disabled=true;$('seedBtn').textContent='Mengambil...';const r=await fetch('./index.html?seed='+Date.now());if(!r.ok)throw Error('index.html tidak bisa dibaca');await importIndexText(await r.text())}catch(e){if(location.protocol==='file:')$('fileInput').click();else toast('Gagal: '+e.message)}finally{$('seedBtn').disabled=false;$('seedBtn').textContent='🚀 Publish ke index.html'}};
 $('pickBtn').onclick=()=>$('fileInput').click();$('fileInput').onchange=async e=>{const f=e.target.files?.[0];if(!f)return;try{await importIndexText(await f.text())}catch(x){toast('Gagal membaca: '+x.message)}e.target.value=''};
 let visitorData={};
 let onlineVisitorData={};
@@ -448,6 +483,134 @@ $('quickImport').onclick=()=>{$('.tab[data-tab="skins"]').click();$('seedBtn').c
  const oldSwitch=window.switchTab;
  // Mulai juga saat panel request dibuka; listener realtime tetap aktif setelahnya.
  start();
+})();
+</script>
+<script id="ryuza-github-publisher">
+(function(){
+  const LS='ryuzaGithubPublishConfigV1';
+  const $=id=>document.getElementById(id);
+  const getCfg=()=>{try{return JSON.parse(localStorage.getItem(LS)||'{}')}catch(e){return {}}};
+  const setCfg=x=>{try{localStorage.setItem(LS,JSON.stringify(x))}catch(e){}};
+  function loadCfg(){const c=getCfg();['ghOwner','ghRepo','ghBranch','ghPath'].forEach(k=>{if($(k)&&c[k])$(k).value=c[k]});if($('ghToken')&&c.token) $('ghToken').value=c.token;if($('ghAuto'))$('ghAuto').checked=c.auto!==false;setStatus(c.owner&&c.repo&&c.token?'Siap publish':'Belum dikonfigurasi','');}
+  function cfgFromUI(){return {owner:$('ghOwner')?.value.trim()||'',repo:$('ghRepo')?.value.trim()||'',branch:$('ghBranch')?.value.trim()||'main',path:$('ghPath')?.value.trim()||'index.html',token:$('ghToken')?.value.trim()||'',auto:!!$('ghAuto')?.checked}}
+  function setStatus(t,kind){const e=$('ghStatus');if(!e)return;e.textContent='● '+t;e.className='badge '+(kind||'')}
+  function headers(token){return {Accept:'application/vnd.github+json',Authorization:'Bearer '+token,'X-GitHub-Api-Version':'2022-11-28','Content-Type':'application/json'}}
+  function b64decode(s){const bin=atob(s.replace(/\n/g,''));let out='';for(let i=0;i<bin.length;i+=8192)out+=String.fromCharCode(...Uint8Array.from(bin.slice(i,i+8192),c=>c.charCodeAt(0)));return decodeURIComponent(escape(out))}
+  function b64encode(s){return btoa(unescape(encodeURIComponent(s)))}
+  function safeJson(x){return JSON.stringify(x).replace(/</g,'\\u003c').replace(/\u2028/g,'\\u2028').replace(/\u2029/g,'\\u2029')}
+  function getAdminState(){
+    const source=window.__RYUZA_ADMIN_ITEMS__||{};
+    const skins=JSON.parse(JSON.stringify(source));
+    const settings=JSON.parse(JSON.stringify(window.__RYUZA_ADMIN_SETTINGS__||{}));
+    if(!settings.pageTitle)settings.pageTitle=document.getElementById('setPageTitle')?.value||'';
+    if(!settings.name)settings.name=document.getElementById('setName')?.value||'';
+    if(!settings.siteTitle)settings.siteTitle=settings.name||'';
+    if(!settings.subtitle)settings.subtitle=document.getElementById('setSubtitle')?.value||'';
+    if(!settings.youtube1)settings.youtube1=document.getElementById('setYoutube')?.value||'';
+    settings.youtube=settings.youtube1;
+    settings.youtube2=document.getElementById('setYoutube2')?.value||settings.youtube2||'';
+    settings.requestFree=document.getElementById('setFree')?.value||settings.requestFree||'';
+    settings.requestPaid=document.getElementById('setPaid')?.value||settings.requestPaid||'';
+    settings.defaultDownload=document.getElementById('setDownload')?.value||settings.defaultDownload||'';
+    settings.announcement=document.getElementById('setAnnouncement')?.value??settings.announcement??'';
+    if(document.getElementById('setMaintenance'))settings.maintenance=document.getElementById('setMaintenance').checked;
+    if(document.getElementById('setShowAnnouncement'))settings.showAnnouncement=document.getElementById('setShowAnnouncement').checked;
+    if(document.getElementById('setBannerEnabled'))settings.bannerEnabled=document.getElementById('setBannerEnabled').checked;
+    const features=JSON.parse(JSON.stringify(window.__RYUZA_ADMIN_FEATURES||settings.indexFeatures||{}));
+    ['trending','featured','newest','recent','favorite','stats','bottomNav'].forEach(k=>{const el=document.getElementById('idx'+k.charAt(0).toUpperCase()+k.slice(1));if(el)features[k]=el.checked});
+    return {version:1,updatedAt:Date.now(),skins,settings,indexFeatures:features};
+  }
+  async function publish(){
+    const c=cfgFromUI();
+    if(!c.owner||!c.repo||!c.token){setStatus('Isi Owner, Repository dan Token','err');toast?.('Lengkapi konfigurasi GitHub dulu');return false}
+    setCfg(c);setStatus('Mengambil index.html...','');
+    const api='https://api.github.com/repos/'+encodeURIComponent(c.owner)+'/'+encodeURIComponent(c.repo)+'/contents/'+c.path.split('/').map(encodeURIComponent).join('/')+'?ref='+encodeURIComponent(c.branch);
+    try{
+      const get=await fetch(api,{headers:headers(c.token)});const gd=await get.json();if(!get.ok)throw Error(gd.message||('GitHub GET '+get.status));
+      const old=b64decode(gd.content||'');
+      const state=getAdminState();
+      const block='<!-- RYUZA_STATIC_CONFIG_START -->\n<script id="ryuza-static-config">window.__RYUZA_STATIC_CONFIG__='+safeJson(state)+';<\/script>\n<!-- RYUZA_STATIC_CONFIG_END -->';
+      const re=/<!-- RYUZA_STATIC_CONFIG_START -->.*?<!-- RYUZA_STATIC_CONFIG_END -->/s;
+      const updated=re.test(old)?old.replace(re,block):old.replace('<script id="ryuza-super-features-js">',block+'\n<script id="ryuza-super-features-js">');
+      const put=await fetch(api,{method:'PUT',headers:headers(c.token),body:JSON.stringify({message:'Admin: update index settings & skins',content:b64encode(updated),sha:gd.sha,branch:c.branch})});
+      const pd=await put.json();if(!put.ok)throw Error(pd.message||('GitHub PUT '+put.status));
+      setStatus('Berhasil dipublish ke index.html','ok');toast?.('Index berhasil diperbarui dari Admin');return true;
+    }catch(e){console.error(e);setStatus('Publish gagal: '+e.message,'err');toast?.('Publish GitHub gagal: '+e.message);return false}
+  }
+  window.ryuzaPublishIndex=publish;
+  window.ryuzaGithubAuto=()=>getCfg().auto!==false;
+  $('ghSaveConfig')?.addEventListener('click',()=>{const c=cfgFromUI();setCfg(c);setStatus(c.owner&&c.repo&&c.token?'Konfigurasi tersimpan':'Konfigurasi belum lengkap',c.owner&&c.repo&&c.token?'ok':'err');toast?.('Konfigurasi GitHub disimpan di browser ini')});
+  $('ghPublish')?.addEventListener('click',publish);
+  loadCfg();
+  // Publish otomatis setelah fungsi save Admin berhasil.
+  const wrap=(name)=>{const old=window[name];if(typeof old!=='function')return;window[name]=async function(...args){const r=await old.apply(this,args);if(window.ryuzaGithubAuto())setTimeout(publish,350);return r}};
+  // saveSkin is local to the main script in this file, so expose a lightweight hook via event instead.
+  document.addEventListener('ryuza-admin-data-changed',()=>{if(window.ryuzaGithubAuto())setTimeout(publish,500)});
+})();
+</script>
+
+<script>
+/* ===== GitHub controls visible on Skin & Replace ===== */
+(function(){
+  const $=id=>document.getElementById(id);
+  const LS='ryuzaGithubConfig';
+  function cfg(){try{return JSON.parse(localStorage.getItem(LS)||'{}')}catch(e){return {}}}
+  function save(c){try{localStorage.setItem(LS,JSON.stringify(c))}catch(e){}}
+  function uiCfg(){return {owner:$('ghSkinOwner')?.value.trim()||'',repo:$('ghSkinRepo')?.value.trim()||'',branch:$('ghSkinBranch')?.value.trim()||'main',path:$('ghSkinPath')?.value.trim()||'index.html',token:$('ghSkinToken')?.value.trim()||''}}
+  function setStatus(t,ok){const e=$('ghSkinStatus');if(!e)return;e.textContent='● '+t;e.className='badge '+(ok?'ok':'err')}
+  function load(){const c=cfg();if($('ghSkinOwner'))$('ghSkinOwner').value=c.owner||'';if($('ghSkinRepo'))$('ghSkinRepo').value=c.repo||'';if($('ghSkinBranch'))$('ghSkinBranch').value=c.branch||'main';if($('ghSkinPath'))$('ghSkinPath').value=c.path||'index.html';if($('ghSkinToken'))$('ghSkinToken').value=c.token||'';setStatus(c.owner&&c.repo&&c.token?'Siap publish':'Belum dikonfigurasi',!!(c.owner&&c.repo&&c.token))}
+  function syncMain(){const c=uiCfg();['ghOwner','ghRepo','ghBranch','ghPath','ghToken'].forEach((id,i)=>{const e=$(id);if(e)e.value=[c.owner,c.repo,c.branch,c.path,c.token][i]});save(c);return c}
+  $('ghSkinSave')?.addEventListener('click',()=>{const c=uiCfg();save(c);syncMain();setStatus(c.owner&&c.repo&&c.token?'Konfigurasi tersimpan':'Lengkapi Owner, Repository dan Token',!!(c.owner&&c.repo&&c.token));if(typeof toast==='function')toast(c.owner&&c.repo&&c.token?'GitHub berhasil disimpan':'Lengkapi konfigurasi GitHub');});
+  $('ghSkinPublish')?.addEventListener('click',async()=>{syncMain();if(typeof window.ryuzaPublishIndex!=='function'){setStatus('Fungsi publish tidak tersedia',false);return}setStatus('Mempublish...',true);try{const ok=await window.ryuzaPublishIndex();setStatus(ok?'Berhasil dipublish':'Publish gagal',!!ok)}catch(e){setStatus('Gagal: '+(e.message||e),false)}});
+  $('ghSkinTest')?.addEventListener('click',async()=>{const c=uiCfg();save(c);syncMain();if(!c.owner||!c.repo||!c.token){setStatus('Lengkapi konfigurasi',false);return}setStatus('Mengecek...',true);const url='https://api.github.com/repos/'+encodeURIComponent(c.owner)+'/'+encodeURIComponent(c.repo);try{const r=await fetch(url,{headers:{Accept:'application/vnd.github+json',Authorization:'Bearer '+c.token,'X-GitHub-Api-Version':'2022-11-28'}});const d=await r.json();if(!r.ok)throw Error(d.message||('HTTP '+r.status));setStatus('Koneksi GitHub OK',true);if(typeof toast==='function')toast('GitHub terhubung: '+d.full_name)}catch(e){setStatus('Gagal: '+(e.message||e),false);if(typeof toast==='function')toast('Tes GitHub gagal: '+(e.message||e))}});
+  load();
+})();
+</script>
+<script>
+/* ===== Upload admin.html langsung ke GitHub ===== */
+(function(){
+  const $=id=>document.getElementById(id);
+  const LS='ryuzaGithubPublishConfigV1';
+  let selectedFile=null;
+  function cfg(){try{return JSON.parse(localStorage.getItem(LS)||'{}')}catch(e){return {}}}
+  function headers(token){return {Accept:'application/vnd.github+json',Authorization:'Bearer '+token,'X-GitHub-Api-Version':'2022-11-28','Content-Type':'application/json'}}
+  function b64encode(s){return btoa(unescape(encodeURIComponent(s)))}
+  function status(t,ok){const e=$('ghAdminStatus');if(!e)return;e.textContent='● '+t;e.className='badge '+(ok===true?'ok':ok===false?'err':'')}
+  function toastMsg(t){if(typeof toast==='function')toast(t);else alert(t)}
+  $('pickAdminBtn')?.addEventListener('click',()=>$('adminFileInput')?.click());
+  $('adminFileInput')?.addEventListener('change',e=>{
+    selectedFile=e.target.files?.[0]||null;
+    if(!selectedFile){$('adminFileName').textContent='Belum memilih file.';status('Belum ada file');return}
+    $('adminFileName').textContent='File dipilih: '+selectedFile.name+' • '+Math.round(selectedFile.size/1024)+' KB';
+    status('Siap diupload',true);
+  });
+  $('uploadAdminBtn')?.addEventListener('click',async()=>{
+    if(!selectedFile){status('Pilih admin.html dulu',false);toastMsg('Pilih file admin.html terlebih dahulu.');return}
+    const c=cfg();
+    if(!c.owner||!c.repo||!c.token){status('GitHub belum dikonfigurasi',false);toastMsg('Isi dan simpan konfigurasi GitHub terlebih dahulu.');return}
+    const branch=c.branch||'main';
+    const path='admin.html';
+    status('Membaca file...',true);
+    try{
+      const content=await selectedFile.text();
+      if(!content.trim().toLowerCase().includes('<html') && !content.trim().toLowerCase().includes('<!doctype')) throw Error('File yang dipilih bukan HTML yang valid.');
+      const api='https://api.github.com/repos/'+encodeURIComponent(c.owner)+'/'+encodeURIComponent(c.repo)+'/contents/'+path+'?ref='+encodeURIComponent(branch);
+      status('Mengecek admin.html di GitHub...',true);
+      const get=await fetch(api,{headers:headers(c.token)});
+      let gd={}; try{gd=await get.json()}catch(e){}
+      if(!get.ok && get.status!==404) throw Error(gd.message||('GitHub GET '+get.status));
+      const body={message:'Admin: update admin.html',content:b64encode(content),branch};
+      if(gd.sha) body.sha=gd.sha;
+      status('Mengupload admin.html...',true);
+      const put=await fetch('https://api.github.com/repos/'+encodeURIComponent(c.owner)+'/'+encodeURIComponent(c.repo)+'/contents/'+path,{method:'PUT',headers:headers(c.token),body:JSON.stringify(body)});
+      const pd=await put.json();
+      if(!put.ok) throw Error(pd.message||('GitHub PUT '+put.status));
+      status('admin.html berhasil dipublish',true);
+      toastMsg('✅ admin.html berhasil diperbarui di GitHub. Tunggu GitHub Pages melakukan deploy.');
+    }catch(e){console.error(e);status('Upload gagal: '+(e.message||e),false);toastMsg('❌ Upload admin.html gagal: '+(e.message||e));}
+  });
+  const c=cfg();
+  if($('adminTargetBranch'))$('adminTargetBranch').textContent=c.branch||'main';
 })();
 </script>
 </body>
