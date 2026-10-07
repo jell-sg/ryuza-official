@@ -43,15 +43,7 @@ body:before{animation:none!important}body{background-attachment:initial!importan
 </style>
 <style>
 .github-publish-panel{border:1px solid rgba(64,211,140,.28);background:linear-gradient(135deg,rgba(10,31,25,.9),rgba(8,18,28,.96))}.github-grid input{width:100%;box-sizing:border-box}.github-publish-panel .primary{background:linear-gradient(135deg,#19b968,#0b8f4c);border-color:#27d47b}.github-publish-panel .badge.ok{color:#67f3aa;border-color:#1c8f59}.github-publish-panel .badge.err{color:#ff7f8d;border-color:#9d3040}@media(max-width:700px){.github-grid{grid-template-columns:1fr!important}.github-grid input,.github-grid label{grid-column:1/-1!important}}</style>
-<!-- Firebase Admin: standalone build. No remote document.write loader. -->
-/i,'');
-        document.open();document.write(clean);document.close();
-      }else finish();
-    })
-    .catch(()=>{clearTimeout(fallback);finish()});
-})();
-</script>
-<!-- RYUZA_FIREBASE_ADMIN_LOADER_END -->
+
 </head>
 <body>
 <div class="wrap">
@@ -613,8 +605,7 @@ $('quickImport').onclick=()=>{$('.tab[data-tab="skins"]').click();$('seedBtn').c
       let content=await selectedFile.text();
       if(!/<(?:!doctype\s+html|html[\s>])/i.test(content))throw Error('File yang dipilih bukan HTML yang valid.');
       // Jika file yang dipilih adalah loader ini sendiri, simpan hanya aplikasi Admin agar tidak terjadi loop.
-      content=content.replace(/<!-- Firebase Admin: standalone build. No remote document.write loader. -->
-/i,'');
+      content=content.replace(/<!-- RYUZA_FIREBASE_ADMIN_LOADER_START -->[\s\S]*?<!-- RYUZA_FIREBASE_ADMIN_LOADER_END -->/gi,'').replace(/<!-- Firebase Admin: standalone build\. No remote document\.write loader\. -->/gi,'');
       if(content.length<200)throw Error('Isi admin.html tidak valid setelah diproses.');
       setStatus('Mengupload ke Firebase...');
       await db.ref('siteConfig/adminHtml').set(content);
