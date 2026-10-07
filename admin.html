@@ -143,17 +143,17 @@ body:before{animation:none!important}body{background-attachment:initial!importan
  </div>
  <div class="card" id="firebaseIndexUploadPanel">
   <div style="display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap">
-   <div><h3 style="margin:0 0 5px">📤 Upload Index ke Firebase</h3><div class="hint">Pilih <b>index.html</b> dari komputer. File akan disimpan ke <b>Firebase Realtime Database</b>, jadi perubahan index tidak perlu dipublish ke GitHub lagi.</div></div>
+   <div><h3 style="margin:0 0 5px">📤 Upload Index langsung ke GitHub</h3><div class="hint">Pilih <b>index.html</b> dari komputer. File akan menggantikan <b>index.html</b> langsung di repository GitHub menggunakan konfigurasi GitHub di atas.</div></div>
    <span id="firebaseIndexStatus" class="badge">● Belum ada file</span>
   </div>
   <div class="toolbar" style="margin-top:12px">
    <button class="secondary" id="pickFirebaseIndexBtn">📁 Pilih index.html</button>
    <input id="firebaseIndexFileInput" class="file" type="file" accept=".html,text/html">
-   <button class="primary" id="uploadFirebaseIndexBtn">🚀 Upload Index</button>
+   <button class="primary" id="uploadFirebaseIndexBtn">🚀 Upload Index ke GitHub</button>
    <button class="secondary" id="downloadFirebaseIndexBtn">⬇️ Download Index</button>
   </div>
   <div id="firebaseIndexFileName" class="hint" style="margin-top:8px">Belum memilih file.</div>
-  <div class="hint" style="margin-top:6px">Target Firebase: <b>siteConfig/indexHtml</b>. Setelah upload, halaman Index akan mengambil versi terbaru secara otomatis.</div>
+  <div class="hint" style="margin-top:6px">Target: <b>GitHub Repository</b>. Setelah upload, GitHub Pages akan melakukan deploy versi terbaru.</div>
  </div>
  <div class="card github-publish-panel" id="githubSkinPanel">
   <div style="display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap">
@@ -729,44 +729,51 @@ $('quickImport').onclick=()=>{$('.tab[data-tab="skins"]').click();$('seedBtn').c
  if(da)da.onclick=()=>downloadHtml('siteConfig/adminHtml','admin.html','Admin','downloadFirebaseAdminBtn');
 })();
 </script>
-<script id="ryuza-firebase-index-upload">
+<script id="ryuza-github-direct-index-upload">
 (()=>{
  const $=id=>document.getElementById(id);
  const input=$('firebaseIndexFileInput'), pick=$('pickFirebaseIndexBtn'), upload=$('uploadFirebaseIndexBtn');
  const status=$('firebaseIndexStatus'), name=$('firebaseIndexFileName');
  if(!input||!pick||!upload)return;
  let selected=null;
- const setStatus=(t,kind='')=>{status.textContent='● '+t;status.className='badge '+kind};
+ const getCfg=()=>{try{return JSON.parse(localStorage.getItem('ryuzaGithubPublishConfigV1')||'{}')}catch(e){return {}}};
+ const setStatus=(t,kind='')=>{if(status){status.textContent='● '+t;status.className='badge '+kind}};
+ const b64encode=s=>btoa(unescape(encodeURIComponent(s)));
+ const headers=token=>({Accept:'application/vnd.github+json',Authorization:'Bearer '+token,'X-GitHub-Api-Version':'2022-11-28','Content-Type':'application/json'});
  pick.onclick=()=>input.click();
  input.onchange=()=>{
    selected=input.files?.[0]||null;
    if(!selected){name.textContent='Belum memilih file.';setStatus('Belum ada file');return}
    name.textContent='File dipilih: '+selected.name+' • '+Math.round(selected.size/1024)+' KB';
-   setStatus('Siap diupload','ok');
+   setStatus('Siap diupload ke GitHub','ok');
  };
  upload.onclick=async()=>{
    if(!selected){toast('Pilih index.html terlebih dahulu.');return}
-   if(!window.db){toast('Firebase belum siap. Tunggu sebentar lalu coba lagi.');return}
    if(selected.size>5*1024*1024){toast('❌ File terlalu besar. Maksimal 5 MB.');return}
-   upload.disabled=true;setStatus('Membaca file...');
+   const c=getCfg();
+   if(!c.owner||!c.repo||!c.token){setStatus('GitHub belum dikonfigurasi','err');toast('❌ Isi Owner, Repository, Branch, Path dan Token di Pengaturan GitHub terlebih dahulu.');return}
+   const branch=c.branch||'main', path=c.path||'index.html';
+   upload.disabled=true;setStatus('Membaca index.html...');
    try{
      const content=await selected.text();
      if(!/<(?:!doctype\s+html|html[\s>])/i.test(content))throw Error('File yang dipilih bukan HTML yang valid.');
-     setStatus('Mengupload ke Firebase...');
-     await db.ref('siteConfig/indexHtml').set(content);
-     await db.ref('siteConfig/indexSource').set({enabled:true,fileName:selected.name,updatedAt:firebase.database.ServerValue.TIMESTAMP,size:selected.size});
-     setStatus('INDEX AKTIF • REALTIME','ok');
-     toast('✅ index.html berhasil diupload ke Firebase. Index tidak perlu dipublish ke GitHub lagi.');
+     const api='https://api.github.com/repos/'+encodeURIComponent(c.owner)+'/'+encodeURIComponent(c.repo)+'/contents/'+path.split('/').map(encodeURIComponent).join('/');
+     setStatus('Mengambil versi GitHub...');
+     const get=await fetch(api+'?ref='+encodeURIComponent(branch),{headers:headers(c.token)});
+     const gd=await get.json();
+     if(!get.ok)throw Error(gd.message||('GitHub GET '+get.status));
+     if(!gd.sha)throw Error('SHA index.html dari GitHub tidak ditemukan.');
+     setStatus('Mengupload langsung ke GitHub...');
+     const put=await fetch(api,{method:'PUT',headers:headers(c.token),body:JSON.stringify({message:'Upload index.html dari Ryuza Admin',content:b64encode(content),sha:gd.sha,branch})});
+     const pd=await put.json();
+     if(!put.ok)throw Error(pd.message||('GitHub PUT '+put.status));
+     setStatus('BERHASIL • GITHUB','ok');
+     name.textContent='GitHub: '+c.owner+'/'+c.repo+'/'+path+' • '+Math.round(selected.size/1024)+' KB';
+     toast('✅ index.html berhasil langsung diupload ke GitHub. Tunggu GitHub Pages selesai deploy.');
    }catch(e){
-     console.error(e);setStatus('Upload gagal','err');toast('❌ Upload Index gagal: '+(e.message||e));
+     console.error(e);setStatus('Upload GitHub gagal','err');toast('❌ Upload Index ke GitHub gagal: '+(e.message||e));
    }finally{upload.disabled=false}
  };
- try{
-   db?.ref('siteConfig/indexSource').on('value',s=>{
-     const x=s.val();
-     if(x?.enabled){setStatus('INDEX FIREBASE AKTIF','ok');if(!selected&&x.fileName)name.textContent='Index aktif: '+x.fileName+' • '+Math.round(Number(x.size||0)/1024)+' KB'}
-   });
- }catch(e){}
 })();
 </script>
 </body>
