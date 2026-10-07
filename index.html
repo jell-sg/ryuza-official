@@ -420,7 +420,197 @@ input{background:#0a1321;border-color:#2b405d}input:focus{border-color:#35a7ff;b
 .ryuza-mini,.ryuza-card-stats{contain:layout paint style}
 @media(prefers-reduced-motion:no-preference){.card.skin:hover{transform:none}}
 </style>
-<style id="ryuza-external-browser-gate-style">#ryuzaExternalGate{position:fixed;inset:0;z-index:2147483646;display:none;align-items:center;justify-content:center;padding:18px;background:rgba(3,7,14,.96);font-family:inherit}#ryuzaExternalGate.show{display:flex}#ryuzaExternalGate .gate-box{width:min(430px,94vw);padding:25px 20px;text-align:center;border:1px solid #2d8cff;border-radius:20px;background:linear-gradient(155deg,#142238,#0a111c);box-shadow:0 25px 80px rgba(0,0,0,.65)}#ryuzaExternalGate .gate-icon{width:64px;height:64px;margin:0 auto 12px;display:grid;place-items:center;border-radius:50%;background:#102b49;border:2px solid #268bff;font-size:28px}#ryuzaExternalGate h2{margin:0 0 8px;font-size:21px}#ryuzaExternalGate p{margin:0 auto 16px;color:#b7c7da;font-size:13px;line-height:1.55}#ryuzaExternalGate .gate-step{margin:0 0 15px;padding:11px 12px;border-radius:11px;background:#0a1524;border:1px solid #263d59;color:#dcecff;font-size:12px;line-height:1.5;text-align:left}#ryuzaExternalGate .gate-open{display:block;width:100%;padding:13px;border:0;border-radius:11px;background:linear-gradient(115deg,#1878f5,#11afd4);color:#fff;font:900 14px/1 inherit;cursor:pointer}#ryuzaExternalGate .gate-copy{display:block;width:100%;margin-top:8px;padding:11px;border:1px solid #30445e;border-radius:11px;background:#172334;color:#d8e4f3;font:800 12px/1 inherit;cursor:pointer}#ryuzaExternalGate .gate-url{margin-top:9px;color:#7188a3;font-size:9px;word-break:break-all}</style></head><body><div id="ryuzaExternalGate" role="dialog" aria-modal="true"><div class="gate-box"><div class="gate-icon">🌐</div><h2>Wajib Buka Lewat Chrome</h2><p>Web Ryuza sedang dibuka dari browser dalam aplikasi. Untuk melanjutkan, buka halaman ini melalui <b>Chrome</b> atau browser eksternal.</p><div class="gate-step"><b>Caranya:</b><br>1. Klik tombol <b>⋮ titik 3</b> di pojok kanan atas.<br>2. Pilih <b>“Buka di Chrome”</b> / <b>Open in Chrome</b>.<br>3. Setelah terbuka di Chrome, web akan bisa digunakan.</div><button class="gate-open" id="ryuzaOpenChrome">🚀 Buka di Chrome</button><button class="gate-copy" id="ryuzaCopyUrl">📋 Salin Link Web</button><div class="gate-url" id="ryuzaGateUrl"></div></div></div>
+
+<style id="ryuza-iphone-popup-minimal">
+/* ===== RYUZA POPUP — iPhone / iOS MINIMAL UI ===== */
+#ryuzaPopup{
+  background:rgba(0,0,0,.62)!important;
+  backdrop-filter:blur(16px) saturate(120%)!important;
+  -webkit-backdrop-filter:blur(16px) saturate(120%)!important;
+  padding:16px!important;
+}
+#ryuzaPopup .popup-box.subscribe-gate{
+  width:min(390px,calc(100vw - 28px))!important;
+  max-height:min(90vh,720px)!important;
+  overflow:auto!important;
+  overscroll-behavior:contain;
+  padding:20px 18px 16px!important;
+  border:1px solid rgba(255,255,255,.11)!important;
+  border-radius:26px!important;
+  background:rgba(20,22,28,.96)!important;
+  box-shadow:0 24px 70px rgba(0,0,0,.52),0 1px 0 rgba(255,255,255,.06) inset!important;
+  color:#f5f5f7!important;
+  text-align:center!important;
+}
+#ryuzaPopup .subscribe-gate:before{display:none!important}
+#ryuzaPopup .subscribe-badge{
+  margin:0 auto 10px!important;
+  padding:5px 9px!important;
+  border:0!important;
+  border-radius:999px!important;
+  background:rgba(255,59,48,.12)!important;
+  color:#ff6961!important;
+  font-size:9px!important;
+  letter-spacing:.8px!important;
+}
+#ryuzaPopup .subscribe-gate .popup-logo{
+  width:68px!important;height:68px!important;
+  margin:0 auto 7px!important;
+  border:2px solid rgba(10,132,255,.85)!important;
+  box-shadow:0 8px 28px rgba(10,132,255,.22)!important;
+}
+#ryuzaPopup .subscribe-check{
+  width:24px!important;height:24px!important;
+  margin:-14px auto 8px!important;
+  border:3px solid #14161c!important;
+  font-size:11px!important;
+  box-shadow:0 5px 14px rgba(10,132,255,.3)!important;
+}
+#ryuzaPopup .subscribe-gate.unlocked .subscribe-check{
+  box-shadow:0 5px 18px rgba(48,209,88,.35)!important;
+}
+#ryuzaPopup .subscribe-gate h2{
+  font-size:20px!important;
+  line-height:1.2!important;
+  letter-spacing:-.3px!important;
+  margin:0 0 5px!important;
+}
+#ryuzaPopup .subscribe-lead{
+  max-width:310px!important;
+  margin:0 auto 13px!important;
+  color:#aeb3bd!important;
+  font-size:11px!important;
+  line-height:1.45!important;
+}
+#ryuzaPopup .name-group{
+  margin:0 0 10px!important;
+  padding:10px!important;
+  border:1px solid rgba(255,255,255,.09)!important;
+  border-radius:15px!important;
+  background:rgba(255,255,255,.045)!important;
+}
+#ryuzaPopup .name-group label{
+  margin-bottom:6px!important;
+  color:#d8d9df!important;
+  font-size:11px!important;
+  font-weight:700!important;
+}
+#ryuzaPopup .name-group input{
+  min-height:40px!important;
+  padding:9px 11px!important;
+  border:1px solid rgba(255,255,255,.10)!important;
+  border-radius:11px!important;
+  background:rgba(0,0,0,.20)!important;
+  color:#fff!important;
+  font-size:13px!important;
+  box-shadow:none!important;
+}
+#ryuzaPopup .name-group input:focus{
+  border-color:rgba(10,132,255,.75)!important;
+  box-shadow:0 0 0 3px rgba(10,132,255,.12)!important;
+}
+#ryuzaPopup .name-group small{
+  margin-top:5px!important;
+  color:#777d88!important;
+  font-size:9px!important;
+}
+#ryuzaPopup .subscribe-progress-wrap{
+  margin:9px 0 10px!important;
+}
+#ryuzaPopup .subscribe-progress-top{
+  margin-bottom:5px!important;
+  color:#858b96!important;
+  font-size:9px!important;
+  letter-spacing:.4px!important;
+}
+#ryuzaPopup .subscribe-progress-count{font-size:10px!important;color:#e9e9ed!important}
+#ryuzaPopup .subscribe-progress{
+  height:5px!important;
+  border:0!important;
+  background:rgba(255,255,255,.09)!important;
+}
+#ryuzaPopup .subscribe-progress-bar{
+  background:linear-gradient(90deg,#0a84ff,#64d2ff)!important;
+}
+#ryuzaPopup .subscribe-status{
+  margin:0 0 9px!important;
+  padding:7px 9px!important;
+  border:0!important;
+  border-radius:10px!important;
+  background:rgba(255,255,255,.045)!important;
+  color:#aeb3bd!important;
+  font-size:10px!important;
+  line-height:1.35!important;
+}
+#ryuzaPopup .subscribe-actions{gap:6px!important}
+#ryuzaPopup .subscribe-channel-step{gap:5px!important}
+#ryuzaPopup .popup-action.youtube-subscribe,
+#ryuzaPopup .subscribe-confirm{
+  min-height:38px!important;
+  padding:9px 11px!important;
+  border-radius:11px!important;
+  font-size:10px!important;
+  letter-spacing:.1px!important;
+  box-shadow:none!important;
+}
+#ryuzaPopup .popup-action.youtube-subscribe{
+  background:#ff3b30!important;
+  border:0!important;
+}
+#ryuzaPopup .popup-action.youtube-subscribe.youtube-subscribe-2{
+  background:#ff453a!important;
+}
+#ryuzaPopup .popup-action.whatsapp-follow{
+  background:#30d158!important;
+}
+#ryuzaPopup .subscribe-confirm{
+  border:0!important;
+  background:#1d9f61!important;
+  color:#fff!important;
+}
+#ryuzaPopup .subscribe-confirm.ready{
+  animation:none!important;
+}
+#ryuzaPopup .subscribe-success{
+  margin-top:9px!important;
+  padding:10px!important;
+  border:1px solid rgba(48,209,88,.18)!important;
+  border-radius:14px!important;
+  background:rgba(48,209,88,.07)!important;
+}
+#ryuzaPopup .subscribe-success-icon{font-size:22px!important;margin-bottom:3px!important}
+#ryuzaPopup .subscribe-success-title{font-size:11px!important}
+#ryuzaPopup .subscribe-success-text{font-size:9px!important;margin-top:3px!important}
+#ryuzaPopup .subscribe-countdown{font-size:14px!important;margin-top:4px!important}
+#ryuzaPopup .subscribe-note{
+  margin-top:8px!important;
+  color:#666d78!important;
+  font-size:8.5px!important;
+  line-height:1.4!important;
+}
+#ryuzaPopup .subscribe-note b{color:#969da8!important}
+@media(max-width:500px){
+  #ryuzaPopup{padding:10px!important}
+  #ryuzaPopup .popup-box.subscribe-gate{
+    width:min(370px,calc(100vw - 20px))!important;
+    max-height:92vh!important;
+    padding:17px 14px 13px!important;
+    border-radius:23px!important;
+  }
+  #ryuzaPopup .subscribe-gate .popup-logo{width:60px!important;height:60px!important}
+  #ryuzaPopup .subscribe-gate h2{font-size:19px!important}
+  #ryuzaPopup .subscribe-lead{font-size:10.5px!important;margin-bottom:10px!important}
+  #ryuzaPopup .name-group{padding:9px!important}
+  #ryuzaPopup .popup-action.youtube-subscribe,
+  #ryuzaPopup .subscribe-confirm{min-height:36px!important;font-size:9.5px!important}
+}
+@media(prefers-reduced-motion:reduce){
+  #ryuzaPopup .subscribe-check,
+  #ryuzaPopup .subscribe-success{animation:none!important;transition:none!important}
+}
+</style>
+
+</head><body>
 <div id="ryuzaBootLoader" role="status" aria-live="polite" aria-label="Memuat Ryuza Official">
   <div class="ryuza-boot-box">
     <div class="ryuza-boot-logo">R</div>
@@ -1734,4 +1924,4 @@ document.querySelectorAll('.replace-dropdown').forEach(box => {
   setTimeout(updateCount,800);
 })();
 </script>
-<script id="ryuza-external-browser-gate">(function(){function isInApp(){var ua=navigator.userAgent||'';return /(FBAN|FBAV|Instagram|Line\/|Twitter|TikTok|Snapchat|GSA\/|; wv\)|YouTube|WhatsApp)/i.test(ua)||(/Android/i.test(ua)&&/; wv\)/i.test(ua));}function isChrome(){var ua=navigator.userAgent||'';return /Chrome\//i.test(ua)&&!/Edg\//i.test(ua)&&!/OPR\//i.test(ua)&&!/SamsungBrowser\//i.test(ua)&&!/CriOS/i.test(ua);}function init(){var gate=document.getElementById('ryuzaExternalGate');if(!gate)return;var url=location.href;var label=document.getElementById('ryuzaGateUrl');if(label)label.textContent=url;var must=isInApp()&&!isChrome();if(!must)return;gate.classList.add('show');document.documentElement.style.overflow='hidden';var open=document.getElementById('ryuzaOpenChrome');if(open)open.onclick=function(){var intent='intent://'+location.host+location.pathname+location.search+location.hash+'#Intent;scheme=https;package=com.android.chrome;end';try{location.href=intent}catch(e){window.open('https://'+location.host+location.pathname+location.search+location.hash,'_blank')}};var copy=document.getElementById('ryuzaCopyUrl');if(copy)copy.onclick=function(){if(navigator.clipboard){navigator.clipboard.writeText(url).then(function(){copy.textContent='✓ Link Berhasil Disalin'}).catch(function(){prompt('Salin link ini:',url)})}else prompt('Salin link ini:',url)};}if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init);else init();})();</script></body></html>
+</body></html>
