@@ -474,6 +474,15 @@ input{background:#0a1321;border-color:#2b405d}input:focus{border-color:#35a7ff;b
 </div>
 <section aria-label="Skin paling banyak diklik" id="skinLeaderboard" style="margin:10px 0;padding:10px 12px;border:1px solid #29364b;border-radius:12px;background:#0c1422;color:#eef5ff"><div style="display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap"><div><h2 style="margin:0;font-size:14px">🏆 Skin &amp; Replace Terpopuler</h2><p style="margin:3px 0 0;color:#aab9cf;font-size:11px">Peringkat berdasarkan jumlah klik download yang tercatat.</p></div><button id="refreshSkinRanking" style="padding:5px 9px;font-size:11px;border:1px solid #456080;border-radius:8px;background:#14243a;color:#fff;cursor:pointer" type="button">↻ Perbarui</button></div><div style="display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;margin-top:8px"><ol id="skinRankingLeft" style="margin:0;padding-left:22px;display:grid;align-content:start;gap:4px"><li style="color:#aab9cf">Memuat peringkat...</li></ol><ol id="skinRankingRight" start="6" style="margin:0;padding-left:22px;display:grid;align-content:start;gap:4px"></ol></div></section>
 <!-- RYUZA INDEX SUPER FEATURES -->
+<style id="ryuza-feature-tabs-css">
+.ryuza-smartbar{position:sticky;top:8px;z-index:20;display:flex;gap:7px;overflow-x:auto;padding:8px;margin:10px 0 8px;border:1px solid rgba(105,201,255,.18);border-radius:15px;background:rgba(7,15,27,.92);backdrop-filter:blur(12px);scrollbar-width:thin}
+.ryuza-smartbar::-webkit-scrollbar{height:4px}.ryuza-smartbar::-webkit-scrollbar-thumb{border-radius:99px;background:#29435f}
+.ryuza-filter{flex:0 0 auto;border:1px solid #263d57;border-radius:10px;background:#101d2d;color:#b9c9dc;padding:9px 12px;font-size:12px;font-weight:800;cursor:pointer;transition:.2s}
+.ryuza-filter:hover{border-color:#3c6b91;transform:translateY(-1px)}.ryuza-filter.active{background:linear-gradient(135deg,#1687e8,#1166ba);border-color:#55b7ff;color:#fff;box-shadow:0 5px 16px rgba(20,130,220,.22)}
+.ryuza-tab-note{font-size:11px;color:#8fa5bd;margin:5px 2px 9px}.ryuza-tab-section{display:none}.ryuza-tab-section.active{display:block}
+#skinLeaderboard.ryuza-tab-popular{display:none;margin-top:10px}#skinLeaderboard.ryuza-tab-popular.active{display:block}
+@media(max-width:600px){.ryuza-smartbar{top:4px;padding:6px}.ryuza-filter{padding:8px 10px;font-size:11px}.ryuza-tab-note{font-size:10px}}
+</style>
 <style id="ryuza-super-features-css">
 .ryuza-super{max-width:1180px;margin:18px auto;padding:0 14px}
 .ryuza-announce{display:none;margin:10px 0;padding:11px 14px;border:1px solid rgba(120,180,255,.25);border-radius:14px;background:linear-gradient(135deg,rgba(30,70,110,.65),rgba(12,20,35,.9));font-size:13px;line-height:1.5;box-shadow:0 8px 25px rgba(0,0,0,.16)}
@@ -495,16 +504,20 @@ input{background:#0a1321;border-color:#2b405d}input:focus{border-color:#35a7ff;b
 <div id="ryuzaSuper" class="ryuza-super">
   <div id="ryuzaAnnouncement" class="ryuza-announce"><b>📢</b><span></span></div>
   <div class="ryuza-smartbar" id="ryuzaSmartbar">
-    <button class="ryuza-filter active" data-mode="ALL">✨ Semua</button>
+    <button class="ryuza-filter active" data-mode="ALL">✨ Semua Skin</button>
+    <button class="ryuza-filter" data-mode="POPULAR">🏆 Terpopuler</button>
     <button class="ryuza-filter" data-mode="TRENDING">🔥 Trending</button>
     <button class="ryuza-filter" data-mode="NEW">🆕 Terbaru</button>
-    <button class="ryuza-filter" data-mode="FEATURED">⭐ Pilihan</button>
+    <button class="ryuza-filter" data-mode="FEATURED">⭐ Pilihan Admin</button>
+    <button class="ryuza-filter" data-mode="RECENT">🕘 Terakhir Dilihat</button>
     <button class="ryuza-filter" data-mode="FAVORITE">❤️ Favorit</button>
   </div>
-  <div class="ryuza-section" id="ryuzaTrendingSec"><div class="ryuza-section-head"><h3>🔥 Trending Skin</h3><span>berdasarkan download</span></div><div class="ryuza-mini-grid" id="ryuzaTrending"></div></div>
-  <div class="ryuza-section" id="ryuzaFeaturedSec"><div class="ryuza-section-head"><h3>⭐ Pilihan Admin</h3><span>rekomendasi Ryuza</span></div><div class="ryuza-mini-grid" id="ryuzaFeatured"></div></div>
-  <div class="ryuza-section" id="ryuzaNewSec"><div class="ryuza-section-head"><h3>🆕 Skin Terbaru</h3><span>update terbaru</span></div><div class="ryuza-mini-grid" id="ryuzaNew"></div></div>
-  <div class="ryuza-section" id="ryuzaRecentSec"><div class="ryuza-section-head"><h3>🕘 Terakhir Dilihat</h3><span>tersimpan di perangkat</span></div><div class="ryuza-mini-grid" id="ryuzaRecent"></div></div>
+  <div class="ryuza-tab-note" id="ryuzaTabNote">Semua skin</div>
+  <div class="ryuza-section ryuza-tab-section" id="ryuzaTrendingSec"><div class="ryuza-section-head"><h3>🔥 Trending Skin</h3><span>berdasarkan download</span></div><div class="ryuza-mini-grid" id="ryuzaTrending"></div></div>
+  <div class="ryuza-section ryuza-tab-section" id="ryuzaFeaturedSec"><div class="ryuza-section-head"><h3>⭐ Pilihan Admin</h3><span>rekomendasi Ryuza</span></div><div class="ryuza-mini-grid" id="ryuzaFeatured"></div></div>
+  <div class="ryuza-section ryuza-tab-section" id="ryuzaNewSec"><div class="ryuza-section-head"><h3>🆕 Skin Terbaru</h3><span>update terbaru</span></div><div class="ryuza-mini-grid" id="ryuzaNew"></div></div>
+  <div class="ryuza-section ryuza-tab-section" id="ryuzaRecentSec"><div class="ryuza-section-head"><h3>🕘 Terakhir Dilihat</h3><span>tersimpan di perangkat</span></div><div class="ryuza-mini-grid" id="ryuzaRecent"></div></div>
+  <div class="ryuza-section ryuza-tab-section" id="ryuzaFavoriteSec"><div class="ryuza-section-head"><h3>❤️ Skin Favorit</h3><span>favorit kamu</span></div><div class="ryuza-mini-grid" id="ryuzaFavorite"></div></div>
 </div>
 <nav class="ryuza-bottom" aria-label="Navigasi cepat">
   <button data-jump="top"><b>⌂</b>Home</button><button data-jump="search"><b>🔎</b>Cari</button><button data-jump="trending"><b>🔥</b>Trending</button><button data-jump="list"><b>📦</b>Semua</button>
@@ -530,10 +543,10 @@ input{background:#0a1321;border-color:#2b405d}input:focus{border-color:#35a7ff;b
       db.ref('siteConfig/settings').on('value',s=>{const st=s.val()||{};const a=document.getElementById('ryuzaAnnouncement');if(a){a.querySelector('span').textContent=clean(st.announcement||'');a.classList.toggle('show',!!st.showAnnouncement&&!!clean(st.announcement));} if(st.maintenance){showMaintenance()} });
       db.ref('siteConfig/indexFeatures').on('value',s=>{featureCfg={...featureCfg,...(s.val()||{})};const reset=Number(featureCfg.favoriteResetAt||0);if(reset){try{localStorage.removeItem('ryuzaFavorites')}catch(e){}}applyFeatureVisibility();applyAll();});
       document.addEventListener('click',trackView,true);
-      document.getElementById('ryuzaSmartbar')?.addEventListener('click',e=>{const b=e.target.closest('[data-mode]');if(!b)return;mode=b.dataset.mode;document.querySelectorAll('.ryuza-filter').forEach(x=>x.classList.toggle('active',x===b));filterCards()});
+      document.getElementById('ryuzaSmartbar')?.addEventListener('click',e=>{const b=e.target.closest('[data-mode]');if(!b)return;mode=b.dataset.mode;document.querySelectorAll('.ryuza-filter').forEach(x=>x.classList.toggle('active',x===b));filterCards();syncFeatureTabs()});
       document.querySelectorAll('.ryuza-bottom [data-jump]').forEach(b=>b.onclick=()=>jump(b.dataset.jump));
       const q=document.getElementById(ids.q);q?.addEventListener('input',()=>setTimeout(filterCards,0));
-      ready=true;setTimeout(applyAll,300);
+      ready=true;syncFeatureTabs();setTimeout(applyAll,300);
     }catch(e){console.warn('[Ryuza Super]',e)}
   }
   function titleOf(card){return clean(card.querySelector('.hero-title-text')?.textContent||card.querySelector('.title')?.textContent||card.dataset.rtdbId||'Skin')}
@@ -546,13 +559,28 @@ input{background:#0a1321;border-color:#2b405d}input:focus{border-color:#35a7ff;b
   function mini(card,rank){const id=keyOf(card),title=titleOf(card),img=card.querySelector('.hero-icon')?.src||'',count=matchCount(title),fav=getLS('ryuzaFavorites',[]).includes(id);return `<div class="ryuza-mini" data-card="${esc(id)}"><span class="ryuza-mini-rank">${rank?('#'+rank):''}</span><div class="ryuza-mini-top"><div class="ryuza-mini-icon">${img?`<img src="${esc(img)}" alt="">`:esc(title.slice(0,2).toUpperCase())}</div><div class="ryuza-mini-title">${esc(title)}</div></div><div class="ryuza-mini-meta">📥 ${count} download${count===1?'':'s'}</div><button class="ryuza-mini-fav" title="Favorit" data-fav="${esc(id)}">${fav?'❤️':'♡'}</button></div>`}
   function renderBox(id,list){const el=document.getElementById(id);if(!el)return;if(!list.length){el.innerHTML='<div class="ryuza-empty">Belum ada data.</div>';return}el.innerHTML=list.map((c,i)=>mini(c,i+1)).join('')}
   function sortByDownload(cs){return cs.slice().sort((a,b)=>matchCount(titleOf(b))-matchCount(titleOf(a)))}
-  function applyAll(){if(!ready)return;const cs=cards();if(!cs.length)return;const featured=cs.filter(c=>skinData[keyOf(c)]?.featured), newest=cs.slice().sort((a,b)=>(Number(skinData[keyOf(b)]?.createdAt)||0)-(Number(skinData[keyOf(a)]?.createdAt)||0));const lim=Math.max(3,Math.min(20,Number(featureCfg.sectionLimit)||8)),tlim=Math.max(3,Math.min(20,Number(featureCfg.trendingLimit)||8));renderBox('ryuzaTrending',sortByDownload(cs).slice(0,tlim));renderBox('ryuzaFeatured',featured.slice(0,lim));renderBox('ryuzaNew',newest.slice(0,lim));const recent=getLS('ryuzaRecent',[]).map(id=>cs.find(c=>keyOf(c)===id)).filter(Boolean).slice(0,lim);renderBox('ryuzaRecent',recent);applyCardStats(cs);filterCards();applyFeatureVisibility()}
+  function applyAll(){if(!ready)return;const cs=cards();if(!cs.length)return;const featured=cs.filter(c=>skinData[keyOf(c)]?.featured), newest=cs.slice().sort((a,b)=>(Number(skinData[keyOf(b)]?.createdAt)||0)-(Number(skinData[keyOf(a)]?.createdAt)||0));const lim=Math.max(3,Math.min(20,Number(featureCfg.sectionLimit)||8)),tlim=Math.max(3,Math.min(20,Number(featureCfg.trendingLimit)||8));renderBox('ryuzaTrending',sortByDownload(cs).slice(0,tlim));renderBox('ryuzaFeatured',featured.slice(0,lim));renderBox('ryuzaNew',newest.slice(0,lim));const recent=getLS('ryuzaRecent',[]).map(id=>cs.find(c=>keyOf(c)===id)).filter(Boolean).slice(0,lim);renderBox('ryuzaRecent',recent);const favorites=getLS('ryuzaFavorites',[]).map(id=>cs.find(c=>keyOf(c)===id)).filter(Boolean).slice(0,lim);renderBox('ryuzaFavorite',favorites);applyCardStats(cs);filterCards();applyFeatureVisibility()}
   function applyCardStats(cs){cs.forEach(c=>{const title=titleOf(c),count=matchCount(title);let box=c.querySelector('.ryuza-card-stats');if(!box){box=document.createElement('div');box.className='ryuza-card-stats';const anchor=c.querySelector('.replace-dropdown')||c.lastElementChild;c.insertBefore(box,anchor||null)}box.innerHTML=(featureCfg.stats?`<span class="ryuza-chip hot">📥 ${count} Download</span>`:'')+(featureCfg.featured&&skinData[keyOf(c)]?.featured?'<span class="ryuza-chip">⭐ Pilihan</span>':'')+(featureCfg.newest&&skinData[keyOf(c)]?.isNew?'<span class="ryuza-chip">🆕 NEW</span>':'')+(featureCfg.favorite&&getLS('ryuzaFavorites',[]).includes(keyOf(c))?'<span class="ryuza-chip">❤️ Favorit</span>':'')})}
   function filterCards(){const cs=cards(),q=clean(document.getElementById(ids.q)?.value).toLowerCase(),fav=getLS('ryuzaFavorites',[]);cs.forEach(c=>{const id=keyOf(c),title=titleOf(c).toLowerCase(),search=(c.dataset.search||'').toLowerCase();let ok=!q||(title+' '+search).includes(q);if(mode==='TRENDING')ok=ok&&featureCfg.trending&&matchCount(titleOf(c))>0;if(mode==='NEW')ok=ok&&featureCfg.newest&&!!skinData[id]?.isNew;if(mode==='FEATURED')ok=ok&&featureCfg.featured&&!!skinData[id]?.featured;if(mode==='FAVORITE')ok=ok&&featureCfg.favorite&&fav.includes(id);c.style.display=ok?'':'none'});}
-  function applyFeatureVisibility(){const map=[['ryuzaTrendingSec',featureCfg.trending],['ryuzaFeaturedSec',featureCfg.featured],['ryuzaNewSec',featureCfg.newest],['ryuzaRecentSec',featureCfg.recent]];map.forEach(([id,on])=>{const el=document.getElementById(id);if(el)el.style.display=on?'':'none'});document.querySelectorAll('#ryuzaSmartbar [data-mode="TRENDING"]').forEach(x=>x.style.display=featureCfg.trending?'':'none');document.querySelectorAll('#ryuzaSmartbar [data-mode="NEW"]').forEach(x=>x.style.display=featureCfg.newest?'':'none');document.querySelectorAll('#ryuzaSmartbar [data-mode="FEATURED"]').forEach(x=>x.style.display=featureCfg.featured?'':'none');document.querySelectorAll('#ryuzaSmartbar [data-mode="FAVORITE"]').forEach(x=>x.style.display=featureCfg.favorite?'':'none');document.querySelectorAll('[data-fav]').forEach(x=>x.style.display=featureCfg.favorite?'':'none');const bottom=document.querySelector('.ryuza-bottom');if(bottom)bottom.style.display=featureCfg.bottomNav?'':'none';}
+  function syncFeatureTabs(){
+    const bar=document.getElementById('ryuzaSmartbar'), list=document.getElementById('list'), lb=document.getElementById('skinLeaderboard');
+    if(!bar)return;
+    // Pindahkan tab + keterangan ke atas ranking agar selalu terlihat sebelum konten.
+    const note=document.getElementById('ryuzaTabNote');
+    if(lb&&bar&&lb.parentNode){lb.parentNode.insertBefore(bar,lb);if(note)lb.parentNode.insertBefore(note,lb)}
+    if(lb&&!lb.classList.contains('ryuza-tab-popular')) lb.classList.add('ryuza-tab-popular');
+    const map={TRENDING:'ryuzaTrendingSec',FEATURED:'ryuzaFeaturedSec',NEW:'ryuzaNewSec',RECENT:'ryuzaRecentSec',FAVORITE:'ryuzaFavoriteSec'};
+    Object.entries(map).forEach(([m,id])=>{const el=document.getElementById(id);if(el)el.classList.toggle('active',mode===m)});
+    if(lb)lb.classList.toggle('active',mode==='POPULAR');
+    if(list)list.style.display=mode==='ALL'?'':'none';
+    const labels={ALL:'Semua skin',POPULAR:'Skin & Replace terpopuler berdasarkan klik download',TRENDING:'Trending berdasarkan aktivitas download',FEATURED:'Pilihan Admin yang direkomendasikan Ryuza',NEW:'Skin terbaru yang ditambahkan',RECENT:'Skin yang terakhir kamu lihat',FAVORITE:'Skin yang kamu tandai sebagai favorit'};
+    if(note)note.textContent=labels[mode]||'Semua skin';
+  }
+
+  function applyFeatureVisibility(){const map=[['ryuzaTrendingSec',featureCfg.trending],['ryuzaFeaturedSec',featureCfg.featured],['ryuzaNewSec',featureCfg.newest],['ryuzaRecentSec',featureCfg.recent],['ryuzaFavoriteSec',featureCfg.favorite]];map.forEach(([id,on])=>{const el=document.getElementById(id);if(el)el.style.display=on?'':'none'});document.querySelectorAll('#ryuzaSmartbar [data-mode="TRENDING"]').forEach(x=>x.style.display=featureCfg.trending?'':'none');document.querySelectorAll('#ryuzaSmartbar [data-mode="NEW"]').forEach(x=>x.style.display=featureCfg.newest?'':'none');document.querySelectorAll('#ryuzaSmartbar [data-mode="FEATURED"]').forEach(x=>x.style.display=featureCfg.featured?'':'none');document.querySelectorAll('#ryuzaSmartbar [data-mode="RECENT"]').forEach(x=>x.style.display=featureCfg.recent?'':'none');document.querySelectorAll('#ryuzaSmartbar [data-mode="FAVORITE"]').forEach(x=>x.style.display=featureCfg.favorite?'':'none');document.querySelectorAll('[data-fav]').forEach(x=>x.style.display=featureCfg.favorite?'':'none');syncFeatureTabs();const bottom=document.querySelector('.ryuza-bottom');if(bottom)bottom.style.display=featureCfg.bottomNav?'':'none';}
   function trackView(e){if(!featureCfg.recent)return;const card=e.target.closest?.('#list .skin[data-rtdb-id]');if(!card)return;if(e.target.closest('select,button'))return;const id=keyOf(card),arr=getLS('ryuzaRecent',[]).filter(x=>x!==id);arr.unshift(id);setLS('ryuzaRecent',arr.slice(0,12));setTimeout(applyAll,50)}
   document.addEventListener('click',e=>{const fav=e.target.closest?.('[data-fav]');if(fav&&featureCfg.favorite){e.preventDefault();e.stopPropagation();const id=fav.dataset.fav,a=getLS('ryuzaFavorites',[]),n=a.includes(id)?a.filter(x=>x!==id):[...a,id];setLS('ryuzaFavorites',n);applyAll();return}const m=e.target.closest?.('.ryuza-mini');if(m&&!e.target.closest('[data-fav]')){const c=document.querySelector('#list .skin[data-rtdb-id="'+CSS.escape(m.dataset.card)+'"]');if(c){c.scrollIntoView({behavior:'smooth',block:'center'});c.style.outline='2px solid rgba(100,190,255,.55)';setTimeout(()=>c.style.outline='',1200)}}});
-  function jump(x){if(x==='search'){document.getElementById('q')?.focus();document.getElementById('q')?.scrollIntoView({behavior:'smooth',block:'center'})}else if(x==='trending')document.getElementById('ryuzaTrendingSec')?.scrollIntoView({behavior:'smooth',block:'start'});else if(x==='list')document.getElementById('list')?.scrollIntoView({behavior:'smooth',block:'start'});else window.scrollTo({top:0,behavior:'smooth'})}
+  function jump(x){if(x==='search'){document.getElementById('q')?.focus();document.getElementById('q')?.scrollIntoView({behavior:'smooth',block:'center'})}else if(x==='trending'){const b=document.querySelector('#ryuzaSmartbar [data-mode="TRENDING"]');b?.click();document.getElementById('ryuzaTrendingSec')?.scrollIntoView({behavior:'smooth',block:'start'})}else if(x==='list'){const b=document.querySelector('#ryuzaSmartbar [data-mode="ALL"]');b?.click();document.getElementById('list')?.scrollIntoView({behavior:'smooth',block:'start'})}else window.scrollTo({top:0,behavior:'smooth'})}
   function showMaintenance(){let a=document.getElementById('ryuzaAnnouncement');if(a){a.querySelector('span').textContent='Website sedang dalam maintenance. Beberapa fitur mungkin sementara tidak tersedia.';a.classList.add('show')}}
   wait();
 })();
