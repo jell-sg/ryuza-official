@@ -173,19 +173,19 @@ body:before{animation:none!important}body{background-attachment:initial!importan
    <button class="secondary" id="ghSkinTest">🔎 Tes Koneksi</button>
   </div>
  </div>
- <div class="card" id="firebaseAdminPanel">
+ <div class="card" id="githubAdminPanel">
   <div style="display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap">
-   <div><h3 style="margin:0 0 5px">📤 Upload Admin ke Firebase</h3><div class="hint">Pilih <b>admin.html</b> dari komputer. Versi Admin akan disimpan di Firebase dan otomatis dimuat saat halaman Admin dibuka. Tidak perlu upload ke GitHub lagi untuk update Admin.</div></div>
-   <span id="firebaseAdminStatus" class="badge">● Belum ada file</span>
+   <div><h3 style="margin:0 0 5px">🚀 Upload Admin langsung ke GitHub</h3><div class="hint">Pilih <b>admin.html</b> dari komputer. File akan langsung menggantikan file Admin di repository GitHub.</div></div>
+   <span id="githubAdminStatus" class="badge">● Belum ada file</span>
   </div>
   <div class="toolbar" style="margin-top:12px">
-   <button class="secondary" id="pickFirebaseAdminBtn">📁 Pilih admin.html</button>
-   <input id="firebaseAdminFileInput" class="file" type="file" accept=".html,text/html">
-   <button class="primary" id="uploadFirebaseAdminBtn">🚀 Upload Admin</button>
-   <button class="secondary" id="downloadFirebaseAdminBtn">⬇️ Download Admin</button>
+   <button class="secondary" id="pickGithubAdminBtn">📁 Pilih admin.html</button>
+   <input id="githubAdminFileInput" class="file" type="file" accept=".html,text/html">
+   <button class="primary" id="uploadGithubAdminBtn">🚀 Upload Admin ke GitHub</button>
+   <button class="secondary" id="downloadGithubAdminBtn">⬇️ Download dari GitHub</button>
   </div>
-  <div id="firebaseAdminFileName" class="hint" style="margin-top:8px">Belum memilih file.</div>
-  <div class="hint" style="margin-top:6px">Target Firebase: <b>siteConfig/adminHtml</b>. URL Admin GitHub yang sekarang tetap menjadi loader awal; setelah versi Firebase tersedia, isi Admin terbaru dimuat otomatis dari Firebase.</div>
+  <div id="githubAdminFileName" class="hint" style="margin-top:8px">Belum memilih file.</div>
+  <div class="hint" style="margin-top:6px">Konfigurasi GitHub di Dashboard dipakai otomatis: <b>Owner / Repository / Branch / Path / Token</b>.</div>
  </div>
 </section>
 
@@ -577,10 +577,11 @@ $('quickImport').onclick=()=>{$('.tab[data-tab="skins"]').click();$('seedBtn').c
 </script>
 <script id="ryuza-github-publisher">
 (function(){
-  const LS='ryuzaGithubPublishConfigV1';
+  const LS='ryuzaGithubConfig';
+  const LEGACY='ryuzaGithubPublishConfigV1';
   const $=id=>document.getElementById(id);
-  const getCfg=()=>{try{return JSON.parse(localStorage.getItem(LS)||'{}')}catch(e){return {}}};
-  const setCfg=x=>{try{localStorage.setItem(LS,JSON.stringify(x))}catch(e){}};
+  const getCfg=()=>{try{const a=JSON.parse(localStorage.getItem(LS)||'{}');const b=JSON.parse(localStorage.getItem(LEGACY)||'{}');const c={...b,...a}; if(!c.branch)c.branch='main'; if(!c.path)c.path='index.html'; return c}catch(e){return {}}};
+  const setCfg=x=>{try{localStorage.setItem(LS,JSON.stringify(x));localStorage.setItem(LEGACY,JSON.stringify(x))}catch(e){}};
   function loadCfg(){const c=getCfg();['ghOwner','ghRepo','ghBranch','ghPath'].forEach(k=>{if($(k)&&c[k])$(k).value=c[k]});if($('ghToken')&&c.token) $('ghToken').value=c.token;if($('ghAuto'))$('ghAuto').checked=c.auto===true;setStatus(c.owner&&c.repo&&c.token?'Siap publish':'Belum dikonfigurasi','');}
   function cfgFromUI(){return {owner:$('ghOwner')?.value.trim()||'',repo:$('ghRepo')?.value.trim()||'',branch:$('ghBranch')?.value.trim()||'main',path:$('ghPath')?.value.trim()||'index.html',token:$('ghToken')?.value.trim()||'',auto:!!$('ghAuto')?.checked}}
   function setStatus(t,kind){const e=$('ghStatus');if(!e)return;e.textContent='● '+t;e.className='badge '+(kind||'')}
@@ -654,52 +655,84 @@ $('quickImport').onclick=()=>{$('.tab[data-tab="skins"]').click();$('seedBtn').c
 })();
 </script>
 <script>
-/* ===== Upload admin.html langsung ke Firebase ===== */
+/* ===== Upload / Download admin.html langsung ke GitHub ===== */
 (function(){
   const $=id=>document.getElementById(id);
-  const input=$('firebaseAdminFileInput'),pick=$('pickFirebaseAdminBtn'),upload=$('uploadFirebaseAdminBtn');
-  const status=$('firebaseAdminStatus'),name=$('firebaseAdminFileName');
+  const input=$('githubAdminFileInput'),pick=$('pickGithubAdminBtn'),upload=$('uploadGithubAdminBtn'),download=$('downloadGithubAdminBtn');
+  const status=$('githubAdminStatus'),name=$('githubAdminFileName');
   if(!input||!pick||!upload)return;
   let selectedFile=null;
-  const setStatus=(t,ok)=>{if(!status)return;status.textContent='● '+t;status.className='badge '+(ok===true?'ok':ok===false?'err':'')};
+  const getCfg=()=>{try{const a=JSON.parse(localStorage.getItem('ryuzaGithubConfig')||'{}');const b=JSON.parse(localStorage.getItem('ryuzaGithubPublishConfigV1')||'{}');return {...b,...a,branch:a.branch||b.branch||'main',adminPath:'admin.html'}}catch(e){return {}}};
+  const setStatus=(t,kind='')=>{if(status){status.textContent='● '+t;status.className='badge '+kind}};
   const toastMsg=t=>typeof toast==='function'?toast(t):alert(t);
+  const headers=token=>({Accept:'application/vnd.github+json',Authorization:'Bearer '+token,'X-GitHub-Api-Version':'2022-11-28','Content-Type':'application/json'});
+  const apiUrl=c=>'https://api.github.com/repos/'+encodeURIComponent(c.owner)+'/'+encodeURIComponent(c.repo)+'/contents/'+encodeURIComponent(c.adminPath||'admin.html')+'?ref='+encodeURIComponent(c.branch||'main');
+  const b64decode=s=>{const bin=atob((s||'').replace(/\n/g,''));let out='';for(let i=0;i<bin.length;i+=8192)out+=String.fromCharCode(...Uint8Array.from(bin.slice(i,i+8192),c=>c.charCodeAt(0)));return decodeURIComponent(escape(out))};
+  const b64encode=s=>btoa(unescape(encodeURIComponent(s)));
+
   pick.onclick=()=>input.click();
   input.onchange=e=>{
     selectedFile=e.target.files?.[0]||null;
     if(!selectedFile){name.textContent='Belum memilih file.';setStatus('Belum ada file');return}
     name.textContent='File dipilih: '+selectedFile.name+' • '+Math.round(selectedFile.size/1024)+' KB';
-    setStatus('Siap diupload',true);
+    setStatus('Siap diupload','ok');
   };
+
   upload.onclick=async()=>{
-    if(!selectedFile){setStatus('Pilih admin.html dulu',false);toastMsg('Pilih file admin.html terlebih dahulu.');return}
-    if(!window.db){setStatus('Firebase belum siap',false);toastMsg('Firebase belum siap. Tunggu sebentar lalu coba lagi.');return}
-    if(selectedFile.size>5*1024*1024){setStatus('File terlalu besar',false);toastMsg('❌ File terlalu besar. Maksimal 5 MB.');return}
-    upload.disabled=true;setStatus('Membaca file...');
+    if(!selectedFile){setStatus('Pilih admin.html dulu','err');toastMsg('Pilih file admin.html terlebih dahulu.');return}
+    const c=getCfg();
+    if(!c.owner||!c.repo||!c.token){setStatus('GitHub belum dikonfigurasi','err');toastMsg('Isi konfigurasi GitHub di Dashboard terlebih dahulu.');return}
+    if(selectedFile.size>5*1024*1024){setStatus('File terlalu besar','err');toastMsg('❌ File terlalu besar. Maksimal 5 MB.');return}
+    upload.disabled=true;
     try{
-      let content=await selectedFile.text();
+      setStatus('Membaca admin.html...');
+      const content=await selectedFile.text();
       if(!/<(?:!doctype\s+html|html[\s>])/i.test(content))throw Error('File yang dipilih bukan HTML yang valid.');
-      // Jika file yang dipilih adalah loader ini sendiri, simpan hanya aplikasi Admin agar tidak terjadi loop.
-      content=content
-        .replace(/<!-- RYUZA_FIREBASE_ADMIN_LOADER_START -->[\s\S]*?<!-- RYUZA_FIREBASE_ADMIN_LOADER_END -->/gi,'')
-        .replace(/<style[^>]*id=[\"']ryuza-admin-remote-style[\"'][^>]*>[\s\S]*?<\/style>/gi,'')
-        .replace(/<script[^>]*id=[\"']ryuza-admin-firebase-loader[\"'][^>]*>[\s\S]*?<\/script>/gi,'')
-        .replace(/<!-- Firebase Admin: standalone build\. No remote document\.write loader\. -->/gi,'');
-      if(content.length<200)throw Error('Isi admin.html tidak valid setelah diproses.');
-      setStatus('Mengupload ke Firebase...');
-      await db.ref('siteConfig/adminHtml').set(content);
-      await db.ref('siteConfig/adminSource').set({enabled:true,fileName:selectedFile.name,updatedAt:firebase.database.ServerValue.TIMESTAMP,size:content.length});
-      setStatus('ADMIN AKTIF • FIREBASE','ok');
-      toastMsg('✅ admin.html berhasil diupload ke Firebase. Buka/refresh URL Admin untuk memakai versi terbaru.');
+      setStatus('Mengambil admin.html dari GitHub...');
+      const url=apiUrl(c);
+      const get=await fetch(url,{headers:headers(c.token),cache:'no-store'});
+      const gd=await get.json();
+      if(!get.ok)throw Error(gd.message||('GitHub GET '+get.status));
+      if(!gd.sha)throw Error('SHA admin.html dari GitHub tidak ditemukan.');
+      setStatus('Mengupload ke GitHub...');
+      const put=await fetch(url,{method:'PUT',headers:headers(c.token),body:JSON.stringify({
+        message:'Update admin.html dari Ryuza Admin Panel',
+        content:b64encode(content),
+        sha:gd.sha,
+        branch:c.branch||'main'
+      })});
+      const pd=await put.json();
+      if(!put.ok)throw Error(pd.message||('GitHub PUT '+put.status));
+      setStatus('ADMIN BERHASIL DIUPLOAD • GITHUB','ok');
+      toastMsg('✅ admin.html berhasil diganti langsung di GitHub.');
     }catch(e){
-      console.error(e);setStatus('Upload gagal: '+(e.message||e),false);toastMsg('❌ Upload Admin gagal: '+(e.message||e));
+      console.error(e);
+      setStatus('Upload gagal: '+(e.message||e),'err');
+      toastMsg('❌ Upload Admin ke GitHub gagal: '+(e.message||e));
     }finally{upload.disabled=false}
   };
-  try{
-    db?.ref('siteConfig/adminSource').on('value',s=>{
-      const x=s.val();
-      if(x?.enabled){setStatus('ADMIN FIREBASE AKTIF','ok');if(!selectedFile&&x.fileName)name.textContent='Admin aktif: '+x.fileName+' • '+Math.round(Number(x.size||0)/1024)+' KB'}
-    });
-  }catch(e){}
+
+  download.onclick=async()=>{
+    const c=getCfg();
+    if(!c.owner||!c.repo||!c.token){setStatus('GitHub belum dikonfigurasi','err');toastMsg('Isi konfigurasi GitHub di Dashboard terlebih dahulu.');return}
+    download.disabled=true;
+    try{
+      setStatus('Mengambil admin.html dari GitHub...');
+      const get=await fetch(apiUrl(c),{headers:headers(c.token),cache:'no-store'});
+      const gd=await get.json();
+      if(!get.ok)throw Error(gd.message||('GitHub GET '+get.status));
+      const html=b64decode(gd.content||'');
+      if(!html.trim())throw Error('admin.html kosong di GitHub.');
+      const blob=new Blob([html],{type:'text/html;charset=utf-8'});
+      const u=URL.createObjectURL(blob),a=document.createElement('a');
+      a.href=u;a.download='admin.html';document.body.appendChild(a);a.click();a.remove();
+      setTimeout(()=>URL.revokeObjectURL(u),1000);
+      setStatus('ADMIN DIDOWNLOAD • GITHUB','ok');
+      toastMsg('✅ admin.html berhasil didownload dari GitHub.');
+    }catch(e){
+      console.error(e);setStatus('Download gagal: '+(e.message||e),'err');toastMsg('❌ Download Admin gagal: '+(e.message||e));
+    }finally{download.disabled=false}
+  };
 })();
 </script>
 
@@ -736,7 +769,14 @@ $('quickImport').onclick=()=>{$('.tab[data-tab="skins"]').click();$('seedBtn').c
  const status=$('firebaseIndexStatus'), name=$('firebaseIndexFileName');
  if(!input||!pick||!upload)return;
  let selected=null;
- const getCfg=()=>{try{return JSON.parse(localStorage.getItem('ryuzaGithubPublishConfigV1')||'{}')}catch(e){return {}}};
+ const getCfg=()=>{
+   try{
+     const a=JSON.parse(localStorage.getItem('ryuzaGithubConfig')||'{}');
+     const b=JSON.parse(localStorage.getItem('ryuzaGithubPublishConfigV1')||'{}');
+     const c={...b,...a};
+     return {owner:c.owner||'',repo:c.repo||'',branch:c.branch||'main',path:'index.html',token:c.token||''};
+   }catch(e){return {}}
+ };
  const setStatus=(t,kind='')=>{if(status){status.textContent='● '+t;status.className='badge '+kind}};
  const b64encode=s=>btoa(unescape(encodeURIComponent(s)));
  const headers=token=>({Accept:'application/vnd.github+json',Authorization:'Bearer '+token,'X-GitHub-Api-Version':'2022-11-28','Content-Type':'application/json'});
