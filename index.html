@@ -196,7 +196,7 @@ input{
 .report-wa{display:block;width:100%;margin-top:16px;padding:13px;border:0;border-radius:10px;text-align:center;text-decoration:none;font-size:14px;font-weight:bold;color:#fff;background:linear-gradient(135deg,#20c56a,#0aa85a);cursor:pointer}
 .report-cancel{display:block;width:100%;margin-top:9px;padding:11px;border:1px solid #3a4b62;border-radius:10px;color:#fff;background:#202b3b;cursor:pointer}
 
-#recalList{display:none;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px;margin-top:12px}.recal-index-empty{grid-column:1/-1;padding:28px 16px;text-align:center;border:1px dashed #39506b;border-radius:14px;color:#9db0c5;background:#0a1524}.recal-index-card{min-width:0}.recal-index-card .recal-badge{display:inline-block;margin-bottom:8px;padding:5px 8px;border-radius:999px;font-size:10px;font-weight:800;background:#241a3e;color:#d9c9ff;border:1px solid #604b8f}@media(max-width:900px){#recalList{grid-template-columns:repeat(2,minmax(0,1fr))}}@media(max-width:600px){#recalList{grid-template-columns:1fr;gap:12px}}
+#recalList{display:none;width:100%;max-width:1180px;margin:14px auto 28px;padding:0 2px;grid-template-columns:repeat(auto-fit,minmax(300px,360px));justify-content:center;align-items:start;gap:18px}.recal-index-empty{grid-column:1/-1;width:100%;padding:28px 16px;text-align:center;border:1px dashed #39506b;border-radius:14px;color:#9db0c5;background:#0a1524}.recal-index-card{width:100%;min-width:0;padding:17px!important;border-radius:17px!important;background:linear-gradient(145deg,#111d30,#0b1320)!important;border-color:#2b4562!important;box-shadow:0 8px 24px rgba(0,0,0,.22)!important}.recal-index-card:hover{border-color:#7652bd!important;box-shadow:0 12px 28px rgba(95,58,160,.2)!important}.recal-index-card .recal-badge{display:inline-flex;align-items:center;margin-bottom:10px;padding:5px 9px;border-radius:999px;font-size:10px;font-weight:800;background:#241a3e;color:#d9c9ff;border:1px solid #604b8f}.recal-index-card .hero-title{gap:10px}.recal-index-card .hero-title-text{font-size:17px}.recal-index-card .replace-dropdown{margin-top:10px!important}.recal-index-card .replace-download{min-height:44px;padding:12px 14px}.recal-index-card .card-report-btn{width:100%;margin-top:8px}@media(max-width:900px){#recalList{grid-template-columns:repeat(auto-fit,minmax(280px,360px));gap:14px}}@media(max-width:600px){#recalList{grid-template-columns:minmax(0,1fr);padding:0 2px;gap:12px}.recal-index-card{padding:15px!important}.recal-index-card .hero-title-text{font-size:16px}}
 </style>
 <style>
 .site-stats{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;margin:14px 0}.stat-card{display:flex;align-items:center;gap:12px;padding:15px;border:1px solid #263246;border-radius:12px;background:linear-gradient(135deg,#101826,#0b111c);box-shadow:0 6px 20px rgba(0,0,0,.16)}.stat-icon{font-size:24px;line-height:1}.stat-label{font-size:11px;font-weight:800;letter-spacing:.6px;color:#aeb7c5}.stat-value{font-size:25px;font-weight:900;line-height:1.15;margin-top:2px}.stat-sub{font-size:11px;color:#7f8b9d;margin-top:2px}@media(max-width:600px){.site-stats{grid-template-columns:1fr}}
@@ -1623,9 +1623,27 @@ document.querySelectorAll('.replace-dropdown').forEach(box => {
    el.innerHTML=arr.map(([id,x])=>{const title=clean(x.title||id)||'Skin Recal';const icon=clean(x.iconText||'R').slice(0,3).toUpperCase();return `<div class="card skin recal-index-card" data-rtdb-id="recal-${esc(id)}" data-recal-id="${esc(id)}"><span class="recal-badge">🔄 RECAL</span><div class="title"><div class="hero-title"><span class="hero-icon-link"><img alt="${esc(title)}" class="hero-icon" loading="lazy" src="${iconSvg(icon)}"></span><span class="hero-title-text">${esc(title)}</span></div></div><div class="replace-dropdown" style="margin-top:12px"><label style="display:block;font-size:13px;font-weight:bold;margin-bottom:6px">🔗 Pilih Replace</label><select class="replace-select" style="width:100%;padding:11px;border-radius:9px;border:1px solid #35445a;background:#080d15;color:#fff;font-size:14px">${optionsHtml(x.options)}</select><a class="btn replace-download" href="#" rel="noopener" style="display:block;margin-top:10px;text-align:center" target="_blank">⬇️ DOWNLOAD</a><button class="card-report-btn" type="button">⚠️ Report Link Error</button></div></div>`}).join('');
    el.querySelectorAll('.recal-index-card').forEach(card=>{const sel=card.querySelector('.replace-select'),btn=card.querySelector('.replace-download');const sync=()=>{const o=sel?.options[sel.selectedIndex];if(o&&btn){btn.href=o.value||'#';btn.textContent='⬇️ DOWNLOAD '+String(o.textContent||'').toUpperCase()}};sel?.addEventListener('change',sync);sync()});
  }
- function setVisible(){const active=document.querySelector('#ryuzaSmartbar [data-mode="RECAL"].active');const on=!!active;const el=list();if(el)el.style.display=on?'grid':'none';if(on){document.getElementById('list')?.style.setProperty('display','none');document.getElementById('recalEmpty')?.style.setProperty('display','none')}}
+ function setVisible(){const active=document.querySelector('#ryuzaSmartbar [data-mode="RECAL"].active');const on=!!active;const el=list();const main=document.getElementById('list');if(el)el.style.display=on?'grid':'none';if(main)main.style.display=on?'none':'grid';document.getElementById('recalEmpty')?.style.setProperty('display','none');const note=document.getElementById('ryuzaTabNote');if(note&&on)note.textContent='Koleksi Recal / Recall yang disiapkan Ryuza';}
  function start(){if(!window.firebase||!firebase.database)return setTimeout(start,500);let app;try{app=firebase.app('ryuza-recal-index')}catch(e){try{app=firebase.initializeApp(CFG,'ryuza-recal-index')}catch(err){return console.warn('[Ryuza Recal] init gagal',err)}}const db=app.database();db.ref('siteConfig/recalSkins').on('value',snap=>{window.__RYUZA_RECAL_SKINS__=snap.val()||{};render(window.__RYUZA_RECAL_SKINS__);setVisible()},err=>console.warn('[Ryuza Recal] gagal membaca:',err));document.getElementById('ryuzaSmartbar')?.addEventListener('click',()=>setTimeout(()=>{render(window.__RYUZA_RECAL_SKINS__||{});setVisible()},0));document.getElementById('q')?.addEventListener('input',()=>{if(document.querySelector('#ryuzaSmartbar [data-mode="RECAL"].active'))render(window.__RYUZA_RECAL_SKINS__||{})});setVisible()}
  start();
+})();
+</script>
+
+<script id="ryuza-recal-ui-fix">
+(function(){
+  function updateCount(){
+    const active=document.querySelector('#ryuzaSmartbar [data-mode="RECAL"].active');
+    const count=document.getElementById('count');
+    const data=window.__RYUZA_RECAL_SKINS__||{};
+    if(!count)return;
+    if(active) count.textContent=Object.keys(data).length+' skin Recal tersedia';
+    else count.textContent=document.querySelectorAll('#list .skin[data-rtdb-id]').length+' skin tersedia';
+  }
+  document.addEventListener('click',e=>{
+    if(e.target.closest('#ryuzaSmartbar')) setTimeout(updateCount,30);
+  });
+  const wait=setInterval(()=>{if(window.__RYUZA_RECAL_SKINS__){updateCount();clearInterval(wait)}},300);
+  setTimeout(updateCount,800);
 })();
 </script>
 </body></html>
