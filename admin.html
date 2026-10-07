@@ -76,7 +76,7 @@ body:before{animation:none!important}body{background-attachment:initial!importan
   root.classList.add('ryuza-admin-remote-check');
   let done=false;
   const showLocal=()=>{if(done)return;done=true;root.classList.remove('ryuza-admin-remote-check')};
-  const fallback=setTimeout(showLocal,3000);
+  const fallback=setTimeout(showLocal,2500);
   fetch(URL,{cache:'no-store'})
     .then(r=>{if(!r.ok)throw Error('HTTP '+r.status);return r.json()})
     .then(remote=>{
@@ -90,6 +90,10 @@ body:before{animation:none!important}body{background-attachment:initial!importan
       document.open();
       document.write(clean);
       document.close();
+      setTimeout(()=>{
+        document.documentElement?.classList.remove('ryuza-admin-remote-check');
+        document.body?.style.removeProperty('visibility');
+      },50);
     })
     .catch(()=>{clearTimeout(fallback);showLocal()});
 })();
