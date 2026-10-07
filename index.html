@@ -39,7 +39,7 @@ html.ryuza-booting body>*:not(#ryuzaBootLoader){visibility:hidden!important}
   };
 })();
 </script>
-<meta charset="utf-8"/><meta content="width=1200, initial-scale=0.35, user-scalable=yes" name="viewport"/><title>Ryuza Official Uploader script NO 1</title><style>
+<meta charset="utf-8"/><meta content="width=device-width, initial-scale=1, viewport-fit=cover" name="viewport"/><title>Ryuza Official Uploader script NO 1</title><style>
 *{box-sizing:border-box}body{margin:0;min-height:100vh;font-family:Arial,sans-serif;background:#080b12;color:#fff;padding:22px 14px}.container{max-width:560px;width:100%;margin:auto}
 .header{text-align:center;margin-bottom:15px}.header h1{margin:0;font-size:23px;text-shadow:0 0 12px rgba(0,170,255,.65)}.header p{margin:7px 0;color:#aeb7c5;font-size:13px}
 .search{position:sticky;top:8px;z-index:20;background:#101620;border:1px solid #263448;border-radius:13px;padding:10px;margin-bottom:13px;box-shadow:0 8px 22px #0006}.wrap{position:relative}
@@ -969,6 +969,212 @@ img,video,canvas,iframe,table{
   #list .replace-download,
   #recalList .replace-download {
     min-height: 38px !important;
+    font-size: 9px !important;
+  }
+}
+</style>
+
+
+<style id="ryuza-mobile-only-final">
+/* =========================================================
+   MOBILE ONLY — halaman tidak lagi memakai canvas desktop
+   ========================================================= */
+html {
+  width: 100% !important;
+  max-width: 100% !important;
+  overflow-x: hidden !important;
+}
+
+body {
+  width: 100% !important;
+  max-width: 100% !important;
+  min-width: 0 !important;
+  margin: 0 auto !important;
+  padding: 12px 10px 70px !important;
+  overflow-x: hidden !important;
+}
+
+/* Batasi seluruh isi seperti lebar HP */
+.container {
+  width: 100% !important;
+  max-width: 480px !important;
+  min-width: 0 !important;
+  margin: 0 auto !important;
+}
+
+/* Navigasi tidak lagi melebar seperti desktop */
+.top-nav {
+  width: 100% !important;
+  max-width: 480px !important;
+  margin: 0 auto 10px !important;
+  padding: 5px !important;
+  position: relative !important;
+  top: auto !important;
+  display: flex !important;
+  overflow-x: auto !important;
+  white-space: nowrap !important;
+  scrollbar-width: none !important;
+}
+.top-nav::-webkit-scrollbar { display:none !important; }
+
+.nav-link {
+  flex: 0 0 auto !important;
+  min-height: 36px !important;
+  padding: 8px 10px !important;
+  font-size: 11px !important;
+}
+
+/* Header/search benar-benar ukuran HP */
+.header {
+  width: 100% !important;
+  min-height: 0 !important;
+  padding: 18px 14px !important;
+  margin-bottom: 12px !important;
+  border-radius: 16px !important;
+  text-align: center !important;
+}
+.header h1 {
+  font-size: 22px !important;
+  line-height: 1.2 !important;
+}
+.header p {
+  font-size: 11px !important;
+  line-height: 1.45 !important;
+}
+
+.search {
+  width: 100% !important;
+  top: auto !important;
+  padding: 9px !important;
+  margin-bottom: 12px !important;
+  border-radius: 13px !important;
+}
+.search input,
+input {
+  width: 100% !important;
+  min-width: 0 !important;
+  min-height: 44px !important;
+  padding: 11px 38px !important;
+  font-size: 13px !important;
+}
+
+/* Semua panel lain tidak boleh melebar */
+.skip,
+.tutorial,
+.site-stats,
+.banner,
+.download-tools,
+.request-section {
+  width: 100% !important;
+  max-width: 480px !important;
+  box-sizing: border-box !important;
+}
+
+/* 3 card hanya di dalam lebar HP */
+#list,
+#recalList {
+  width: 100% !important;
+  max-width: 480px !important;
+  margin: 0 auto !important;
+  display: grid !important;
+  grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+  gap: 7px !important;
+}
+
+#list > .card,
+#recalList > .card,
+#list > .card.skin,
+#recalList > .card.skin {
+  width: 100% !important;
+  min-width: 0 !important;
+  max-width: none !important;
+  box-sizing: border-box !important;
+  padding: 7px !important;
+  margin: 0 !important;
+  border-radius: 11px !important;
+}
+
+/* Gambar utama card tetap proporsional */
+#list .card img,
+#recalList .card img {
+  max-width: 100% !important;
+  box-sizing: border-box !important;
+}
+
+/* Jangan biarkan gambar konten mengambil ukuran desktop */
+#list .card > img:not(.hero-icon),
+#recalList .card > img:not(.hero-icon) {
+  width: 100% !important;
+  height: auto !important;
+  max-height: 150px !important;
+  object-fit: cover !important;
+  border-radius: 8px !important;
+}
+
+/* Icon kecil */
+#list .hero-icon,
+#recalList .hero-icon {
+  width: 28px !important;
+  height: 28px !important;
+  min-width: 28px !important;
+  max-width: 28px !important;
+  object-fit: cover !important;
+  border-radius: 50% !important;
+}
+
+/* Teks card */
+#list .card h3,
+#recalList .card h3,
+#list .card .title,
+#recalList .card .title {
+  font-size: 10px !important;
+  line-height: 1.25 !important;
+  overflow-wrap: anywhere !important;
+}
+
+#list .card p,
+#recalList .card p {
+  font-size: 8px !important;
+  line-height: 1.3 !important;
+}
+
+#list .card button,
+#recalList .card button,
+#list .card a,
+#recalList .card a {
+  max-width: 100% !important;
+  min-width: 0 !important;
+  font-size: 8px !important;
+  padding: 6px 4px !important;
+  box-sizing: border-box !important;
+}
+
+/* Statistik juga tidak boleh berubah menjadi layout desktop */
+.site-stats {
+  grid-template-columns: repeat(2, minmax(0,1fr)) !important;
+  gap: 7px !important;
+}
+
+/* Modal/pop-up mengikuti lebar HP */
+.modal,
+.popup,
+.dialog,
+[class*="popup"],
+[id*="popup"] {
+  max-width: calc(100vw - 24px) !important;
+  box-sizing: border-box !important;
+}
+
+img, video, iframe, canvas {
+  max-width: 100% !important;
+}
+
+@media (max-width: 360px) {
+  body { padding-left: 7px !important; padding-right: 7px !important; }
+  #list, #recalList { gap: 5px !important; }
+  #list > .card, #recalList > .card { padding: 6px !important; }
+  #list .card h3, #recalList .card h3,
+  #list .card .title, #recalList .card .title {
     font-size: 9px !important;
   }
 }
