@@ -44,6 +44,26 @@ body:before{animation:none!important}body{background-attachment:initial!importan
 <style>
 .github-publish-panel{border:1px solid rgba(64,211,140,.28);background:linear-gradient(135deg,rgba(10,31,25,.9),rgba(8,18,28,.96))}.github-grid input{width:100%;box-sizing:border-box}.github-publish-panel .primary{background:linear-gradient(135deg,#19b968,#0b8f4c);border-color:#27d47b}.github-publish-panel .badge.ok{color:#67f3aa;border-color:#1c8f59}.github-publish-panel .badge.err{color:#ff7f8d;border-color:#9d3040}@media(max-width:700px){.github-grid{grid-template-columns:1fr!important}.github-grid input,.github-grid label{grid-column:1/-1!important}}</style>
 
+<style id="ryuza-file-manager-style">
+#fileManager .file-manager-title{display:flex;align-items:center;justify-content:space-between;gap:10px}
+#fileManager>.card{margin-bottom:14px}
+#fileManager .toolbar{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+@media(max-width:700px){#fileManager .toolbar{display:grid;grid-template-columns:1fr}#fileManager .toolbar button{width:100%}}
+</style>
+
+<style id="ryuza-modern-tabs">
+/* Modern admin navigation */
+.nav-modern{display:flex;gap:10px;align-items:stretch;margin:18px 0 12px;padding:10px;border:1px solid #1d3a54;border-radius:18px;background:linear-gradient(135deg,rgba(10,25,40,.96),rgba(7,17,29,.98));box-shadow:0 12px 35px rgba(0,0,0,.22);overflow-x:auto;scrollbar-width:thin;scrollbar-color:#2b5879 transparent}
+.nav-modern::-webkit-scrollbar{height:5px}.nav-modern::-webkit-scrollbar-track{background:transparent}.nav-modern::-webkit-scrollbar-thumb{background:#2b5879;border-radius:99px}
+.nav-group{flex:0 0 auto;min-width:max-content;padding:2px 8px 3px;border-right:1px solid #19344d}.nav-group-last{border-right:0}.nav-group-title{font-size:9px;font-weight:900;letter-spacing:.14em;color:#627e98;margin:1px 5px 7px;text-transform:uppercase}
+.nav-items{display:flex;gap:5px;align-items:center}.nav-modern .tab{position:relative;display:inline-flex;align-items:center;gap:8px;min-height:40px;padding:9px 12px;border:1px solid transparent;border-radius:11px;background:transparent;color:#9eb2c7;font-size:13px;font-weight:800;white-space:nowrap;box-shadow:none;transform:none}
+.nav-modern .tab:hover{background:#10283d;border-color:#234761;color:#eaf5ff;filter:none;transform:none}.nav-modern .tab.active{background:linear-gradient(135deg,#087cff,#00a9ff);border-color:rgba(111,211,255,.35);color:#fff;box-shadow:0 7px 20px rgba(0,145,255,.25),inset 0 1px 0 rgba(255,255,255,.16)}
+.nav-modern .tab.active:after{content:"";position:absolute;left:13px;right:13px;bottom:3px;height:2px;border-radius:99px;background:rgba(255,255,255,.72)}
+.tab-icon{width:22px;height:22px;border-radius:7px;display:grid;place-items:center;background:#132a40;color:#7fb8dd;font-size:13px;font-weight:900;flex:0 0 22px}.nav-modern .tab.active .tab-icon{background:rgba(255,255,255,.18);color:#fff}
+.request-count{display:none;min-width:19px;height:19px;padding:0 5px;border-radius:99px;background:#ff4d67;color:#fff;font-size:10px;font-weight:900;align-items:center;justify-content:center;box-shadow:0 0 0 3px rgba(255,77,103,.12)}
+@media(max-width:900px){.nav-modern{gap:7px;padding:8px}.nav-group{padding:2px 6px}.nav-modern .tab{min-height:38px;padding:8px 10px;font-size:12px}.nav-group-title{font-size:8px;margin-bottom:5px}}
+@media(max-width:600px){.nav-modern{margin:12px 0 10px;border-radius:14px}.nav-modern .tab{gap:6px;padding:8px 9px}.tab-icon{width:20px;height:20px;flex-basis:20px;font-size:12px}.nav-group{border-right:0}}
+</style>
 </head>
 <body>
 <div class="wrap">
@@ -51,16 +71,37 @@ body:before{animation:none!important}body{background-attachment:initial!importan
  <div class="brand"><div class="logo">⚡</div><div><h1>Ryuza Admin Panel</h1><div class="muted">Skin Manager • Realtime Control Center</div></div></div>
  <div id="status" class="badge">Menghubungkan...</div>
 </header>
-<nav class="nav">
- <button class="tab active" data-tab="dashboard">📊 Dashboard</button>
- <button class="tab" data-tab="skins">🎨 Skin & Replace</button>
- <button class="tab" data-tab="settings">⚙️ Pengaturan</button>
- <button class="tab" data-tab="visitors">👥 Nama Pengunjung</button>
- <button class="tab" data-tab="activity">📡 Live Activity</button>
- <button class="tab" data-tab="backup">💾 Backup</button>
- <button class="tab" data-tab="analytics">📈 Analytics</button>
- <button class="tab" data-tab="indexFeatures">🎛️ Index Features</button>
- <button class="tab" data-tab="requests">📨 Request Script <span id="requestCountBadge" class="badge" style="display:none;margin-left:5px">0</span></button>
+<nav class="nav-modern" aria-label="Navigasi Admin">
+ <div class="nav-group">
+  <div class="nav-group-title">UTAMA</div>
+  <div class="nav-items">
+   <button class="tab active" data-tab="dashboard"><span class="tab-icon">▦</span><span>Dashboard</span></button>
+   <button class="tab" data-tab="skins"><span class="tab-icon">✦</span><span>Skin & Replace</span></button>
+   <button class="tab" data-tab="fileManager"><span class="tab-icon">▣</span><span>File Manager</span></button>
+  </div>
+ </div>
+ <div class="nav-group">
+  <div class="nav-group-title">PENGELOLAAN</div>
+  <div class="nav-items">
+   <button class="tab" data-tab="settings"><span class="tab-icon">⚙</span><span>Pengaturan</span></button>
+   <button class="tab" data-tab="visitors"><span class="tab-icon">♟</span><span>Pengunjung</span></button>
+   <button class="tab" data-tab="requests"><span class="tab-icon">✉</span><span>Request Script</span><span id="requestCountBadge" class="request-count">0</span></button>
+  </div>
+ </div>
+ <div class="nav-group">
+  <div class="nav-group-title">MONITORING</div>
+  <div class="nav-items">
+   <button class="tab" data-tab="activity"><span class="tab-icon">◉</span><span>Live Activity</span></button>
+   <button class="tab" data-tab="analytics"><span class="tab-icon">⌁</span><span>Analytics</span></button>
+   <button class="tab" data-tab="indexFeatures"><span class="tab-icon">✣</span><span>Index Features</span></button>
+  </div>
+ </div>
+ <div class="nav-group nav-group-last">
+  <div class="nav-group-title">DATA</div>
+  <div class="nav-items">
+   <button class="tab" data-tab="backup"><span class="tab-icon">▤</span><span>Backup</span></button>
+  </div>
+ </div>
 </nav>
 
 <section id="dashboard" class="panel active">
@@ -78,8 +119,25 @@ body:before{animation:none!important}body{background-attachment:initial!importan
 
 <section id="skins" class="panel">
  <div class="card">
-  <div class="toolbar"><button class="primary" id="addBtn">＋ Tambah Skin</button><button class="secondary" id="seedBtn">🚀 Publish ke index.html</button><button class="secondary" id="pickBtn">📁 Pilih index.html</button><input id="fileInput" class="file" type="file" accept=".html,text/html"><input id="search" placeholder="🔎 Cari nama skin atau Replace..."></div>
+  <div class="toolbar"><button class="primary" id="addBtn">＋ Tambah Skin</button><input id="search" placeholder="🔎 Cari nama skin atau Replace..."></div>
   <div class="hint">Klik Simpan pada kartu untuk memperbarui data. Data skin dan pengaturan tetap tersimpan realtime di Firebase.</div>
+ </div>
+ <div id="list" class="grid"><div class="empty">Memuat database...</div></div><div id="skinPagination" class="skin-pagination" aria-label="Paginasi skin"></div>
+</section>
+
+
+<section id="fileManager" class="panel">
+ <div class="card">
+  <h2 style="margin:0 0 6px">📁 File Manager</h2>
+  <div class="hint">Semua fitur upload, download, import, dan publish file dipisahkan dari <b>Skin &amp; Replace</b> supaya halaman pengelolaan skin tetap rapi.</div>
+ </div>
+ <div class="card">
+  <div class="toolbar">
+   <button class="secondary" id="pickBtn">📁 Pilih index.html</button>
+   <input id="fileInput" class="file" type="file" accept=".html,text/html">
+   <button class="primary" id="seedBtn">🚀 Publish ke index.html</button>
+  </div>
+  <div class="hint">Import/publish index lama dari komputer. Fitur ini tetap memakai sistem Skin &amp; Replace yang sudah ada.</div>
  </div>
  <div class="card" id="firebaseIndexUploadPanel">
   <div style="display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap">
@@ -127,7 +185,6 @@ body:before{animation:none!important}body{background-attachment:initial!importan
   <div id="firebaseAdminFileName" class="hint" style="margin-top:8px">Belum memilih file.</div>
   <div class="hint" style="margin-top:6px">Target Firebase: <b>siteConfig/adminHtml</b>. URL Admin GitHub yang sekarang tetap menjadi loader awal; setelah versi Firebase tersedia, isi Admin terbaru dimuat otomatis dari Firebase.</div>
  </div>
- <div id="list" class="grid"><div class="empty">Memuat database...</div></div><div id="skinPagination" class="skin-pagination" aria-label="Paginasi skin"></div>
 </section>
 
 <section id="settings" class="panel">
