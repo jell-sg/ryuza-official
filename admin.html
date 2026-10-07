@@ -662,7 +662,7 @@ $('quickImport').onclick=()=>{$('.tab[data-tab="skins"]').click();$('seedBtn').c
   const status=$('githubAdminStatus'),name=$('githubAdminFileName');
   if(!input||!pick||!upload)return;
   let selectedFile=null;
-  const getCfg=()=>{try{const a=JSON.parse(localStorage.getItem('ryuzaGithubConfig')||'{}');const b=JSON.parse(localStorage.getItem('ryuzaGithubPublishConfigV1')||'{}');return {...b,...a,branch:a.branch||b.branch||'main',adminPath:'admin.html'}}catch(e){return {}}};
+  const getCfg=()=>{try{const a=JSON.parse(localStorage.getItem('ryuzaGithubConfig')||'{}');const b=JSON.parse(localStorage.getItem('ryuzaGithubPublishConfigV1')||'{}');return {owner:$('ghOwner')?.value.trim()||a.owner||b.owner||'',repo:$('ghRepo')?.value.trim()||a.repo||b.repo||'',token:$('ghToken')?.value.trim()||a.token||b.token||'',branch:$('ghBranch')?.value.trim()||a.branch||b.branch||'main',adminPath:'admin.html'}}catch(e){return {}}};
   const setStatus=(t,kind='')=>{if(status){status.textContent='● '+t;status.className='badge '+kind}};
   const toastMsg=t=>typeof toast==='function'?toast(t):alert(t);
   const headers=token=>({Accept:'application/vnd.github+json',Authorization:'Bearer '+token,'X-GitHub-Api-Version':'2022-11-28','Content-Type':'application/json'});
@@ -769,17 +769,19 @@ $('quickImport').onclick=()=>{$('.tab[data-tab="skins"]').click();$('seedBtn').c
  const status=$('firebaseIndexStatus'), name=$('firebaseIndexFileName');
  if(!input||!pick||!upload)return;
  let selected=null;
- const getCfg=()=>{
-   try{
-     const a=JSON.parse(localStorage.getItem('ryuzaGithubConfig')||'{}');
-     const b=JSON.parse(localStorage.getItem('ryuzaGithubPublishConfigV1')||'{}');
-     const c={...b,...a};
-     return {owner:c.owner||'',repo:c.repo||'',branch:c.branch||'main',path:'index.html',token:c.token||''};
-   }catch(e){return {}}
- };
+ const readCfg=()=>({
+   owner:$('ghOwner')?.value.trim()||'',
+   repo:$('ghRepo')?.value.trim()||'',
+   branch:$('ghBranch')?.value.trim()||'main',
+   path:$('ghPath')?.value.trim()||'index.html',
+   token:$('ghToken')?.value.trim()||''
+ });
+ const saveCfg=c=>{try{const old=JSON.parse(localStorage.getItem('ryuzaGithubConfig')||'{}');const x={...old,...c};localStorage.setItem('ryuzaGithubConfig',JSON.stringify(x));localStorage.setItem('ryuzaGithubPublishConfigV1',JSON.stringify(x))}catch(e){}};
  const setStatus=(t,kind='')=>{if(status){status.textContent='● '+t;status.className='badge '+kind}};
- const b64encode=s=>btoa(unescape(encodeURIComponent(s)));
+ const toastMsg=t=>typeof toast==='function'?toast(t):alert(t);
+ const b64encode=s=>{const bytes=new TextEncoder().encode(s);let bin='';for(let i=0;i<bytes.length;i+=0x8000)bin+=String.fromCharCode(...bytes.subarray(i,i+0x8000));return btoa(bin)};
  const headers=token=>({Accept:'application/vnd.github+json',Authorization:'Bearer '+token,'X-GitHub-Api-Version':'2022-11-28','Content-Type':'application/json'});
+ const api=(c)=>'https://api.github.com/repos/'+encodeURIComponent(c.owner)+'/'+encodeURIComponent(c.repo)+'/contents/'+c.path.split('/').map(encodeURIComponent).join('/');
  pick.onclick=()=>input.click();
  input.onchange=()=>{
    selected=input.files?.[0]||null;
@@ -788,31 +790,31 @@ $('quickImport').onclick=()=>{$('.tab[data-tab="skins"]').click();$('seedBtn').c
    setStatus('Siap diupload ke GitHub','ok');
  };
  upload.onclick=async()=>{
-   if(!selected){toast('Pilih index.html terlebih dahulu.');return}
-   if(selected.size>5*1024*1024){toast('❌ File terlalu besar. Maksimal 5 MB.');return}
-   const c=getCfg();
-   if(!c.owner||!c.repo||!c.token){setStatus('GitHub belum dikonfigurasi','err');toast('❌ Isi Owner, Repository, Branch, Path dan Token di Pengaturan GitHub terlebih dahulu.');return}
-   const branch=c.branch||'main', path=c.path||'index.html';
-   upload.disabled=true;setStatus('Membaca index.html...');
+   if(!selected){setStatus('Pilih index.html dulu','err');toastMsg('Pilih index.html terlebih dahulu.');return}
+   if(selected.size>5*1024*1024){setStatus('File terlalu besar','err');toastMsg('❌ File terlalu besar. Maksimal 5 MB.');return}
+   const c=readCfg();
+   if(!c.owner||!c.repo||!c.token){setStatus('Konfigurasi GitHub belum lengkap','err');toastMsg('❌ Isi Owner, Repository, Branch, Path, dan Token pada GitHub Publish di atas.');return}
+   saveCfg(c); upload.disabled=true;
    try{
+     setStatus('Membaca index.html...');
      const content=await selected.text();
      if(!/<(?:!doctype\s+html|html[\s>])/i.test(content))throw Error('File yang dipilih bukan HTML yang valid.');
-     const api='https://api.github.com/repos/'+encodeURIComponent(c.owner)+'/'+encodeURIComponent(c.repo)+'/contents/'+path.split('/').map(encodeURIComponent).join('/');
-     setStatus('Mengambil versi GitHub...');
-     const get=await fetch(api+'?ref='+encodeURIComponent(branch),{headers:headers(c.token)});
+     const url=api(c);
+     setStatus('Mengecek akses GitHub...');
+     const get=await fetch(url+'?ref='+encodeURIComponent(c.branch),{headers:headers(c.token),cache:'no-store'});
      const gd=await get.json();
-     if(!get.ok)throw Error(gd.message||('GitHub GET '+get.status));
-     if(!gd.sha)throw Error('SHA index.html dari GitHub tidak ditemukan.');
-     setStatus('Mengupload langsung ke GitHub...');
-     const put=await fetch(api,{method:'PUT',headers:headers(c.token),body:JSON.stringify({message:'Upload index.html dari Ryuza Admin',content:b64encode(content),sha:gd.sha,branch})});
+     if(!get.ok)throw Error('GET '+get.status+': '+(gd.message||'Gagal membaca index.html'));
+     if(!gd.sha)throw Error('SHA index.html tidak ditemukan.');
+     setStatus('Mengupload dan membuat commit GitHub...');
+     const put=await fetch(url,{method:'PUT',headers:headers(c.token),body:JSON.stringify({message:'Upload index.html dari Ryuza Admin',content:b64encode(content),sha:gd.sha,branch:c.branch})});
      const pd=await put.json();
-     if(!put.ok)throw Error(pd.message||('GitHub PUT '+put.status));
-     setStatus('BERHASIL • GITHUB','ok');
-     name.textContent='GitHub: '+c.owner+'/'+c.repo+'/'+path+' • '+Math.round(selected.size/1024)+' KB';
-     toast('✅ index.html berhasil langsung diupload ke GitHub. Tunggu GitHub Pages selesai deploy.');
-   }catch(e){
-     console.error(e);setStatus('Upload GitHub gagal','err');toast('❌ Upload Index ke GitHub gagal: '+(e.message||e));
-   }finally{upload.disabled=false}
+     if(!put.ok)throw Error('PUT '+put.status+': '+(pd.message||'GitHub menolak upload'));
+     const commitUrl=pd.commit?.html_url||'';
+     setStatus('BERHASIL DIUPLOAD • GITHUB','ok');
+     name.innerHTML='✅ '+c.owner+'/'+c.repo+'/'+c.path+' • '+Math.round(selected.size/1024)+' KB'+(commitUrl?' • <a href="'+commitUrl+'" target="_blank" rel="noopener">Lihat commit</a>':'');
+     toastMsg('✅ index.html berhasil diupload ke GitHub. Commit baru sudah dibuat.');
+   }catch(e){console.error(e);setStatus('GAGAL: '+(e.message||e),'err');toastMsg('❌ Upload Index gagal: '+(e.message||e));}
+   finally{upload.disabled=false}
  };
 })();
 </script>
