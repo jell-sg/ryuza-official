@@ -195,6 +195,8 @@ input{
 .report-field input:focus,.report-field select:focus{border-color:#ff4d6d}
 .report-wa{display:block;width:100%;margin-top:16px;padding:13px;border:0;border-radius:10px;text-align:center;text-decoration:none;font-size:14px;font-weight:bold;color:#fff;background:linear-gradient(135deg,#20c56a,#0aa85a);cursor:pointer}
 .report-cancel{display:block;width:100%;margin-top:9px;padding:11px;border:1px solid #3a4b62;border-radius:10px;color:#fff;background:#202b3b;cursor:pointer}
+
+#recalList{display:none;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px;margin-top:12px}.recal-index-empty{grid-column:1/-1;padding:28px 16px;text-align:center;border:1px dashed #39506b;border-radius:14px;color:#9db0c5;background:#0a1524}.recal-index-card{min-width:0}.recal-index-card .recal-badge{display:inline-block;margin-bottom:8px;padding:5px 8px;border-radius:999px;font-size:10px;font-weight:800;background:#241a3e;color:#d9c9ff;border:1px solid #604b8f}@media(max-width:900px){#recalList{grid-template-columns:repeat(2,minmax(0,1fr))}}@media(max-width:600px){#recalList{grid-template-columns:1fr;gap:12px}}
 </style>
 <style>
 .site-stats{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;margin:14px 0}.stat-card{display:flex;align-items:center;gap:12px;padding:15px;border:1px solid #263246;border-radius:12px;background:linear-gradient(135deg,#101826,#0b111c);box-shadow:0 6px 20px rgba(0,0,0,.16)}.stat-icon{font-size:24px;line-height:1}.stat-label{font-size:11px;font-weight:800;letter-spacing:.6px;color:#aeb7c5}.stat-value{font-size:25px;font-weight:900;line-height:1.15;margin-top:2px}.stat-sub{font-size:11px;color:#7f8b9d;margin-top:2px}@media(max-width:600px){.site-stats{grid-template-columns:1fr}}
@@ -473,6 +475,11 @@ input{background:#0a1321;border-color:#2b405d}input:focus{border-color:#35a7ff;b
 <div class="stat-card"><div class="stat-icon">👥</div><div><div class="stat-label">TOTAL PENGUNJUNG</div><div class="stat-value" id="totalVisitors">5.000.000</div><div class="stat-sub">yang mengunjungi situs</div></div></div>
 </div>
 <section aria-label="Skin paling banyak diklik" id="skinLeaderboard" style="margin:10px 0;padding:10px 12px;border:1px solid #29364b;border-radius:12px;background:#0c1422;color:#eef5ff"><div style="display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap"><div><h2 style="margin:0;font-size:14px">🏆 Skin &amp; Replace Terpopuler</h2><p style="margin:3px 0 0;color:#aab9cf;font-size:11px">Peringkat berdasarkan jumlah klik download yang tercatat.</p></div><button id="refreshSkinRanking" style="padding:5px 9px;font-size:11px;border:1px solid #456080;border-radius:8px;background:#14243a;color:#fff;cursor:pointer" type="button">↻ Perbarui</button></div><div style="display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;margin-top:8px"><ol id="skinRankingLeft" style="margin:0;padding-left:22px;display:grid;align-content:start;gap:4px"><li style="color:#aab9cf">Memuat peringkat...</li></ol><ol id="skinRankingRight" start="6" style="margin:0;padding-left:22px;display:grid;align-content:start;gap:4px"></ol></div></section>
+
+<style id="ryuza-recal-tab-style">
+.ryuza-filter[data-mode="RECAL"]{color:#d7c8ff;border-color:#604b8f;background:linear-gradient(135deg,#211936,#33245a)}
+.ryuza-filter[data-mode="RECAL"].active{color:#fff;background:linear-gradient(135deg,#7046c6,#9b63f6);border-color:#b999ff;box-shadow:0 5px 16px rgba(139,92,246,.25)}
+</style>
 <!-- RYUZA INDEX SUPER FEATURES -->
 <style id="ryuza-feature-tabs-css">
 .ryuza-smartbar{position:sticky;top:8px;z-index:20;display:flex;gap:7px;overflow-x:auto;padding:8px;margin:10px 0 8px;border:1px solid rgba(105,201,255,.18);border-radius:15px;background:rgba(7,15,27,.92);backdrop-filter:blur(12px);scrollbar-width:thin}
@@ -511,6 +518,7 @@ input{background:#0a1321;border-color:#2b405d}input:focus{border-color:#35a7ff;b
     <button class="ryuza-filter" data-mode="FEATURED">⭐ Pilihan Admin</button>
     <button class="ryuza-filter" data-mode="RECENT">🕘 Terakhir Dilihat</button>
     <button class="ryuza-filter" data-mode="FAVORITE">❤️ Favorit</button>
+    <button class="ryuza-filter" data-mode="RECAL">🔄 Recal</button>
   </div>
   <div class="ryuza-tab-note" id="ryuzaTabNote">Semua skin</div>
   <div class="ryuza-section ryuza-tab-section" id="ryuzaTrendingSec"><div class="ryuza-section-head"><h3>🔥 Trending Skin</h3><span>berdasarkan download</span></div><div class="ryuza-mini-grid" id="ryuzaTrending"></div></div>
@@ -533,12 +541,13 @@ input{background:#0a1321;border-color:#2b405d}input:focus{border-color:#35a7ff;b
   const clean=s=>String(s||'').replace(/\s+/g,' ').trim();
   const getLS=(k,d)=>{try{return JSON.parse(localStorage.getItem(k)||'null')??d}catch(e){return d}};
   const setLS=(k,v)=>{try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}};
-  let db=null, skinData={}, activity=[], mode='ALL', ready=false, featureCfg={trending:true,featured:true,newest:true,recent:true,favorite:true,stats:true,bottomNav:true,trendingLimit:8,sectionLimit:8};
+  let db=null, skinData={}, activity=[], playlistData={}, mode='ALL', ready=false, featureCfg={trending:true,featured:true,newest:true,recent:true,favorite:true,stats:true,bottomNav:true,trendingLimit:8,sectionLimit:8};
   const ids={list:'list',q:'q'};
   function wait(){if(window.firebase&&firebase.database){start()}else setTimeout(wait,500)}
   function start(){
     try{let app;try{app=firebase.app('ryuza-super-features')}catch(e){app=firebase.initializeApp(CFG,'ryuza-super-features')}db=app.database();
       db.ref('siteConfig/skins').on('value',s=>{skinData=s.val()||{};applyAll()});
+      db.ref('siteConfig/playlists').on('value',s=>{playlistData=s.val()||{};applyAll()});
       db.ref('searchStats/activityLog').on('value',s=>{const v=s.val()||{};activity=Object.values(v);applyAll()});
       db.ref('siteConfig/settings').on('value',s=>{const st=s.val()||{};const a=document.getElementById('ryuzaAnnouncement');if(a){a.querySelector('span').textContent=clean(st.announcement||'');a.classList.toggle('show',!!st.showAnnouncement&&!!clean(st.announcement));} if(st.maintenance){showMaintenance()} });
       db.ref('siteConfig/indexFeatures').on('value',s=>{featureCfg={...featureCfg,...(s.val()||{})};const reset=Number(featureCfg.favoriteResetAt||0);if(reset){try{localStorage.removeItem('ryuzaFavorites')}catch(e){}}applyFeatureVisibility();applyAll();});
@@ -551,6 +560,17 @@ input{background:#0a1321;border-color:#2b405d}input:focus{border-color:#35a7ff;b
   }
   function titleOf(card){return clean(card.querySelector('.hero-title-text')?.textContent||card.querySelector('.title')?.textContent||card.dataset.rtdbId||'Skin')}
   function keyOf(card){return card.dataset.rtdbId||slug(titleOf(card))}
+  function isRecalCard(card){
+    const id=keyOf(card), data=skinData[id]||{}, search=String(card.dataset.search||'').toLowerCase(), title=titleOf(card).toLowerCase();
+    const raw=data.playlist??data.playlists??data.category??data.categories??card.dataset.playlist??'';
+    const vals=Array.isArray(raw)?raw:[raw];
+    const hasRecal=vals.some(v=>String(v).toLowerCase().replace(/[^a-z0-9]/g,'')==='recal' || String(v).toLowerCase().replace(/[^a-z0-9]/g,'')==='recall');
+    const cfg=playlistData?.recal||playlistData?.Recal||playlistData?.RECAL||playlistData?.recall;
+    let inCfg=false;
+    if(Array.isArray(cfg)) inCfg=cfg.some(v=>String(v)===id || slug(v)===slug(id));
+    else if(cfg&&typeof cfg==='object') inCfg=Object.prototype.hasOwnProperty.call(cfg,id) || !!cfg[id];
+    return hasRecal || inCfg || /\brecal\b|\brecall\b/.test(search+' '+title);
+  }
   function slug(s){return clean(s).toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'')}
   function cards(){return [...document.querySelectorAll('#list .skin[data-rtdb-id]')].filter(x=>x.offsetParent!==null||document.getElementById('list'))}
   function stats(){const out={};activity.filter(x=>String(x.type).toUpperCase()==='DOWNLOAD').forEach(x=>{const k=slug(x.title);if(!k)return;out[k]=(out[k]||0)+1});return out}
@@ -561,7 +581,7 @@ input{background:#0a1321;border-color:#2b405d}input:focus{border-color:#35a7ff;b
   function sortByDownload(cs){return cs.slice().sort((a,b)=>matchCount(titleOf(b))-matchCount(titleOf(a)))}
   function applyAll(){if(!ready)return;const cs=cards();if(!cs.length)return;const featured=cs.filter(c=>skinData[keyOf(c)]?.featured), newest=cs.slice().sort((a,b)=>(Number(skinData[keyOf(b)]?.createdAt)||0)-(Number(skinData[keyOf(a)]?.createdAt)||0));const lim=Math.max(3,Math.min(20,Number(featureCfg.sectionLimit)||8)),tlim=Math.max(3,Math.min(20,Number(featureCfg.trendingLimit)||8));renderBox('ryuzaTrending',sortByDownload(cs).slice(0,tlim));renderBox('ryuzaFeatured',featured.slice(0,lim));renderBox('ryuzaNew',newest.slice(0,lim));const recent=getLS('ryuzaRecent',[]).map(id=>cs.find(c=>keyOf(c)===id)).filter(Boolean).slice(0,lim);renderBox('ryuzaRecent',recent);const favorites=getLS('ryuzaFavorites',[]).map(id=>cs.find(c=>keyOf(c)===id)).filter(Boolean).slice(0,lim);renderBox('ryuzaFavorite',favorites);applyCardStats(cs);filterCards();applyFeatureVisibility()}
   function applyCardStats(cs){cs.forEach(c=>{const title=titleOf(c),count=matchCount(title);let box=c.querySelector('.ryuza-card-stats');if(!box){box=document.createElement('div');box.className='ryuza-card-stats';const anchor=c.querySelector('.replace-dropdown')||c.lastElementChild;c.insertBefore(box,anchor||null)}box.innerHTML=(featureCfg.stats?`<span class="ryuza-chip hot">📥 ${count} Download</span>`:'')+(featureCfg.featured&&skinData[keyOf(c)]?.featured?'<span class="ryuza-chip">⭐ Pilihan</span>':'')+(featureCfg.newest&&skinData[keyOf(c)]?.isNew?'<span class="ryuza-chip">🆕 NEW</span>':'')+(featureCfg.favorite&&getLS('ryuzaFavorites',[]).includes(keyOf(c))?'<span class="ryuza-chip">❤️ Favorit</span>':'')})}
-  function filterCards(){const cs=cards(),q=clean(document.getElementById(ids.q)?.value).toLowerCase(),fav=getLS('ryuzaFavorites',[]);cs.forEach(c=>{const id=keyOf(c),title=titleOf(c).toLowerCase(),search=(c.dataset.search||'').toLowerCase();let ok=!q||(title+' '+search).includes(q);if(mode==='TRENDING')ok=ok&&featureCfg.trending&&matchCount(titleOf(c))>0;if(mode==='NEW')ok=ok&&featureCfg.newest&&!!skinData[id]?.isNew;if(mode==='FEATURED')ok=ok&&featureCfg.featured&&!!skinData[id]?.featured;if(mode==='FAVORITE')ok=ok&&featureCfg.favorite&&fav.includes(id);c.style.display=ok?'':'none'});}
+  function filterCards(){const cs=cards(),q=clean(document.getElementById(ids.q)?.value).toLowerCase(),fav=getLS('ryuzaFavorites',[]);let recalVisible=0;cs.forEach(c=>{const id=keyOf(c),title=titleOf(c).toLowerCase(),search=(c.dataset.search||'').toLowerCase();let ok=!q||(title+' '+search).includes(q);if(mode==='TRENDING')ok=ok&&featureCfg.trending&&matchCount(titleOf(c))>0;if(mode==='NEW')ok=ok&&featureCfg.newest&&!!skinData[id]?.isNew;if(mode==='FEATURED')ok=ok&&featureCfg.featured&&!!skinData[id]?.featured;if(mode==='FAVORITE')ok=ok&&featureCfg.favorite&&fav.includes(id);if(mode==='RECAL')ok=ok&&isRecalCard(c);if(mode==='RECAL'&&ok)recalVisible++;c.style.display=ok?'':'none'});if(mode==='RECAL'){let n=document.getElementById('recalEmpty');if(!n){n=document.createElement('div');n.id='recalEmpty';n.className='empty';n.style.display='none';n.innerHTML='🔄 Belum ada skin di playlist Recal.';document.getElementById('list')?.appendChild(n)}n.style.display=recalVisible?'none':'block';}else{document.getElementById('recalEmpty')?.style.setProperty('display','none')}}
   function syncFeatureTabs(){
     const bar=document.getElementById('ryuzaSmartbar'), list=document.getElementById('list'), lb=document.getElementById('skinLeaderboard');
     if(!bar)return;
@@ -573,7 +593,7 @@ input{background:#0a1321;border-color:#2b405d}input:focus{border-color:#35a7ff;b
     Object.entries(map).forEach(([m,id])=>{const el=document.getElementById(id);if(el)el.classList.toggle('active',mode===m)});
     if(lb)lb.classList.toggle('active',mode==='POPULAR');
     if(list)list.style.display=mode==='ALL'?'':'none';
-    const labels={ALL:'Semua skin',POPULAR:'Skin & Replace terpopuler berdasarkan klik download',TRENDING:'Trending berdasarkan aktivitas download',FEATURED:'Pilihan Admin yang direkomendasikan Ryuza',NEW:'Skin terbaru yang ditambahkan',RECENT:'Skin yang terakhir kamu lihat',FAVORITE:'Skin yang kamu tandai sebagai favorit'};
+    const labels={ALL:'Semua skin',POPULAR:'Skin & Replace terpopuler berdasarkan klik download',TRENDING:'Trending berdasarkan aktivitas download',FEATURED:'Pilihan Admin yang direkomendasikan Ryuza',NEW:'Skin terbaru yang ditambahkan',RECENT:'Skin yang terakhir kamu lihat',FAVORITE:'Skin yang kamu tandai sebagai favorit',RECAL:'Koleksi Recal / Recall yang disiapkan Ryuza'};
     if(note)note.textContent=labels[mode]||'Semua skin';
   }
 
@@ -1436,6 +1456,7 @@ document.querySelectorAll('.replace-dropdown').forEach(box => {
 </script>
 
 <div id="ryuzaWelcome" role="status" aria-live="polite"><span class="ryuzaWelcomeIcon">👋</span><div class="ryuzaWelcomeText"><b id="ryuzaWelcomeTitle">Selamat datang!</b><span>Senang melihat kamu kembali di Ryuza Official.</span></div></div>
+<div id="recalList" aria-label="Skin Recal"></div>
 <script id="ryuza-stats-fixed">
 /* Statistik Ryuza — versi stabil, dijalankan setelah Firebase tersedia. */
 (function(){
@@ -1584,6 +1605,27 @@ document.querySelectorAll('.replace-dropdown').forEach(box => {
       if(typeof openReport==='function') openReport();
     });
   });
+})();
+</script>
+
+<script id="ryuza-recal-skins-index">
+(function(){
+ const CFG={authDomain:'ryuza-official.firebaseapp.com',databaseURL:'https://ryuza-official-default-rtdb.firebaseio.com',projectId:'ryuza-official'};
+ const list=()=>document.getElementById('recalList');
+ const clean=v=>String(v||'').replace(/^[\s📌•·—–:-]+/,'').replace(/\s+/g,' ').trim();
+ const esc=v=>String(v??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
+ const slug=v=>clean(v).toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'');
+ const iconSvg=v=>{const t=esc(v||'R');const svg=`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 160 160"><rect width="160" height="160" rx="80" fill="#111d31"/><circle cx="80" cy="80" r="58" fill="#1b3554" stroke="#9b63f6" stroke-width="3"/><text x="80" y="95" text-anchor="middle" font-family="Arial,sans-serif" font-size="42" font-weight="800" fill="white">${t}</text></svg>`;return 'data:image/svg+xml;charset=UTF-8,'+encodeURIComponent(svg)};
+ function optionsHtml(options){const a=Array.isArray(options)&&options.length?options:[{label:'Default',url:''}];return a.map((o,i)=>`<option data-label="${esc(o?.label||('Replace '+(i+1)))}" value="${esc(o?.url||'')}" ${o?.selected||i===0?'selected':''}>${esc(o?.label||('Replace '+(i+1)))}</option>`).join('')}
+ function render(data){
+   const el=list();if(!el)return;const q=clean(document.getElementById('q')?.value).toLowerCase();const arr=Object.entries(data||{}).filter(([id,x])=>x&&typeof x==='object').sort((a,b)=>Number(a[1].order??999999)-Number(b[1].order??999999)).filter(([id,x])=>{const hay=(clean(x.title||id)+' '+(x.options||[]).map(o=>o?.label||'').join(' ')).toLowerCase();return !q||hay.includes(q)});
+   if(!arr.length){el.innerHTML='<div class="recal-index-empty">🔄 Belum ada Skin Recal.<br><small>Tambahkan Skin Recal melalui Admin Panel.</small></div>';return}
+   el.innerHTML=arr.map(([id,x])=>{const title=clean(x.title||id)||'Skin Recal';const icon=clean(x.iconText||'R').slice(0,3).toUpperCase();return `<div class="card skin recal-index-card" data-rtdb-id="recal-${esc(id)}" data-recal-id="${esc(id)}"><span class="recal-badge">🔄 RECAL</span><div class="title"><div class="hero-title"><span class="hero-icon-link"><img alt="${esc(title)}" class="hero-icon" loading="lazy" src="${iconSvg(icon)}"></span><span class="hero-title-text">${esc(title)}</span></div></div><div class="replace-dropdown" style="margin-top:12px"><label style="display:block;font-size:13px;font-weight:bold;margin-bottom:6px">🔗 Pilih Replace</label><select class="replace-select" style="width:100%;padding:11px;border-radius:9px;border:1px solid #35445a;background:#080d15;color:#fff;font-size:14px">${optionsHtml(x.options)}</select><a class="btn replace-download" href="#" rel="noopener" style="display:block;margin-top:10px;text-align:center" target="_blank">⬇️ DOWNLOAD</a><button class="card-report-btn" type="button">⚠️ Report Link Error</button></div></div>`}).join('');
+   el.querySelectorAll('.recal-index-card').forEach(card=>{const sel=card.querySelector('.replace-select'),btn=card.querySelector('.replace-download');const sync=()=>{const o=sel?.options[sel.selectedIndex];if(o&&btn){btn.href=o.value||'#';btn.textContent='⬇️ DOWNLOAD '+String(o.textContent||'').toUpperCase()}};sel?.addEventListener('change',sync);sync()});
+ }
+ function setVisible(){const active=document.querySelector('#ryuzaSmartbar [data-mode="RECAL"].active');const on=!!active;const el=list();if(el)el.style.display=on?'grid':'none';if(on){document.getElementById('list')?.style.setProperty('display','none');document.getElementById('recalEmpty')?.style.setProperty('display','none')}}
+ function start(){if(!window.firebase||!firebase.database)return setTimeout(start,500);let app;try{app=firebase.app('ryuza-recal-index')}catch(e){try{app=firebase.initializeApp(CFG,'ryuza-recal-index')}catch(err){return console.warn('[Ryuza Recal] init gagal',err)}}const db=app.database();db.ref('siteConfig/recalSkins').on('value',snap=>{window.__RYUZA_RECAL_SKINS__=snap.val()||{};render(window.__RYUZA_RECAL_SKINS__);setVisible()},err=>console.warn('[Ryuza Recal] gagal membaca:',err));document.getElementById('ryuzaSmartbar')?.addEventListener('click',()=>setTimeout(()=>{render(window.__RYUZA_RECAL_SKINS__||{});setVisible()},0));document.getElementById('q')?.addEventListener('input',()=>{if(document.querySelector('#ryuzaSmartbar [data-mode="RECAL"].active'))render(window.__RYUZA_RECAL_SKINS__||{})});setVisible()}
+ start();
 })();
 </script>
 </body></html>

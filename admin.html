@@ -32,6 +32,9 @@ input:focus,textarea:focus,select:focus{outline:none;border-color:#4a9eff!import
 .visitor-toolbar{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-bottom:12px}.visitor-toolbar input{flex:1;min-width:220px}.visitor-list{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:10px}.visitor-item{padding:13px;border:1px solid #263f58;border-radius:13px;background:#091522}.visitor-head{display:flex;justify-content:space-between;gap:10px;align-items:center}.visitor-name{font-weight:800;font-size:15px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.visitor-meta{margin-top:7px;color:#8fa8bf;font-size:11px;line-height:1.5}.visitor-online{color:#72f0a3;font-weight:700}.visitor-offline{color:#8094a9;font-weight:700}.visitor-count{font-size:28px;font-weight:900;color:#65c9ff}.visitor-empty{text-align:center;padding:28px;color:#8193a6;border:1px dashed #29445e;border-radius:12px}@media(max-width:560px){.visitor-list{grid-template-columns:1fr}}
 
 .featured-picker{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;max-height:430px;overflow:auto;padding:2px}.featured-item{display:flex;align-items:center;gap:10px;padding:10px 11px;border:1px solid rgba(130,170,220,.16);border-radius:12px;background:rgba(15,24,38,.72);cursor:pointer;transition:.16s}.featured-item:hover{transform:translateY(-1px);border-color:rgba(100,180,255,.35)}.featured-item input{width:18px;height:18px;accent-color:#4da3ff}.featured-icon{width:36px;height:36px;border-radius:10px;display:grid;place-items:center;background:#16263c;font-weight:900;flex:0 0 auto}.featured-name{font-weight:800;font-size:13px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.featured-id{font-size:10px;opacity:.55;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}@media(max-width:650px){.featured-picker{grid-template-columns:1fr}}
+
+.recal-skin-card{border:1px solid #29445e;border-radius:16px;background:#0b1726;padding:14px;margin-top:12px}.recal-skin-card .replace-box{margin-top:12px;border:1px solid #263f59;border-radius:12px;padding:11px;background:#08131f}.recal-skin-card .replace-top{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:9px}.recal-replace-row{display:grid;grid-template-columns:1fr 2fr auto;gap:7px;margin-top:7px}.recal-replace-row input{width:100%}.recal-icon-preview{min-width:48px}.recal-skin-card .actions{display:flex;gap:8px;flex-wrap:wrap}
+@media(max-width:600px){.recal-replace-row{grid-template-columns:1fr}.recal-replace-row .danger{width:100%}.recal-skin-card{padding:11px}}
 </style>
 <style>.activity-list{display:flex;flex-direction:column;gap:8px;max-height:620px;overflow:auto}.activity-item{display:grid;grid-template-columns:150px 1fr auto;gap:12px;align-items:center;padding:12px 14px;border:1px solid #20364c;border-radius:12px;background:#091522}.activity-time{font-size:11px;color:#7f98ae}.activity-main{min-width:0}.activity-name{font-weight:800;color:#fff}.activity-detail{font-size:12px;color:#91a8bc;margin-top:4px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.activity-badge{font-size:11px;font-weight:800;padding:5px 8px;border-radius:999px;background:#10283b;color:#75d1ff}@media(max-width:700px){.activity-item{grid-template-columns:1fr}}.analytics-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}.bar-chart{height:210px;display:flex;align-items:flex-end;gap:5px;padding:15px 5px 25px;border-bottom:1px solid #29445e}.bar-col{flex:1;min-width:8px;height:100%;display:flex;flex-direction:column;justify-content:flex-end;align-items:center;gap:5px}.bar-fill{width:100%;max-width:28px;border-radius:6px 6px 2px 2px;background:linear-gradient(180deg,#19b9ff,#1768d5);min-height:2px}.bar-label{font-size:9px;color:#718ba3}.bar-val{font-size:9px;color:#b9d4ea}.trend-list,.notification-list{display:flex;flex-direction:column;gap:7px;max-height:380px;overflow:auto}.trend-item,.notification-item{display:flex;align-items:center;gap:10px;padding:10px;border:1px solid #20364c;border-radius:10px;background:#091522}.trend-rank{font-weight:900;color:#65c9ff;width:25px}.trend-name{font-weight:700;flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.trend-count{font-weight:900}.notification-item{font-size:12px}.notification-item b{color:#fff}.notification-time{color:#718ba3;font-size:10px;margin-left:auto;white-space:nowrap}.detail-box{margin-top:12px;padding:14px;border:1px solid #29445e;border-radius:12px;background:#091522;min-height:80px}.detail-stats{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}.detail-stat{padding:10px;border-radius:10px;background:#102033;text-align:center}.detail-stat b{display:block;font-size:20px}.skin-flags{display:flex;gap:14px;flex-wrap:wrap;margin:5px 0 12px}.skin-flags label{font-size:12px;color:#a9bad0;display:flex;align-items:center;gap:6px}.skin-flags input{width:auto}@media(max-width:700px){.analytics-grid{grid-template-columns:1fr}.detail-stats{grid-template-columns:1fr 1fr}}</style><style id="ryuza-replace-dropdown-ui">.replace-box{margin-top:12px;padding:12px;border:1px solid #243f59;border-radius:13px;background:linear-gradient(145deg,#0b1827,#09131f)}.replace-top{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:9px}.replace-title{font-weight:800;font-size:13px;color:#dcecff}.replace-hint{font-size:11px;color:#718ba3;margin-top:3px}.replace-count{font-size:11px;font-weight:800;color:#76cfff;background:#102b43;border:1px solid #285476;padding:5px 8px;border-radius:999px;white-space:nowrap}.replace-select-admin{width:100%;height:42px;border-radius:10px;border:1px solid #2e5270;background:#0a1b2b;color:#fff;font-weight:700;padding:0 12px;cursor:pointer}.replace-select-admin option{background:#0a1b2b;color:#fff}.replace-editor{margin-top:8px}.replace-row{margin:0!important}.replace-row .label{font-weight:700}.replace-row .url{color:#a9d8ff}.replace-box .row{grid-template-columns:145px 1fr 38px}.replace-box .delOpt{height:38px;padding:0;font-size:18px}.replace-box:focus-within{border-color:#287db6;box-shadow:0 0 0 3px #168cff12}@media(max-width:560px){.replace-box .row{grid-template-columns:1fr 38px}.replace-box .row .label{grid-column:1/2}.replace-box .row .url{grid-column:1/2}.replace-box .row .delOpt{grid-column:2;grid-row:1/3;height:100%}}</style>
 <style id="ryuza-admin-performance">
@@ -65,6 +68,18 @@ body:before{animation:none!important}body{background-attachment:initial!importan
 @media(max-width:900px){.nav-modern{gap:7px;padding:8px}.nav-group{padding:2px 6px}.nav-modern .tab{min-height:38px;padding:8px 10px;font-size:12px}.nav-group-title{font-size:8px;margin-bottom:5px}}
 @media(max-width:600px){.nav-modern{margin:12px 0 10px;border-radius:14px}.nav-modern .tab{gap:6px;padding:8px 9px}.tab-icon{width:20px;height:20px;flex-basis:20px;font-size:12px}.nav-group{border-right:0}}
 </style>
+
+<style id="ryuza-recal-playlist-ui">
+.recal-playlist-list{display:flex;flex-direction:column;gap:8px;margin-top:12px}
+.recal-playlist-row{display:grid;grid-template-columns:42px 1fr 42px;gap:8px;align-items:center;padding:9px;border:1px solid #29445e;border-radius:12px;background:#091522}
+.recal-playlist-num{width:34px;height:34px;border-radius:9px;display:grid;place-items:center;background:#142a40;color:#7fc8ff;font-weight:900}
+.recal-playlist-row select{height:40px}
+.recal-playlist-del{height:40px;padding:0!important;font-size:18px}
+.recal-playlist-empty{padding:20px;text-align:center;border:1px dashed #29445e;border-radius:11px;color:#8193a6}
+.recal-playlist-tools{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-top:12px}
+.recal-count{font-size:11px;font-weight:800;color:#76cfff;background:#102b43;border:1px solid #285476;padding:6px 9px;border-radius:999px}
+@media(max-width:560px){.recal-playlist-row{grid-template-columns:34px 1fr 38px;padding:7px}.recal-playlist-num{width:30px;height:30px}.recal-playlist-row select{height:38px}}
+</style>
 </head>
 </head>
 <body>
@@ -95,6 +110,7 @@ body:before{animation:none!important}body{background-attachment:initial!importan
   <div class="nav-items">
    <button class="tab" data-tab="activity"><span class="tab-icon">◉</span><span>Live Activity</span></button>
    <button class="tab" data-tab="analytics"><span class="tab-icon">⌁</span><span>Analytics</span></button>
+   <button class="tab" data-tab="recalPlaylist"><span class="tab-icon">🔄</span><span>Playlist Recal</span></button>
    <button class="tab" data-tab="indexFeatures"><span class="tab-icon">✣</span><span>Index Features</span></button>
   </div>
  </div>
@@ -262,6 +278,19 @@ body:before{animation:none!important}body{background-attachment:initial!importan
 .request-head{display:flex;justify-content:space-between;gap:10px;align-items:flex-start}.request-name,.request-email{font-weight:900;color:#fff}.request-time{font-size:10px;color:#71859b;margin-top:4px}.request-status{padding:5px 8px;border-radius:999px;background:#5b4012;color:#ffd779;font-size:9px;font-weight:900;white-space:nowrap}.request-content{margin-top:11px;padding:11px;border-radius:12px;background:#09121e;color:#bfd0e2;font-size:12px;line-height:1.6;white-space:pre-wrap}.request-meta{margin-top:8px;color:#7f95aa;font-size:10px}.request-actions{display:flex;gap:8px;margin-top:11px;flex-wrap:wrap}.request-actions button{border:1px solid #34516e;border-radius:10px;padding:9px 12px;background:#112238;color:#fff;font-weight:900;font-size:11px;cursor:pointer}.request-actions .req-done{background:linear-gradient(135deg,#176b50,#114b3a);border-color:#2b966e}.request-actions .req-delete{background:#321722;border-color:#6a3142}.request-admin-note{width:100%;min-height:52px;resize:vertical;border:1px solid #2a4662;border-radius:10px;background:#08131f;color:#fff;padding:9px;font:inherit;font-size:11px;outline:none}.request-admin-note:focus{border-color:#4da5df}
 </style>
 
+
+<section id="recalPlaylist" class="panel">
+ <div class="card">
+  <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap">
+   <div><h3 style="margin:0">🔄 Skin Recal</h3><div class="hint" style="margin-top:5px">Skin Recal adalah <b>koleksi sendiri</b>. Tidak mengambil atau bergantung pada tab Skin &amp; Replace. Semua data disimpan terpisah di <b>siteConfig/recalSkins</b>.</div></div>
+   <span id="recalPlaylistCount" class="badge">0 skin</span>
+  </div>
+  <div class="recal-playlist-tools"><button class="primary" id="recalAddBtn">＋ Tambah Skin Recal</button><button class="secondary" id="recalSaveBtn">💾 Simpan Semua Recal</button><button class="secondary" id="recalReloadBtn">↻ Muat Ulang</button><span id="recalSaveStatus" class="badge">● Menunggu Firebase...</span></div>
+  <div id="recalPlaylistList" class="recal-playlist-list"></div>
+  <div class="notice" style="margin-top:12px">💡 Setiap kartu Recal punya nama, icon, dan daftar Replace sendiri. Tambah/hapus Replace juga tidak memengaruhi Skin &amp; Replace utama.</div>
+ </div>
+</section>
+
 <section id="indexFeatures" class="panel">
  <div class="card">
   <h3 style="margin-top:0">🎛️ Kontrol Fitur Index / Member</h3>
@@ -381,7 +410,7 @@ async function saveIndexFeatures(){
 }
 $('saveIndexFeatures').onclick=saveIndexFeatures; $('reloadIndexFeatures').onclick=loadIndexFeatures; $('refreshIndexStats').onclick=()=>{watchRankings();toast('↻ Statistik direfresh')}; $('clearIndexFavorites').onclick=async()=>{if(!confirm('Reset penanda favorit global pada perangkat pengunjung?'))return;try{await db.ref('siteConfig/indexFeatures/favoriteResetAt').set(Date.now());toast('✅ Perintah reset favorit dikirim realtime')}catch(e){toast('❌ Gagal: '+e.message)}};
 try{app=firebase.initializeApp(CFG,'ryuza-admin-'+Math.random().toString(36).slice(2));db=app.database(); window.db=db;
- db.ref('siteConfig/skins').on('value',s=>{items=s.val()||{};renderFeaturedPicker();$('status').textContent='● REALTIME AKTIF';$('status').className='badge ok';$('systemInfo').innerHTML='<b class="ok">Terhubung ke Firebase Realtime Database</b><br><span class="small">Path skin: siteConfig/skins • Perubahan dipantau realtime.</span>';render()},e=>{$('status').textContent='Firebase gagal: '+e.message;$('status').className='badge err';$('systemInfo').textContent='Firebase gagal: '+e.message});
+ db.ref('siteConfig/skins').on('value',s=>{items=s.val()||{};window.__RYUZA_ADMIN_ITEMS__=items;renderFeaturedPicker();$('status').textContent='● REALTIME AKTIF';$('status').className='badge ok';$('systemInfo').innerHTML='<b class="ok">Terhubung ke Firebase Realtime Database</b><br><span class="small">Path skin: siteConfig/skins • Perubahan dipantau realtime.</span>';render()},e=>{$('status').textContent='Firebase gagal: '+e.message;$('status').className='badge err';$('systemInfo').textContent='Firebase gagal: '+e.message});
  db.ref('siteConfig/settings').on('value',s=>{settings=s.val()||{};window.__RYUZA_ADMIN_SETTINGS__=settings;loadSettings();loadIndexFeatures()});
 db.ref('siteConfig/indexFeatures').on('value',s=>{settings.indexFeatures=s.val()||{};loadIndexFeatures()});
  db.ref('onlineUsers').on('value',s=>{$('statOnline').textContent=Object.keys(s.val()||{}).length});
@@ -994,6 +1023,74 @@ $('quickImport').onclick=()=>{$('.tab[data-tab="skins"]').click();$('seedBtn').c
    }catch(e){console.error(e);setStatus('GAGAL: '+(e.message||e),'err');toastMsg('❌ Upload Index gagal: '+(e.message||e));}
    finally{upload.disabled=false}
  };
+})();
+</script>
+
+<script id="ryuza-recal-playlist-admin">
+(function(){
+  const $=id=>document.getElementById(id);
+  let recalItems={};
+  let recalOrder=[];
+
+  function slug(v){return String(v||'').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'').slice(0,100)}
+  function esc2(v){return esc(v)}
+  function iconFor(title){return String(title||'R').trim().split(/\s+/).filter(Boolean).slice(0,2).map(x=>x[0]).join('').toUpperCase().slice(0,3)||'R'}
+  function rows(options){return (options&&options.length?options:[{label:'Default',url:'',selected:true}]).map((o,i)=>({label:String(o?.label||('Replace '+(i+1))),url:String(o?.url||''),selected:i===0?true:!!o?.selected}))}
+  function makeId(title){let base='recal-'+(slug(title)||Date.now().toString());let id=base,n=2;while(recalItems[id])id=base+'-'+n++;return id}
+
+  function normalize(data){
+    const out={};
+    if(!data||typeof data!=='object')return out;
+    Object.entries(data).forEach(([id,x],i)=>{if(!x||typeof x!=='object')return;out[id]={id,title:String(x.title||id),iconText:String(x.iconText||iconFor(x.title||id)).slice(0,3).toUpperCase(),options:rows(x.options),order:Number.isFinite(Number(x.order))?Number(x.order):i,createdAt:x.createdAt||Date.now(),updatedAt:x.updatedAt||Date.now()}});
+    return out;
+  }
+  function sorted(){return Object.entries(recalItems).sort((a,b)=>Number(a[1].order??999999)-Number(b[1].order??999999))}
+  function optionHtml(opts){return rows(opts).map((o,i)=>`<div class="row recal-replace-row"><input class="label" value="${esc2(o.label)}" placeholder="Nama Replace"><input class="url" value="${esc2(o.url)}" placeholder="https://..."><button type="button" class="danger recal-del-replace">×</button></div>`).join('')}
+
+  function render(){
+    const el=$('recalPlaylistList'),count=$('recalPlaylistCount');if(!el)return;
+    const arr=sorted();if(count)count.textContent=arr.length+' skin';
+    if(!arr.length){el.innerHTML='<div class="recal-playlist-empty">Belum ada Skin Recal. Klik <b>＋ Tambah Skin Recal</b>.</div>';return}
+    el.innerHTML=arr.map(([id,x],i)=>`
+      <div class="recal-skin-card" data-id="${esc2(id)}">
+       <div class="skinhead"><span class="label">Recal #${String(i+1).padStart(3,'0')}</span><span class="muted small">${esc2(id)}</span></div>
+       <div class="namebox"><span class="num">${String(i+1).padStart(2,'0')}</span><input class="recal-title" value="${esc2(x.title)}" placeholder="Contoh: Badang Recal Special"></div>
+       <div class="field"><label>Icon Recal</label><div class="iconField"><div class="iconPreview recal-icon-preview">${esc2(x.iconText||iconFor(x.title))}</div><input class="recal-icon" maxlength="3" value="${esc2(x.iconText||iconFor(x.title))}" placeholder="R"></div></div>
+       <div class="replace-box"><div class="replace-top"><b>🔗 Replace Recal</b><button type="button" class="secondary recal-add-replace">＋ Tambah Replace</button></div>
+        <div class="recal-replace-rows">${optionHtml(x.options)}</div>
+       </div>
+       <div class="actions" style="margin-top:10px"><button type="button" class="primary recal-save-one">💾 Simpan Skin</button><button type="button" class="danger recal-delete-one">🗑️ Hapus Skin</button></div>
+      </div>`).join('');
+    bindCards();
+  }
+  function collect(card){
+    const id=card.dataset.id,old=recalItems[id]||{};
+    const title=String(card.querySelector('.recal-title')?.value||'Skin Recal').trim()||'Skin Recal';
+    const opts=[...card.querySelectorAll('.recal-replace-row')].map((r,i)=>({label:String(r.querySelector('.label')?.value||'Replace '+(i+1)).trim()||('Replace '+(i+1)),url:String(r.querySelector('.url')?.value||'').trim(),selected:i===0}));
+    return {id,title,iconText:(String(card.querySelector('.recal-icon')?.value||iconFor(title)).trim()||iconFor(title)).slice(0,3).toUpperCase(),options:opts.length?opts:[{label:'Default',url:'',selected:true}],order:Number(old.order??0),createdAt:old.createdAt||Date.now(),updatedAt:Date.now()};
+  }
+  async function saveOne(card){
+    if(!window.db)return toast('❌ Firebase belum siap');
+    const id=card.dataset.id,x=collect(card),btn=card.querySelector('.recal-save-one');try{if(btn)btn.disabled=true;await db.ref('siteConfig/recalSkins/'+id).set(x);recalItems[id]=x;toast('✅ Skin Recal tersimpan');render();}catch(e){toast('❌ Gagal menyimpan Recal: '+e.message)}finally{if(btn)btn.disabled=false}}
+  async function deleteOne(card){
+    if(!window.db)return;const id=card.dataset.id;if(!confirm('Hapus Skin Recal ini?'))return;try{await db.ref('siteConfig/recalSkins/'+id).remove();delete recalItems[id];render();toast('🗑️ Skin Recal dihapus');}catch(e){toast('❌ Gagal menghapus: '+e.message)}}
+  function bindCards(){
+    document.querySelectorAll('.recal-skin-card').forEach(card=>{
+      card.querySelector('.recal-save-one')?.addEventListener('click',()=>saveOne(card));
+      card.querySelector('.recal-delete-one')?.addEventListener('click',()=>deleteOne(card));
+      card.querySelector('.recal-add-replace')?.addEventListener('click',()=>{const box=card.querySelector('.recal-replace-rows');const row=document.createElement('div');row.className='row recal-replace-row';row.innerHTML='<input class="label" value="Replace Baru" placeholder="Nama Replace"><input class="url" value="" placeholder="https://..."><button type="button" class="danger recal-del-replace">×</button>';box.appendChild(row);bindDelete(row)});
+      card.querySelectorAll('.recal-del-replace').forEach(bindDelete);
+    });
+  }
+  function bindDelete(row){row.querySelector('.recal-del-replace')?.addEventListener('click',()=>{const rows=row.parentElement.querySelectorAll('.recal-replace-row');if(rows.length<=1){toast('Minimal 1 Replace');return}row.remove()})}
+  function add(){
+    const id=makeId('Skin Recal Baru'),n=Object.keys(recalItems).length;recalItems[id]={id,title:'Skin Recal Baru',iconText:'R',options:[{label:'Default',url:'',selected:true}],order:n,createdAt:Date.now(),updatedAt:Date.now()};render();document.querySelector(`.recal-skin-card[data-id="${CSS.escape(id)}"]`)?.scrollIntoView({behavior:'smooth',block:'center'});}
+  async function load(){
+    if(!window.db)return;const st=$('recalSaveStatus');if(st)st.textContent='● Memuat...';try{const snap=await db.ref('siteConfig/recalSkins').once('value');recalItems=normalize(snap.val());render();if(st){st.textContent='● REALTIME';st.className='badge ok'}}catch(e){if(st){st.textContent='● Gagal';st.className='badge err'}toast('❌ Gagal memuat Skin Recal: '+e.message)}}
+  async function saveAll(){
+    if(!window.db)return toast('❌ Firebase belum siap');const st=$('recalSaveStatus'),btn=$('recalSaveBtn');try{if(btn)btn.disabled=true;const data={};document.querySelectorAll('.recal-skin-card').forEach(card=>{const x=collect(card);data[x.id]=x;});recalItems=data;await db.ref('siteConfig/recalSkins').set(data);render();if(st){st.textContent='✓ Tersimpan realtime';st.className='badge ok'}toast('✅ Semua Skin Recal berhasil disimpan');}catch(e){toast('❌ Gagal menyimpan Recal: '+e.message)}finally{if(btn)btn.disabled=false}}
+  $('recalAddBtn')?.addEventListener('click',add);$('recalSaveBtn')?.addEventListener('click',saveAll);$('recalReloadBtn')?.addEventListener('click',load);
+  const boot=setInterval(()=>{if(window.db){clearInterval(boot);load();db.ref('siteConfig/recalSkins').on('value',snap=>{recalItems=normalize(snap.val());render()})}},250);
 })();
 </script>
 </body>
