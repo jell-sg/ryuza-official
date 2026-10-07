@@ -80,6 +80,12 @@ body:before{animation:none!important}body{background-attachment:initial!importan
 .recal-count{font-size:11px;font-weight:800;color:#76cfff;background:#102b43;border:1px solid #285476;padding:6px 9px;border-radius:999px}
 @media(max-width:560px){.recal-playlist-row{grid-template-columns:34px 1fr 38px;padding:7px}.recal-playlist-num{width:30px;height:30px}.recal-playlist-row select{height:38px}}
 </style>
+<style id="recal-dropdown-fix">
+.recal-replace-row{display:grid;grid-template-columns:minmax(150px,190px) minmax(0,1fr) 40px;gap:8px;align-items:center}
+.recal-replace-row .recal-replace-select,.recal-replace-row .custom-label,.recal-replace-row .url{width:100%;min-width:0;box-sizing:border-box}
+.recal-replace-row .custom-label{margin:0}
+@media(max-width:700px){.recal-replace-row{grid-template-columns:1fr 40px}.recal-replace-row .url{grid-column:1/-1}.recal-replace-row .custom-label{grid-column:1/-1}}
+</style>
 </head>
 </head>
 <body>
@@ -1045,7 +1051,19 @@ $('quickImport').onclick=()=>{$('.tab[data-tab="skins"]').click();$('seedBtn').c
     return out;
   }
   function sorted(){return Object.entries(recalItems).sort((a,b)=>Number(a[1].order??999999)-Number(b[1].order??999999))}
-  function optionHtml(opts){return rows(opts).map((o,i)=>`<div class="row recal-replace-row"><input class="label" value="${esc2(o.label)}" placeholder="Nama Replace"><input class="url" value="${esc2(o.url)}" placeholder="https://..."><button type="button" class="danger recal-del-replace">×</button></div>`).join('')}
+  const REPLACE_PRESETS=['Default','Basic','Classic','Collector','Elite','Special','Starlight','Season','Epic','Legend','MPL','Valentine','Limited','Custom'];
+  function replaceSelect(label){
+    const v=String(label||'Default');
+    const isPreset=REPLACE_PRESETS.includes(v);
+    return `<select class="recal-replace-select"><option value="${esc2(v)}" selected>${esc2(v)}</option></select><input class="custom-label" value="${isPreset?'':esc2(v)}" placeholder="Nama Replace Custom" ${isPreset?'style="display:none"':''}>`;
+  }
+  function optionHtml(opts){
+    const arr=rows(opts);
+    return arr.map((o,i)=>`<div class="recal-replace-row" data-i="${i}" style="display:${i===0?'grid':'none'}"><input class="label" value="${esc2(o.label)}" placeholder="Nama Replace"><input class="url" value="${esc2(o.url)}" placeholder="Link download / https://..."><button type="button" class="danger recal-del-replace" title="Hapus Replace">×</button></div>`).join('');
+  }
+  function optionPicker(opts){
+    return rows(opts).map((o,i)=>`<option value="${i}">${esc2(o.label||('Replace '+(i+1)))}</option>`).join('');
+  }
 
   function render(){
     const el=$('recalPlaylistList'),count=$('recalPlaylistCount');if(!el)return;
@@ -1056,8 +1074,9 @@ $('quickImport').onclick=()=>{$('.tab[data-tab="skins"]').click();$('seedBtn').c
        <div class="skinhead"><span class="label">Recal #${String(i+1).padStart(3,'0')}</span><span class="muted small">${esc2(id)}</span></div>
        <div class="namebox"><span class="num">${String(i+1).padStart(2,'0')}</span><input class="recal-title" value="${esc2(x.title)}" placeholder="Contoh: Badang Recal Special"></div>
        <div class="field"><label>Icon Recal</label><div class="iconField"><div class="iconPreview recal-icon-preview">${esc2(x.iconText||iconFor(x.title))}</div><input class="recal-icon" maxlength="3" value="${esc2(x.iconText||iconFor(x.title))}" placeholder="R"></div></div>
-       <div class="replace-box"><div class="replace-top"><b>🔗 Replace Recal</b><button type="button" class="secondary recal-add-replace">＋ Tambah Replace</button></div>
-        <div class="recal-replace-rows">${optionHtml(x.options)}</div>
+       <div class="replace-box"><div class="replace-top"><div><b>🔗 Replace Recal</b><div class="replace-hint">Pilih Replace dari dropdown. Link akan tampil sesuai pilihan.</div></div><button type="button" class="secondary recal-add-replace">＋ Tambah Replace</button></div>
+        <select class="replace-select-admin recal-replace-picker" aria-label="Pilih Replace Recal">${optionPicker(x.options)}</select>
+        <div class="replace-editor">${optionHtml(x.options)}</div>
        </div>
        <div class="actions" style="margin-top:10px"><button type="button" class="primary recal-save-one">💾 Simpan Skin</button><button type="button" class="danger recal-delete-one">🗑️ Hapus Skin</button></div>
       </div>`).join('');
@@ -1066,7 +1085,7 @@ $('quickImport').onclick=()=>{$('.tab[data-tab="skins"]').click();$('seedBtn').c
   function collect(card){
     const id=card.dataset.id,old=recalItems[id]||{};
     const title=String(card.querySelector('.recal-title')?.value||'Skin Recal').trim()||'Skin Recal';
-    const opts=[...card.querySelectorAll('.recal-replace-row')].map((r,i)=>({label:String(r.querySelector('.label')?.value||'Replace '+(i+1)).trim()||('Replace '+(i+1)),url:String(r.querySelector('.url')?.value||'').trim(),selected:i===0}));
+    const opts=[...card.querySelectorAll('.recal-replace-row')].map((r,i)=>({label:String(r.querySelector('.label')?.value||('Replace '+(i+1))).trim()||('Replace '+(i+1)),url:String(r.querySelector('.url')?.value||'').trim(),selected:i===0}));
     return {id,title,iconText:(String(card.querySelector('.recal-icon')?.value||iconFor(title)).trim()||iconFor(title)).slice(0,3).toUpperCase(),options:opts.length?opts:[{label:'Default',url:'',selected:true}],order:Number(old.order??0),createdAt:old.createdAt||Date.now(),updatedAt:Date.now()};
   }
   async function saveOne(card){
@@ -1074,15 +1093,45 @@ $('quickImport').onclick=()=>{$('.tab[data-tab="skins"]').click();$('seedBtn').c
     const id=card.dataset.id,x=collect(card),btn=card.querySelector('.recal-save-one');try{if(btn)btn.disabled=true;await db.ref('siteConfig/recalSkins/'+id).set(x);recalItems[id]=x;toast('✅ Skin Recal tersimpan');render();}catch(e){toast('❌ Gagal menyimpan Recal: '+e.message)}finally{if(btn)btn.disabled=false}}
   async function deleteOne(card){
     if(!window.db)return;const id=card.dataset.id;if(!confirm('Hapus Skin Recal ini?'))return;try{await db.ref('siteConfig/recalSkins/'+id).remove();delete recalItems[id];render();toast('🗑️ Skin Recal dihapus');}catch(e){toast('❌ Gagal menghapus: '+e.message)}}
+  function showReplace(card,index){
+    const rows=card.querySelectorAll('.recal-replace-row');
+    rows.forEach((r,i)=>r.style.display=i===Number(index)?'grid':'none');
+    const row=rows[Number(index)];
+    if(row) row.scrollIntoView({behavior:'smooth',block:'nearest'});
+  }
   function bindCards(){
     document.querySelectorAll('.recal-skin-card').forEach(card=>{
       card.querySelector('.recal-save-one')?.addEventListener('click',()=>saveOne(card));
       card.querySelector('.recal-delete-one')?.addEventListener('click',()=>deleteOne(card));
-      card.querySelector('.recal-add-replace')?.addEventListener('click',()=>{const box=card.querySelector('.recal-replace-rows');const row=document.createElement('div');row.className='row recal-replace-row';row.innerHTML='<input class="label" value="Replace Baru" placeholder="Nama Replace"><input class="url" value="" placeholder="https://..."><button type="button" class="danger recal-del-replace">×</button>';box.appendChild(row);bindDelete(row)});
-      card.querySelectorAll('.recal-del-replace').forEach(bindDelete);
+      const picker=card.querySelector('.recal-replace-picker');
+      picker?.addEventListener('change',()=>showReplace(card,picker.value));
+      card.querySelector('.recal-add-replace')?.addEventListener('click',()=>{
+        const box=card.querySelector('.replace-editor');
+        const rows=box.querySelectorAll('.recal-replace-row');
+        const next=rows.length;
+        const row=document.createElement('div');row.className='recal-replace-row';row.dataset.i=next;row.style.display='grid';
+        row.innerHTML=`<input class="label" value="Replace ${next+1}" placeholder="Nama Replace"><input class="url" value="" placeholder="Link download / https://..."><button type="button" class="danger recal-del-replace" title="Hapus Replace">×</button>`;
+        box.appendChild(row);
+        const opt=document.createElement('option');opt.value=String(next);opt.textContent=`Replace ${next+1}`;picker.appendChild(opt);picker.value=String(next);
+        showReplace(card,next);bindDelete(row,card);
+      });
+      card.querySelectorAll('.recal-del-replace').forEach(row=>bindDelete(row,card));
     });
   }
-  function bindDelete(row){row.querySelector('.recal-del-replace')?.addEventListener('click',()=>{const rows=row.parentElement.querySelectorAll('.recal-replace-row');if(rows.length<=1){toast('Minimal 1 Replace');return}row.remove()})}
+  function bindDelete(row,card){
+    row.querySelector('.recal-del-replace')?.addEventListener('click',()=>{
+      const rows=[...card.querySelectorAll('.recal-replace-row')];
+      if(rows.length<=1){toast('Minimal 1 Replace');return}
+      const idx=Number(row.dataset.i);
+      row.remove();
+      const picker=card.querySelector('.recal-replace-picker');
+      [...picker.options].find(o=>Number(o.value)===idx)?.remove();
+      [...picker.options].forEach((o,i)=>o.value=String(i));
+      [...card.querySelectorAll('.recal-replace-row')].forEach((r,i)=>r.dataset.i=i);
+      picker.value=String(Math.min(idx, picker.options.length-1));
+      showReplace(card,picker.value);
+    });
+  }
   function add(){
     const id=makeId('Skin Recal Baru'),n=Object.keys(recalItems).length;recalItems[id]={id,title:'Skin Recal Baru',iconText:'R',options:[{label:'Default',url:'',selected:true}],order:n,createdAt:Date.now(),updatedAt:Date.now()};render();document.querySelector(`.recal-skin-card[data-id="${CSS.escape(id)}"]`)?.scrollIntoView({behavior:'smooth',block:'center'});}
   async function load(){
