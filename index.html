@@ -331,8 +331,6 @@ input{background:#0a1321;border-color:#2b405d}input:focus{border-color:#35a7ff;b
 .download-tool.request{background:linear-gradient(135deg,#174a78,#146da4);border-color:#3d9fe5}.download-tool.inbox{background:linear-gradient(135deg,#31215b,#4d2c83);border-color:#7652bb}
 .download-tool .badge{display:none;min-width:19px;height:19px;padding:0 5px;border-radius:99px;background:#ff3b63;font-size:10px;line-height:19px;text-align:center}
 .card.skin .replace-download{min-height:48px;font-size:14px;font-weight:900;letter-spacing:.2px;border-radius:12px}
-.card.skin .request-skin-btn{display:flex;align-items:center;justify-content:center;width:100%;min-height:40px;margin-top:8px;padding:10px 12px;border:1px solid #304a67;border-radius:10px;background:#0d1a2b;color:#bfe5ff;font:800 12px/1 inherit;cursor:pointer;transition:.2s ease}
-.card.skin .request-skin-btn:hover{background:#142942;border-color:#4b82b2;color:#fff;transform:translateY(-1px)}
 .request-overlay,.inbox-overlay{position:fixed;inset:0;z-index:10050;display:none;align-items:center;justify-content:center;padding:16px;background:rgba(3,7,14,.82);backdrop-filter:blur(9px)}
 .request-box,.inbox-box{width:min(560px,100%);max-height:90vh;overflow:auto;border:1px solid #345575;border-radius:22px;background:linear-gradient(155deg,#142238,#0b121e);box-shadow:0 25px 70px rgba(0,0,0,.5);padding:23px}
 .inbox-box{width:min(620px,100%)}
@@ -464,8 +462,7 @@ input{background:#0a1321;border-color:#2b405d}input:focus{border-color:#35a7ff;b
     const vid=visitorId(),name=visitorName(),m=clean(message.value);if(!vid){msg.textContent='❌ ID pengunjung belum tersedia. Muat ulang halaman dan isi nama terlebih dahulu.';return}if(!m){msg.textContent='Tulis detail request terlebih dahulu.';return}
     const btn=document.getElementById('sendRequestScript');btn.disabled=true;btn.textContent='MENGIRIM...';
     try{const ref=db.ref('scriptRequests').push();await ref.set({visitorId:vid,name,skin:clean(skin.value,80),replace:clean(replace.value,80),message:m,status:'baru',createdAt:firebase.database.ServerValue.TIMESTAMP,updatedAt:firebase.database.ServerValue.TIMESTAMP});requestCache[ref.key]={visitorId:vid,name,skin:clean(skin.value,80),replace:clean(replace.value,80),message:m,status:'baru',createdAt:Date.now(),updatedAt:Date.now()};watchRequest(ref.key);msg.textContent='✅ Request berhasil dikirim ke admin.';message.value='';setTimeout(closeRequest,700)}catch(e){msg.textContent='❌ Gagal mengirim: '+e.message}finally{btn.disabled=false;btn.textContent='🚀 KIRIM REQUEST'}};
-  function addCardButtons(){document.querySelectorAll('.card.skin').forEach(card=>{if(card.querySelector('.request-skin-btn'))return;const btn=document.createElement('button');btn.type='button';btn.className='request-skin-btn';btn.textContent='💬 REQUEST SCRIPT SKIN';btn.onclick=()=>{const title=clean(card.querySelector('.hero-title-text')?.textContent||card.querySelector('.title')?.textContent||'',80);const sel=card.querySelector('.replace-select');const opt=sel?.options?.[sel.selectedIndex];openRequest(title,opt?.dataset?.label||opt?.textContent||'')};const drop=card.querySelector('.replace-dropdown');if(drop)drop.appendChild(btn)});}
-  function init(){try{if(!window.firebase||!firebase.database)return setTimeout(init,500);let app;try{app=firebase.app('ryuza-request-system')}catch(e){app=firebase.initializeApp(CFG,'ryuza-request-system')}db=app.database();addCardButtons();new MutationObserver(addCardButtons).observe(document.getElementById('list')||document.body,{childList:true,subtree:true});loadInbox()}catch(e){console.warn('[Ryuza Request] init gagal',e);setTimeout(init,1000)}}
+  function init(){try{if(!window.firebase||!firebase.database)return setTimeout(init,500);let app;try{app=firebase.app('ryuza-request-system')}catch(e){app=firebase.initializeApp(CFG,'ryuza-request-system')}db=app.database();new MutationObserver(addCardButtons).observe(document.getElementById('list')||document.body,{childList:true,subtree:true});loadInbox()}catch(e){console.warn('[Ryuza Request] init gagal',e);setTimeout(init,1000)}}
   init();
 })();
 </script>
@@ -557,7 +554,22 @@ input{background:#0a1321;border-color:#2b405d}input:focus{border-color:#35a7ff;b
   wait();
 })();
 </script>
-<div id="list"><div class="card skin" data-rtdb-id="paquito-kof-revamp-no-password-baru" data-search="paquito kof revamp no password default basic starlight manny pacquiao spesial fmvp collector spesial mpl">
+<div id="list"><div class="card skin" data-rtdb-id="badang-saint-seiya-no-password" data-search="badang saint seiya no password default basic collector pegasus seiya mpl spesial arms spesial zodiac">
+<div class="title"><div class="hero-title"><span class="hero-icon-link"><img alt="Badang" class="hero-icon" data-hero="Badang" loading="lazy" src="data:image/svg+xml;charset=UTF-8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 160 160'%3E%3Crect width='160' height='160' rx='80' fill='%23111d31'/%3E%3Ccircle cx='80' cy='80' r='58' fill='%231b3554' stroke='%2369c9ff' stroke-width='3'/%3E%3Ctext x='80' y='90' text-anchor='middle' font-family='Arial' font-size='42' font-weight='700' fill='white'%3EB%3C/text%3E%3C/svg%3E"/></span><span class="hero-title-text">Badang Saint Seiya No Password 🆕 BARU</span></div></div>
+<div class="replace-dropdown" style="margin-top:12px">
+<label style="display:block;font-size:13px;font-weight:bold;margin-bottom:6px">🔗 Pilih Replace</label>
+<select class="replace-select" style="width:100%;padding:11px;border-radius:9px;border:1px solid #35445a;background:#080d15;color:#fff;font-size:14px">
+<option data-btn="⬇️ DOWNLOAD DEFAULT" data-label="Default" selected="" value="https://sfl.gl/sSpnOE">Default</option>
+<option data-btn="⬇️ DOWNLOAD BASIC" data-label="Basic" value="https://sfl.gl/ie5zdUZ">Basic</option>
+<option data-btn="⬇️ DOWNLOAD COLLECTOR" data-label="Collector" value="https://sfl.gl/Rv2zeO">Collector</option>
+<option data-btn="⬇️ DOWNLOAD PEGASUS SEIYA" data-label="Pegasus Seiya" value="https://sfl.gl/Br8j">Pegasus Seiya</option>
+<option data-btn="⬇️ DOWNLOAD MPL" data-label="MPL" value="https://sfl.gl/KVWv">MPL</option>
+<option data-btn="⬇️ DOWNLOAD SPESIAL ARMS" data-label="Spesial Arms" value="https://sfl.gl/bVe5pw">Spesial Arms</option>
+<option data-btn="⬇️ DOWNLOAD SPESIAL" data-label="Spesial" value="https://sfl.gl/qoG1">Spesial</option>
+<option data-btn="⬇️ DOWNLOAD ZODIAC" data-label="Zodiac" value="https://sfl.gl/ZgzMk">Zodiac</option>
+</select>
+<a class="btn replace-download" href="https://sfl.gl/sSpnOE" rel="noopener" style="display:block;margin-top:10px;text-align:center" target="_blank">⬇️ DOWNLOAD DEFAULT</a><button class="card-report-btn" type="button">⚠️ Report Link Error</button>
+</div></div><div class="card skin" data-rtdb-id="paquito-kof-revamp-no-password-baru" data-search="paquito kof revamp no password default basic starlight manny pacquiao spesial fmvp collector spesial mpl">
 <div class="title"><div class="hero-title"><span class="hero-icon-link"><img alt="Paquito" class="hero-icon" data-hero="Paquito" loading="lazy" src="data:image/svg+xml;charset=UTF-8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 160 160'%3E%3Crect width='160' height='160' rx='80' fill='%23111d31'/%3E%3Ccircle cx='80' cy='80' r='58' fill='%231b3554' stroke='%2369c9ff' stroke-width='3'/%3E%3Ctext x='80' y='90' text-anchor='middle' font-family='Arial,sans-serif' font-size='42' font-weight='700' fill='white'%3ER%3C/text%3E%3C/svg%3E"/></span><span class="hero-title-text">Paquito KOF Revamp No Password 🆕 BARU</span></div></div>
 <div class="replace-dropdown" style="margin-top:12px">
 <label style="display:block;font-size:13px;font-weight:bold;margin-bottom:6px">🔗 Pilih Replace</label>
