@@ -1180,6 +1180,152 @@ img, video, iframe, canvas {
 }
 </style>
 
+
+<style id="ryuza-download-not-cut">
+/* ===== DOWNLOAD CARD: TIDAK TERPOTONG ===== */
+#list .card.skin,
+#recalList .recal-index-card {
+  overflow: hidden !important;
+  min-width: 0 !important;
+  box-sizing: border-box !important;
+}
+
+#list .replace-dropdown,
+#recalList .replace-dropdown {
+  width: 100% !important;
+  max-width: 100% !important;
+  min-width: 0 !important;
+  box-sizing: border-box !important;
+  overflow: hidden !important;
+}
+
+#list .replace-select,
+#recalList .replace-select {
+  width: 100% !important;
+  max-width: 100% !important;
+  min-width: 0 !important;
+  box-sizing: border-box !important;
+  display: block !important;
+  text-overflow: ellipsis !important;
+}
+
+#list .card.skin .replace-download,
+#recalList .recal-index-card .replace-download {
+  width: 100% !important;
+  max-width: 100% !important;
+  min-width: 0 !important;
+  box-sizing: border-box !important;
+  overflow: hidden !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: flex-start !important;
+  gap: 6px !important;
+  padding: 6px !important;
+  min-height: 42px !important;
+  border-radius: 10px !important;
+}
+
+/* Icon download jangan mengambil ruang terlalu banyak */
+#list .card.skin .replace-download::before,
+#recalList .recal-index-card .replace-download::before {
+  flex: 0 0 27px !important;
+  width: 27px !important;
+  height: 27px !important;
+  border-radius: 8px !important;
+  font-size: 15px !important;
+}
+
+/* Panah kanan diperkecil */
+#list .card.skin .replace-download::after,
+#recalList .recal-index-card .replace-download::after {
+  flex: 0 0 20px !important;
+  width: 20px !important;
+  height: 20px !important;
+  border-radius: 6px !important;
+  font-size: 15px !important;
+}
+
+/* Teks tidak boleh keluar dari tombol */
+#list .card.skin .replace-download .rz-dl-copy,
+#recalList .recal-index-card .replace-download .rz-dl-copy {
+  flex: 1 1 auto !important;
+  min-width: 0 !important;
+  max-width: 100% !important;
+  overflow: hidden !important;
+}
+
+#list .card.skin .replace-download .rz-dl-main,
+#recalList .recal-index-card .replace-download .rz-dl-main {
+  display: block !important;
+  max-width: 100% !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+  white-space: nowrap !important;
+  font-size: 9px !important;
+  line-height: 1.15 !important;
+}
+
+#list .card.skin .replace-download .rz-dl-sub,
+#recalList .recal-index-card .replace-download .rz-dl-sub {
+  display: block !important;
+  max-width: 100% !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+  white-space: nowrap !important;
+  font-size: 7px !important;
+  line-height: 1.15 !important;
+  margin-top: 2px !important;
+}
+
+#list .card.skin .replace-download .rz-dl-shine,
+#recalList .recal-index-card .replace-download .rz-dl-shine {
+  pointer-events: none !important;
+}
+
+#list .card.skin .card-report-btn,
+#recalList .recal-index-card .card-report-btn {
+  width: 100% !important;
+  max-width: 100% !important;
+  min-width: 0 !important;
+  box-sizing: border-box !important;
+  overflow: hidden !important;
+  white-space: nowrap !important;
+  text-overflow: ellipsis !important;
+}
+
+@media (max-width: 430px) {
+  #list .card.skin .replace-download,
+  #recalList .recal-index-card .replace-download {
+    min-height: 40px !important;
+    padding: 5px !important;
+    gap: 5px !important;
+  }
+
+  #list .card.skin .replace-download::before,
+  #recalList .recal-index-card .replace-download::before {
+    flex-basis: 24px !important;
+    width: 24px !important;
+    height: 24px !important;
+    font-size: 13px !important;
+  }
+
+  #list .card.skin .replace-download::after,
+  #recalList .recal-index-card .replace-download::after {
+    display: none !important;
+  }
+
+  #list .card.skin .replace-download .rz-dl-main,
+  #recalList .recal-index-card .replace-download .rz-dl-main {
+    font-size: 8px !important;
+  }
+
+  #list .card.skin .replace-download .rz-dl-sub,
+  #recalList .recal-index-card .replace-download .rz-dl-sub {
+    font-size: 6.5px !important;
+  }
+}
+</style>
+
 </head><body>
 <div id="ryuzaBootLoader" role="status" aria-live="polite" aria-label="Memuat Ryuza Official">
   <div class="ryuza-boot-box">
