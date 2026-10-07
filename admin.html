@@ -73,8 +73,8 @@ body:before{animation:none!important}body{background-attachment:initial!importan
 
 <section id="skins" class="panel">
  <div class="card">
-  <div class="toolbar"><button class="primary" id="addBtn">＋ Tambah Skin</button><button class="secondary" id="seedBtn">🔄 Ambil dari index.html</button><button class="secondary" id="pickBtn">📁 Pilih index.html</button><input id="fileInput" class="file" type="file" accept=".html,text/html"><input id="search" placeholder="🔎 Cari nama skin atau Replace..."></div>
-  <div class="hint">Klik Simpan pada kartu untuk memperbarui data. Tombol ↑ ↓ mengatur urutan tampilan.</div>
+  <div class="toolbar"><button class="primary" id="addBtn">＋ Tambah Skin</button><button class="secondary" id="seedBtn">🔄 Sinkron Skin Baru dari index</button><button class="secondary" id="pickBtn">📁 Pilih index.html</button><input id="fileInput" class="file" type="file" accept=".html,text/html"><input id="search" placeholder="🔎 Cari nama skin atau Replace..."></div>
+  <div class="hint">Klik Simpan pada kartu untuk memperbarui data. Perubahan tersimpan realtime ke Firebase dan otomatis diterapkan ke index. Sinkron dari index hanya menambahkan skin yang belum ada, tidak menimpa pengaturan Admin.</div>
  </div>
  <div id="list" class="grid"><div class="empty">Memuat database...</div></div><div id="skinPagination" class="skin-pagination" aria-label="Paginasi skin"></div>
 </section>
@@ -310,8 +310,45 @@ function bindRealtimeSetting(id,type='input'){const el=$(id);if(!el)return;el.ad
 ['setPageTitle','setName','setSubtitle','setYoutube','setYoutube2','setFree','setPaid','setDownload','setAnnouncement'].forEach(id=>bindRealtimeSetting(id));
 ['setMaintenance','setShowAnnouncement','setBannerEnabled'].forEach(id=>bindRealtimeSetting(id,'change'));
 $('reloadSettings').onclick=()=>loadSettings();
-async function importIndexText(txt){if(Object.keys(items).length&&!confirm('Database sudah berisi data. Timpa semua skin dengan data dari index.html?'))return false;const doc=new DOMParser().parseFromString(txt,'text/html'),out={};doc.querySelectorAll('.skin').forEach((c,i)=>{const title=cleanTitle(c.querySelector('.hero-title-text')?.textContent||c.querySelector('.title')?.textContent||('Skin '+(i+1)));const iconText=(c.dataset.iconText||'').trim().toUpperCase()||initials(title);let id=title.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'').slice(0,100)||('skin-'+(i+1));if(out[id])id+='-'+i;out[id]={id,title,iconText,options:[...c.querySelectorAll('.replace-select option')].map(o=>({label:o.dataset.label||o.textContent.trim(),url:o.value,selected:o.hasAttribute('selected')})),order:i}});if(!Object.keys(out).length)throw Error('Tidak menemukan .skin');await db.ref('siteConfig/skins').set(out);toast('Berhasil mengimpor '+Object.keys(out).length+' skin');return true}
-$('seedBtn').onclick=async()=>{try{$('seedBtn').disabled=true;$('seedBtn').textContent='Mengambil...';const r=await fetch('./index.html?seed='+Date.now());if(!r.ok)throw Error('index.html tidak bisa dibaca');await importIndexText(await r.text())}catch(e){if(location.protocol==='file:')$('fileInput').click();else toast('Gagal: '+e.message)}finally{$('seedBtn').disabled=false;$('seedBtn').textContent='🔄 Ambil dari index.html'}};
+async function importIndexText(txt){
+  try{
+    const doc=new DOMParser().parseFromString(txt,'text/html'), parsed={};
+    doc.querySelectorAll('.skin').forEach((c,i)=>{
+      const title=cleanTitle(c.querySelector('.hero-title-text')?.textContent||c.querySelector('.title')?.textContent||('Skin '+(i+1)));
+      const iconText=(c.dataset.iconText||'').trim().toUpperCase()||initials(title);
+      let id=(c.getAttribute('data-rtdb-id')||'').trim()||title.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'').slice(0,100)||('skin-'+(i+1));
+      if(parsed[id])id+='-'+i;
+      parsed[id]={id,title,iconText,options:[...c.querySelectorAll('.replace-select option')].map(o=>({label:o.dataset.label||o.textContent.trim(),url:o.value,selected:o.hasAttribute('selected')})),order:i};
+    });
+    if(!Object.keys(parsed).length)throw Error('Tidak menemukan .skin');
+
+    // IMPORTANT: index.html bukan lagi sumber yang menimpa database.
+    // Firebase/Admin adalah sumber utama. Import hanya menambahkan skin yang belum ada.
+    const snap=await db.ref('siteConfig/skins').once('value');
+    const current=snap.val()||{};
+    const merged={...current};
+    const existingIds=new Set(Object.keys(current));
+    let added=0;
+    Object.entries(parsed).forEach(([id,item])=>{
+      if(existingIds.has(id))return; // jangan timpa perubahan dari Admin
+      let newId=id;
+      while(merged[newId])newId=id+'-'+Math.random().toString(36).slice(2,6);
+      merged[newId]={...item,id:newId,order:Object.keys(merged).length};
+      added++;
+    });
+    if(!added){
+      toast('Semua skin dari index sudah ada. Data Admin TIDAK diubah.');
+      return true;
+    }
+    await db.ref('siteConfig/skins').set(merged);
+    toast('Berhasil menambahkan '+added+' skin baru. Pengaturan Admin tetap aman.');
+    return true;
+  }catch(e){
+    toast('Gagal sinkron: '+(e?.message||e));
+    throw e;
+  }
+}
+$('seedBtn').onclick=async()=>{try{$('seedBtn').disabled=true;$('seedBtn').textContent='Mengambil...';const r=await fetch('./index.html?seed='+Date.now());if(!r.ok)throw Error('index.html tidak bisa dibaca');await importIndexText(await r.text())}catch(e){if(location.protocol==='file:')$('fileInput').click();else toast('Gagal: '+e.message)}finally{$('seedBtn').disabled=false;$('seedBtn').textContent='🔄 Sinkron Skin Baru dari index'}};
 $('pickBtn').onclick=()=>$('fileInput').click();$('fileInput').onchange=async e=>{const f=e.target.files?.[0];if(!f)return;try{await importIndexText(await f.text())}catch(x){toast('Gagal membaca: '+x.message)}e.target.value=''};
 let visitorData={};
 let onlineVisitorData={};
