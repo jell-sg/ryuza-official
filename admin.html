@@ -182,6 +182,7 @@ body:before{animation:none!important}body{background-attachment:initial!importan
    <button class="secondary" id="pickGithubAdminBtn">📁 Pilih admin.html</button>
    <input id="githubAdminFileInput" class="file" type="file" accept=".html,text/html">
    <button class="primary" id="uploadGithubAdminBtn">🚀 Upload Admin ke GitHub</button>
+   <button class="secondary" id="testGithubAdminBtn">🔎 Tes Admin GitHub</button>
    <button class="secondary" id="downloadGithubAdminBtn">⬇️ Download dari GitHub</button>
   </div>
   <div id="githubAdminFileName" class="hint" style="margin-top:8px">Belum memilih file.</div>
@@ -655,84 +656,91 @@ $('quickImport').onclick=()=>{$('.tab[data-tab="skins"]').click();$('seedBtn').c
 })();
 </script>
 <script>
-/* ===== Upload / Download admin.html langsung ke GitHub ===== */
+/* ===== ADMIN GITHUB DIRECT UPLOAD — INDEPENDENT ===== */
 (function(){
+  'use strict';
   const $=id=>document.getElementById(id);
-  const input=$('githubAdminFileInput'),pick=$('pickGithubAdminBtn'),upload=$('uploadGithubAdminBtn'),download=$('downloadGithubAdminBtn');
-  const status=$('githubAdminStatus'),name=$('githubAdminFileName');
+  const input=$('githubAdminFileInput'), pick=$('pickGithubAdminBtn'), upload=$('uploadGithubAdminBtn'), test=$('testGithubAdminBtn'), download=$('downloadGithubAdminBtn');
+  const status=$('githubAdminStatus'), name=$('githubAdminFileName');
   if(!input||!pick||!upload)return;
-  let selectedFile=null;
-  const getCfg=()=>{try{const a=JSON.parse(localStorage.getItem('ryuzaGithubConfig')||'{}');const b=JSON.parse(localStorage.getItem('ryuzaGithubPublishConfigV1')||'{}');return {owner:$('ghOwner')?.value.trim()||a.owner||b.owner||'',repo:$('ghRepo')?.value.trim()||a.repo||b.repo||'',token:$('ghToken')?.value.trim()||a.token||b.token||'',branch:$('ghBranch')?.value.trim()||a.branch||b.branch||'main',adminPath:'admin.html'}}catch(e){return {}}};
-  const setStatus=(t,kind='')=>{if(status){status.textContent='● '+t;status.className='badge '+kind}};
-  const toastMsg=t=>typeof toast==='function'?toast(t):alert(t);
-  const headers=token=>({Accept:'application/vnd.github+json',Authorization:'Bearer '+token,'X-GitHub-Api-Version':'2022-11-28','Content-Type':'application/json'});
-  const apiUrl=c=>'https://api.github.com/repos/'+encodeURIComponent(c.owner)+'/'+encodeURIComponent(c.repo)+'/contents/'+encodeURIComponent(c.adminPath||'admin.html')+'?ref='+encodeURIComponent(c.branch||'main');
-  const b64decode=s=>{const bin=atob((s||'').replace(/\n/g,''));let out='';for(let i=0;i<bin.length;i+=8192)out+=String.fromCharCode(...Uint8Array.from(bin.slice(i,i+8192),c=>c.charCodeAt(0)));return decodeURIComponent(escape(out))};
-  const b64encode=s=>btoa(unescape(encodeURIComponent(s)));
 
+  const setStatus=(t,kind)=>{if(status){status.textContent='● '+t;status.className='badge '+(kind||'')}};
+  const toastMsg=t=>{try{if(typeof toast==='function')toast(t);else alert(t)}catch(_){alert(t)}};
+  const readCfg=()=>{
+    let a={},b={};
+    try{a=JSON.parse(localStorage.getItem('ryuzaGithubConfig')||'{}')}catch(_){ }
+    try{b=JSON.parse(localStorage.getItem('ryuzaGithubPublishConfigV1')||'{}')}catch(_){ }
+    return {
+      owner:String($('ghOwner')?.value||a.owner||b.owner||'').trim(),
+      repo:String($('ghRepo')?.value||a.repo||b.repo||'').trim(),
+      branch:String($('ghBranch')?.value||a.branch||b.branch||'main').trim()||'main',
+      token:String($('ghToken')?.value||a.token||b.token||'').trim()
+    };
+  };
+  const saveCfg=c=>{
+    try{const old=JSON.parse(localStorage.getItem('ryuzaGithubConfig')||'{}');localStorage.setItem('ryuzaGithubConfig',JSON.stringify({...old,...c}));}catch(_){ }
+  };
+  const headers=token=>({Accept:'application/vnd.github+json',Authorization:'Bearer '+token,'X-GitHub-Api-Version':'2022-11-28','Content-Type':'application/json'});
+  const api=(c)=>'https://api.github.com/repos/'+encodeURIComponent(c.owner)+'/'+encodeURIComponent(c.repo)+'/contents/admin.html?ref='+encodeURIComponent(c.branch);
+  const b64=s=>btoa(unescape(encodeURIComponent(s)));
+  const fromB64=s=>decodeURIComponent(escape(atob(String(s||'').replace(/\n/g,''))));
+  const validate=c=>{if(!c.owner||!c.repo||!c.token)throw Error('Owner, Repository, dan Token belum lengkap.');};
+
+  let selected=null;
   pick.onclick=()=>input.click();
-  input.onchange=e=>{
-    selectedFile=e.target.files?.[0]||null;
-    if(!selectedFile){name.textContent='Belum memilih file.';setStatus('Belum ada file');return}
-    name.textContent='File dipilih: '+selectedFile.name+' • '+Math.round(selectedFile.size/1024)+' KB';
+  input.onchange=()=>{
+    selected=input.files&&input.files[0]||null;
+    if(!selected){name.textContent='Belum memilih file.';setStatus('Belum ada file');return;}
+    name.textContent='File dipilih: '+selected.name+' • '+Math.round(selected.size/1024)+' KB';
     setStatus('Siap diupload','ok');
   };
 
+  async function getGithub(c){
+    const r=await fetch(api(c),{headers:headers(c.token),cache:'no-store'});
+    let d={};try{d=await r.json()}catch(_){ }
+    return {r,d};
+  }
+
+  test?.addEventListener('click',async()=>{
+    try{
+      const c=readCfg();validate(c);saveCfg(c);setStatus('Mengecek admin.html di GitHub...');
+      const {r,d}=await getGithub(c);
+      if(!r.ok)throw Error((d.message||'HTTP '+r.status)+' [HTTP '+r.status+']');
+      setStatus('ADMIN GITHUB OK • SHA '+String(d.sha||'').slice(0,7),'ok');
+      toastMsg('✅ admin.html ditemukan di GitHub. SHA: '+(d.sha||'-'));
+    }catch(e){setStatus('Tes gagal: '+e.message,'err');toastMsg('❌ '+e.message);}
+  });
+
   upload.onclick=async()=>{
-    if(!selectedFile){setStatus('Pilih admin.html dulu','err');toastMsg('Pilih file admin.html terlebih dahulu.');return}
-    const c=getCfg();
-    if(!c.owner||!c.repo||!c.token){setStatus('GitHub belum dikonfigurasi','err');toastMsg('Isi konfigurasi GitHub di Dashboard terlebih dahulu.');return}
-    if(selectedFile.size>5*1024*1024){setStatus('File terlalu besar','err');toastMsg('❌ File terlalu besar. Maksimal 5 MB.');return}
+    if(!selected){setStatus('Pilih admin.html dulu','err');toastMsg('Pilih file admin.html terlebih dahulu.');return;}
+    const c=readCfg();
+    try{validate(c);saveCfg(c);}catch(e){setStatus('GitHub belum lengkap','err');toastMsg('❌ '+e.message);return;}
+    if(selected.size>5*1024*1024){setStatus('File terlalu besar','err');toastMsg('❌ Maksimal 5 MB.');return;}
     upload.disabled=true;
     try{
       setStatus('Membaca admin.html...');
-      const content=await selectedFile.text();
+      const content=await selected.text();
       if(!/<(?:!doctype\s+html|html[\s>])/i.test(content))throw Error('File yang dipilih bukan HTML yang valid.');
-      setStatus('Mengambil admin.html dari GitHub...');
-      const url=apiUrl(c);
-      const get=await fetch(url,{headers:headers(c.token),cache:'no-store'});
-      const gd=await get.json();
-      if(!get.ok)throw Error(gd.message||('GitHub GET '+get.status));
-      if(!gd.sha)throw Error('SHA admin.html dari GitHub tidak ditemukan.');
-      setStatus('Mengupload ke GitHub...');
-      const put=await fetch(url,{method:'PUT',headers:headers(c.token),body:JSON.stringify({
-        message:'Update admin.html dari Ryuza Admin Panel',
-        content:b64encode(content),
-        sha:gd.sha,
-        branch:c.branch||'main'
-      })});
-      const pd=await put.json();
-      if(!put.ok)throw Error(pd.message||('GitHub PUT '+put.status));
-      setStatus('ADMIN BERHASIL DIUPLOAD • GITHUB','ok');
-      toastMsg('✅ admin.html berhasil diganti langsung di GitHub.');
-    }catch(e){
-      console.error(e);
-      setStatus('Upload gagal: '+(e.message||e),'err');
-      toastMsg('❌ Upload Admin ke GitHub gagal: '+(e.message||e));
-    }finally{upload.disabled=false}
+      setStatus('Mengecek admin.html di GitHub...');
+      const {r,d}=await getGithub(c);
+      if(!r.ok && r.status!==404)throw Error((d.message||'GitHub GET gagal')+' [HTTP '+r.status+']');
+      const body={message:'Update admin.html dari Ryuza Admin Panel',content:b64(content),branch:c.branch};
+      if(d.sha)body.sha=d.sha;
+      setStatus('Mengirim admin.html ke GitHub...');
+      const put=await fetch('https://api.github.com/repos/'+encodeURIComponent(c.owner)+'/'+encodeURIComponent(c.repo)+'/contents/admin.html',{method:'PUT',headers:headers(c.token),body:JSON.stringify(body)});
+      let pd={};try{pd=await put.json()}catch(_){ }
+      if(!put.ok)throw Error((pd.message||'GitHub PUT gagal')+' [HTTP '+put.status+']');
+      const commitUrl=pd.commit?.html_url||pd.content?.html_url||('https://github.com/'+c.owner+'/'+c.repo+'/commits/'+c.branch);
+      setStatus('ADMIN BERHASIL DIUPLOAD • COMMIT OK','ok');
+      toastMsg('✅ admin.html berhasil diupload ke GitHub. Commit: '+commitUrl);
+    }catch(e){console.error(e);setStatus('Upload gagal: '+e.message,'err');toastMsg('❌ Upload Admin gagal: '+e.message);}
+    finally{upload.disabled=false;}
   };
 
-  download.onclick=async()=>{
-    const c=getCfg();
-    if(!c.owner||!c.repo||!c.token){setStatus('GitHub belum dikonfigurasi','err');toastMsg('Isi konfigurasi GitHub di Dashboard terlebih dahulu.');return}
-    download.disabled=true;
-    try{
-      setStatus('Mengambil admin.html dari GitHub...');
-      const get=await fetch(apiUrl(c),{headers:headers(c.token),cache:'no-store'});
-      const gd=await get.json();
-      if(!get.ok)throw Error(gd.message||('GitHub GET '+get.status));
-      const html=b64decode(gd.content||'');
-      if(!html.trim())throw Error('admin.html kosong di GitHub.');
-      const blob=new Blob([html],{type:'text/html;charset=utf-8'});
-      const u=URL.createObjectURL(blob),a=document.createElement('a');
-      a.href=u;a.download='admin.html';document.body.appendChild(a);a.click();a.remove();
-      setTimeout(()=>URL.revokeObjectURL(u),1000);
-      setStatus('ADMIN DIDOWNLOAD • GITHUB','ok');
-      toastMsg('✅ admin.html berhasil didownload dari GitHub.');
-    }catch(e){
-      console.error(e);setStatus('Download gagal: '+(e.message||e),'err');toastMsg('❌ Download Admin gagal: '+(e.message||e));
-    }finally{download.disabled=false}
-  };
+  download?.addEventListener('click',async()=>{
+    const c=readCfg();
+    try{validate(c);saveCfg(c);setStatus('Mengambil admin.html dari GitHub...');const {r,d}=await getGithub(c);if(!r.ok)throw Error((d.message||'GitHub GET gagal')+' [HTTP '+r.status+']');const html=fromB64(d.content||'');const a=document.createElement('a'),u=URL.createObjectURL(new Blob([html],{type:'text/html;charset=utf-8'}));a.href=u;a.download='admin.html';document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(u),1000);setStatus('ADMIN DIDOWNLOAD • GITHUB','ok');}catch(e){setStatus('Download gagal: '+e.message,'err');toastMsg('❌ '+e.message);}
+  });
 })();
 </script>
 
