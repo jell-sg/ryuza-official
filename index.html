@@ -1,45 +1,35 @@
 <!DOCTYPE html>
 
 <html lang="id"><head>
-<style id="ryuza-boot-critical">
-html.ryuza-booting,html.ryuza-booting body{overflow:hidden!important}
-html.ryuza-booting body>*:not(#ryuzaBootLoader){visibility:hidden!important}
-#ryuzaBootLoader{
-  position:fixed;inset:0;z-index:2147483647;display:flex;align-items:center;justify-content:center;
-  padding:20px;background:#070b12;color:#fff;font-family:Inter,ui-sans-serif,system-ui,-apple-system,"Segoe UI",Arial,sans-serif;
-  opacity:1;visibility:visible;transition:opacity .28s ease,visibility .28s ease;
-}
-#ryuzaBootLoader.hide{opacity:0;visibility:hidden;pointer-events:none}
-.ryuza-boot-box{
-  width:min(390px,92vw);padding:28px 24px;text-align:center;border:1px solid #294568;border-radius:22px;
-  background:linear-gradient(145deg,#111c2b,#0b111b);box-shadow:0 24px 70px rgba(0,0,0,.48)
-}
-.ryuza-boot-logo{
-  width:72px;height:72px;margin:0 auto 16px;border-radius:50%;display:grid;place-items:center;
-  border:2px solid #268bff;background:radial-gradient(circle,#173b62,#0b1421);
-  box-shadow:0 0 28px rgba(38,139,255,.25);font-size:25px;font-weight:900
-}
-.ryuza-boot-title{font-size:18px;font-weight:900;margin-bottom:7px}
-.ryuza-boot-text{font-size:12px;color:#9fb3ca;min-height:18px}
-.ryuza-boot-track{height:7px;margin-top:18px;border-radius:99px;background:#18273a;overflow:hidden}
-.ryuza-boot-bar{height:100%;width:8%;border-radius:99px;background:linear-gradient(90deg,#1976f3,#22d3ee);transition:width .25s ease}
-.ryuza-boot-percent{margin-top:8px;font-size:10px;color:#71859c;font-variant-numeric:tabular-nums}
-@media(prefers-reduced-motion:reduce){#ryuzaBootLoader{transition:none}.ryuza-boot-bar{transition:none}}
-</style>
-<script>
+
+
+<meta charset="utf-8"/><meta content="width=device-width, initial-scale=1, viewport-fit=cover" name="viewport"/>
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate"/>
+<meta http-equiv="Pragma" content="no-cache"/>
+<meta http-equiv="Expires" content="0"/>
+<script id="ryuza-fresh-load">
 (function(){
-  document.documentElement.classList.add('ryuza-booting');
-  window.__RYUZA_BOOT_START=performance.now();
-  window.__RYUZA_BOOT_HIDE=function(){
-    var loader=document.getElementById('ryuzaBootLoader');
-    if(!loader)return;
-    loader.classList.add('hide');
-    document.documentElement.classList.remove('ryuza-booting');
-    setTimeout(function(){loader.remove()},350);
-  };
+  /* Ambil dokumen terbaru saat masuk melalui navigasi baru.
+     Data localStorage/sessionStorage aplikasi tetap dipertahankan. */
+  try{
+    var nav = performance.getEntriesByType && performance.getEntriesByType('navigation')[0];
+    var type = nav ? nav.type : 'navigate';
+    var url = new URL(location.href);
+
+    if(type === 'navigate' && !url.searchParams.has('ryuza_fresh')){
+      url.searchParams.set('ryuza_fresh', Date.now().toString(36));
+      location.replace(url.toString());
+      return;
+    }
+
+    if(url.searchParams.has('ryuza_fresh')){
+      url.searchParams.delete('ryuza_fresh');
+      history.replaceState(null, '', url.pathname + url.search + url.hash);
+    }
+  }catch(e){}
 })();
 </script>
-<meta charset="utf-8"/><meta content="width=device-width, initial-scale=1, viewport-fit=cover" name="viewport"/><title>Ryuza Official Uploader script NO 1</title><style>
+<title>Ryuza Official Uploader script NO 1</title><style>
 *{box-sizing:border-box}body{margin:0;min-height:100vh;font-family:Arial,sans-serif;background:#080b12;color:#fff;padding:22px 14px}.container{max-width:560px;width:100%;margin:auto}
 .header{text-align:center;margin-bottom:15px}.header h1{margin:0;font-size:23px;text-shadow:0 0 12px rgba(0,170,255,.65)}.header p{margin:7px 0;color:#aeb7c5;font-size:13px}
 .search{position:sticky;top:8px;z-index:20;background:#101620;border:1px solid #263448;border-radius:13px;padding:10px;margin-bottom:13px;box-shadow:0 8px 22px #0006}.wrap{position:relative}
@@ -1181,129 +1171,99 @@ img, video, iframe, canvas {
 </style>
 
 </head><body>
-<div id="ryuzaBootLoader" role="status" aria-live="polite" aria-label="Memuat Ryuza Official">
-  <div class="ryuza-boot-box">
-    <div class="ryuza-boot-logo">R</div>
-    <div class="ryuza-boot-title">Ryuza Official</div>
-    <div class="ryuza-boot-text" id="ryuzaBootText">Menyiapkan web...</div>
-    <div class="ryuza-boot-track"><div class="ryuza-boot-bar" id="ryuzaBootBar"></div></div>
-    <div class="ryuza-boot-percent" id="ryuzaBootPercent">8%</div>
+<style id="ryuza-chrome-gate-style">
+#ryuzaChromeGate{
+  display:none;position:fixed;inset:0;z-index:2147483647;
+  background:#050a12;color:#fff;align-items:center;justify-content:center;
+  padding:22px;font-family:Arial,sans-serif;text-align:center;
+}
+#ryuzaChromeGate .box{
+  width:min(420px,100%);padding:28px 22px;border-radius:20px;
+  background:linear-gradient(145deg,#0d1726,#07101c);
+  border:1px solid #1d4268;box-shadow:0 20px 70px rgba(0,0,0,.55);
+}
+#ryuzaChromeGate .icon{
+  width:64px;height:64px;border-radius:50%;margin:0 auto 16px;
+  display:grid;place-items:center;background:#111f32;border:1px solid #2c8cff;
+  font-size:30px;
+}
+#ryuzaChromeGate h2{margin:0 0 9px;font-size:21px}
+#ryuzaChromeGate p{margin:0 0 18px;color:#9db1c8;font-size:13px;line-height:1.55}
+#ryuzaChromeGate button{
+  width:100%;border:0;border-radius:12px;padding:13px 16px;
+  font-weight:800;font-size:14px;color:#fff;cursor:pointer;
+  background:linear-gradient(135deg,#087cff,#16c8ff);
+  box-shadow:0 8px 25px rgba(8,124,255,.25);
+}
+#ryuzaChromeGate small{display:block;margin-top:12px;color:#687d96;font-size:10px}
+html.ryuza-chrome-block body>*{visibility:hidden!important}
+html.ryuza-chrome-block #ryuzaChromeGate{display:flex!important}
+</style>
+<div id="ryuzaChromeGate" aria-hidden="true">
+  <div class="box">
+    <div class="icon">🌐</div>
+    <h2>Buka di Google Chrome</h2>
+    <p>
+      Ryuza Official tidak dibuka melalui browser bawaan YouTube
+      atau browser di dalam aplikasi lain. Tekan tombol di bawah
+      untuk membuka halaman ini langsung di Google Chrome.
+    </p>
+    <button id="ryuzaOpenChrome" type="button">🚀 BUKA DI GOOGLE CHROME</button>
+    <small>Jika tombol tidak bekerja, pilih menu ⋮ → Buka di Chrome.</small>
   </div>
 </div>
-<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
-<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
-<script id="ryuza-boot-controller">
+<script id="ryuza-chrome-only">
 (function(){
-  var bar=document.getElementById('ryuzaBootBar');
-  var txt=document.getElementById('ryuzaBootText');
-  var pct=document.getElementById('ryuzaBootPercent');
-  var progress=5, ready=false, retrying=false;
+  'use strict';
 
-  function setProgress(n,message){
-    progress=Math.max(progress,Math.min(100,n));
-    if(bar)bar.style.width=progress+'%';
-    if(pct)pct.textContent=Math.round(progress)+'%';
-    if(txt&&message)txt.textContent=message;
-  }
-  function sleep(ms){return new Promise(function(r){setTimeout(r,ms)});}
+  var ua = navigator.userAgent || '';
+  var isAndroid = /Android/i.test(ua);
 
-  // Hanya data yang benar-benar dibutuhkan untuk membangun Index.
-  // Statistik pencarian/klik sengaja TIDAK diambil di Index.
-  var CORE_PATHS=[
-    'siteConfig/settings',
-    'siteConfig/skins',
-    'siteConfig/playlists',
-    'siteConfig/indexFeatures',
-    'siteConfig/recalSkins'
-  ];
+  /* Browser yang umum dipakai sebagai in-app WebView/browser. */
+  var inApp =
+    /; ?wv\)/i.test(ua) ||
+    /\bwv\b/i.test(ua) ||
+    /FBAN|FBAV|FBIOS|FB_IAB|Instagram|Line\/|TikTok|BytedanceWebview|Snapchat|Twitter|Pinterest/i.test(ua) ||
+    /; ?GSA\//i.test(ua);
 
-  function getFirebase(){
-    return window.firebase && firebase.database ? firebase : null;
-  }
+  /*
+   * Android Chrome normal biasanya punya Chrome/<versi>.
+   * WebView Android biasanya punya Version/<versi> ... wv.
+   */
+  var chrome = /Chrome\/[\d.]+/i.test(ua) && !inApp;
 
-  async function waitFirebase(){
-    for(var i=0;i<100;i++){
-      var fb=getFirebase();
-      if(fb)return fb;
-      setProgress(12,'Menyiapkan database...');
-      await sleep(100);
-    }
-    throw new Error('Firebase SDK tidak tersedia');
-  }
+  if(!isAndroid || chrome) return;
 
-  async function preloadCore(){
-    var fb=await waitFirebase();
-    var CFG={
-      authDomain:'ryuza-official.firebaseapp.com',
-      databaseURL:'https://ryuza-official-default-rtdb.firebaseio.com',
-      projectId:'ryuza-official'
-    };
+  document.documentElement.classList.add('ryuza-chrome-block');
 
-    var app;
+  function openChrome(){
+    var clean = location.href.replace(/^https?:\/\//i,'');
+    var intent =
+      'intent://' + clean +
+      '#Intent;scheme=https;package=com.android.chrome;' +
+      'S.browser_fallback_url=' + encodeURIComponent(location.href) +
+      ';end';
+
     try{
-      app=fb.app('ryuza-boot-preload');
+      location.href = intent;
     }catch(e){
-      app=fb.initializeApp(CFG,'ryuza-boot-preload');
-    }
-
-    var db=app.database();
-    var result={};
-    var total=CORE_PATHS.length;
-    var completed=0;
-
-    setProgress(18,'Mengunduh data utama...');
-
-    await Promise.all(CORE_PATHS.map(function(path){
-      return db.ref(path).once('value').then(function(snap){
-        result[path]=snap.val();
-        completed++;
-        setProgress(18+Math.round(completed/total*68),
-          'Mengunduh data utama... '+completed+'/'+total);
-      });
-    }));
-
-    window.__RYUZA_PRELOADED_DB__=result;
-    window.__RYUZA_DB_READY=true;
-  }
-
-  async function boot(){
-    try{
-      setProgress(10,'Memulai Ryuza Official...');
-      await preloadCore();
-
-      if(document.readyState!=='complete'){
-        setProgress(90,'Menunggu tampilan selesai...');
-        await new Promise(function(resolve){
-          window.addEventListener('load',resolve,{once:true});
-        });
-      }
-
-      if(document.fonts && document.fonts.ready){
-        try{await document.fonts.ready;}catch(e){}
-      }
-
-      setProgress(98,'Semua data utama siap...');
-      await sleep(250);
-      setProgress(100,'Web siap digunakan');
-
-      setTimeout(function(){
-        if(window.__RYUZA_BOOT_HIDE)window.__RYUZA_BOOT_HIDE();
-      },300);
-
-      ready=true;
-    }catch(err){
-      console.error('[Ryuza Boot] preload gagal:',err);
-      setProgress(100,'Koneksi database gagal — mencoba lagi...');
-      retrying=true;
-      await sleep(1500);
-      retrying=false;
-      if(!ready)boot();
+      window.open(location.href,'_blank');
     }
   }
 
-  boot();
+  var btn=document.getElementById('ryuzaOpenChrome');
+  if(btn) btn.addEventListener('click',openChrome);
+
+  /* Coba buka Chrome otomatis sekali; tetap sediakan tombol jika Android menolak intent. */
+  setTimeout(function(){
+    try{ openChrome(); }catch(e){}
+  },500);
 })();
 </script>
+
+<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
+
 <div class="upload-notice" id="uploadNotice">🆕 Paquito KOF Revamp baru saja di-upload!<small>No Password • 8 pilihan Replace tersedia</small></div>
 <div aria-labelledby="popupTitle" aria-modal="true" class="popup-overlay" id="ryuzaPopup" role="dialog">
   <div class="popup-box subscribe-gate">
