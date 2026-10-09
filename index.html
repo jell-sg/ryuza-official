@@ -1958,54 +1958,57 @@ function getCountElement(btn) {
   }
   return el;
 }
-const countUrl = key => `${RTDB_URL}/linkClicks/${encodeURIComponent(key)}.json`;
+/* Penghitung klik Firebase: delegated listeners mendukung kartu yang dirender dinamis.
+   transaction() mencegah dua klik bersamaan saling menimpa hitungan. */
+let ryuzaClickDb = null;
+function getClickDb(){
+  if(ryuzaClickDb)return ryuzaClickDb;
+  if(!window.firebase || !firebase.database)throw new Error('Firebase Database SDK belum dimuat');
+  const cfg={authDomain:'ryuza-official.firebaseapp.com',databaseURL:RTDB_URL,projectId:'ryuza-official'};
+  let app;try{app=firebase.app('ryuza-click-counter')}catch(e){app=firebase.initializeApp(cfg,'ryuza-click-counter')}
+  ryuzaClickDb=app.database();return ryuzaClickDb;
+}
 async function showCount(btn) {
+  if(!btn)return;
   const card = btn.closest('.skin'); if (!card) return;
   const select = card.querySelector('.replace-select');
-  const label = select ? (select.options[select.selectedIndex].dataset.label || select.value) : 'download';
+  const label = select ? (select.options[select.selectedIndex]?.dataset.label || select.value) : 'download';
   const key = stableKey(card, label), el = getCountElement(btn); el.dataset.key = key;
   try {
-    const res = await fetch(countUrl(key)); if (!res.ok) throw new Error(`HTTP ${res.status}`);
-    const data = await res.json(); if (el.dataset.key !== key) return;
-    el.classList.remove('loading'); el.innerHTML = `👁️ <strong>${numberFormat(data?.count)} klik</strong>`;
+    const snap=await getClickDb().ref('linkClicks/'+key).once('value');
+    if(el.dataset.key!==key)return;
+    el.classList.remove('loading'); el.innerHTML = `👁️ <strong>${numberFormat(snap.val()?.count)} klik</strong>`;
   } catch (err) {
     console.error('Gagal memuat statistik:', err); el.classList.remove('loading');
     el.innerHTML = '👁️ <strong>Statistik tidak tersedia</strong>';
   }
 }
 async function incrementCount(key) {
-  const url = countUrl(key);
-  // Baca nilai lalu simpan kembali melalui REST API Realtime Database.
-  const read = await fetch(url);
-  if (!read.ok) throw new Error(`HTTP ${read.status} saat membaca`);
-  const old = await read.json();
-  const updated = { ...(old || {}), count: Number(old?.count || 0) + 1, updatedAt: Date.now() };
-  const write = await fetch(url, {
-    method: 'PUT',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(updated)
-  });
-  if (!write.ok) throw new Error(`HTTP ${write.status} saat menyimpan`);
-  return updated.count;
+  const ref=getClickDb().ref('linkClicks/'+key);
+  const result=await ref.transaction(old=>({...((old&&typeof old==='object')?old:{}),count:Number(old?.count||0)+1,updatedAt:firebase.database.ServerValue.TIMESTAMP}));
+  if(!result.committed)throw new Error('Hitungan klik tidak tersimpan');
+  return Number(result.snapshot.val()?.count||0);
 }
-document.querySelectorAll('.replace-dropdown').forEach(box => {
-  const select = box.querySelector('.replace-select'), btn = box.querySelector('.replace-download');
-  select?.addEventListener('change', () => showCount(btn)); showCount(btn);
-  btn.addEventListener('click', async event => {
-    const card = btn.closest('.skin');
-    const label = select.options[select.selectedIndex].dataset.label || select.value;
-    const key = stableKey(card, label), destination = btn.href;
-    event.preventDefault(); window.open(destination, '_blank', 'noopener');
-    const el = getCountElement(btn); el.classList.add('loading');
-    try {
-      const count = await incrementCount(key); el.dataset.key = key; el.classList.remove('loading');
-      el.innerHTML = `👁️ <strong>${numberFormat(count)} klik</strong>`;
-    } catch (err) {
-      console.error('Gagal menyimpan klik:', err); el.classList.remove('loading');
-      el.innerHTML = '👁️ <strong>Klik belum tersimpan</strong>';
-    }
-  });
+function initRyuzaClickCounters(root=document){
+  root.querySelectorAll?.('.replace-dropdown .replace-download').forEach(btn=>showCount(btn));
+}
+document.addEventListener('change',e=>{if(e.target.matches('.replace-select'))showCount(e.target.closest('.replace-dropdown')?.querySelector('.replace-download'))});
+document.addEventListener('click',async event=>{
+  const btn=event.target.closest?.('.replace-dropdown .replace-download');
+  if(!btn)return;
+  const card=btn.closest('.skin'); if(!card)return;
+  const select=card.querySelector('.replace-select');
+  const label=select?(select.options[select.selectedIndex]?.dataset.label||select.value):'download';
+  const key=stableKey(card,label),destination=btn.href;
+  event.preventDefault();
+  // Buka tab secara sinkron pada event pengguna agar tidak terblokir popup blocker.
+  if(destination)window.open(destination,'_blank','noopener,noreferrer');
+  const el=getCountElement(btn);el.classList.add('loading');
+  try{const count=await incrementCount(key);el.dataset.key=key;el.classList.remove('loading');el.innerHTML=`👁️ <strong>${numberFormat(count)} klik</strong>`}
+  catch(err){console.error('Gagal menyimpan klik:',err);el.classList.remove('loading');el.innerHTML='👁️ <strong>Klik belum tersimpan</strong>'}
 });
+initRyuzaClickCounters();
+if(window.MutationObserver){const clickCounterObserver=new MutationObserver(records=>records.forEach(r=>r.addedNodes.forEach(n=>{if(n.nodeType===1)initRyuzaClickCounters(n)})));clickCounterObserver.observe(document.getElementById('list')||document.body,{childList:true,subtree:true});}
 </script>
 <style id="ryuza-banner-style">.ryuza-banner{position:relative;overflow:hidden;margin:18px 0 20px;border:1px solid #29364b;border-radius:18px;background:#0c1422;aspect-ratio:16/6;min-height:180px;max-height:390px;box-shadow:0 14px 36px rgba(0,0,0,.25)}.ryuza-slides,.ryuza-slide{position:absolute;inset:0}.ryuza-slide{opacity:0;transition:opacity .65s ease;pointer-events:none}.ryuza-slide.active{opacity:1}.ryuza-slide img{width:100%;height:100%;object-fit:cover;object-position:center 35%;display:block}.ryuza-slide-shade{position:absolute;inset:0;background:linear-gradient(90deg,rgba(5,10,20,.84),rgba(5,10,20,.24) 75%),linear-gradient(0deg,rgba(5,10,20,.45),transparent 55%)}.ryuza-slide-caption{position:absolute;left:clamp(18px,5%,54px);bottom:clamp(24px,8%,48px);color:#fff;max-width:75%;text-shadow:0 2px 12px #000}.ryuza-slide-caption span{font-size:clamp(9px,1.2vw,12px);font-weight:800;letter-spacing:2px;color:#8edbff}.ryuza-slide-caption h2{font-size:clamp(20px,4vw,42px);line-height:1.1;margin:8px 0 0;font-weight:900}.ryuza-arrow{position:absolute;top:50%;transform:translateY(-50%);z-index:3;width:38px;height:38px;border:1px solid #ffffff55;border-radius:50%;background:#08111dcc;color:#fff;font-size:27px;line-height:1;cursor:pointer;backdrop-filter:none;}.ryuza-arrow.prev{left:12px}.ryuza-arrow.next{right:12px}.ryuza-dots{position:absolute;z-index:3;bottom:14px;right:20px;display:flex;gap:7px}.ryuza-dot{width:8px;height:8px;border:0;border-radius:99px;background:#ffffff88;padding:0;cursor:pointer;transition:width .2s,background .2s}.ryuza-dot.active{width:23px;background:#69c9ff}@media(max-width:600px){.ryuza-banner{aspect-ratio:4/3;min-height:190px;border-radius:14px;margin:14px 0}.ryuza-slide img{object-position:center}.ryuza-slide-caption{max-width:78%;bottom:35px}.ryuza-arrow{width:32px;height:32px;font-size:23px}.ryuza-dots{bottom:12px;right:14px}}@media(prefers-reduced-motion:reduce){.ryuza-slide,.ryuza-dot{transition:none}}</style>
 <script id="ryuza-banner-script">(()=>{const root=document.querySelector('.ryuza-banner');if(!root)return;const slides=[...root.querySelectorAll('.ryuza-slide')],dots=root.querySelector('.ryuza-dots');let index=0,timer;slides.forEach((_,i)=>{const b=document.createElement('button');b.type='button';b.className='ryuza-dot'+(i===0?' active':'');b.setAttribute('aria-label','Tampilkan banner '+(i+1));b.addEventListener('click',()=>show(i,true));dots.appendChild(b)});const buttons=[...dots.children];function show(n,manual=false){index=(n+slides.length)%slides.length;slides.forEach((s,i)=>{s.classList.toggle('active',i===index);s.setAttribute('aria-hidden',i!==index?'true':'false')});buttons.forEach((b,i)=>{b.classList.toggle('active',i===index);b.setAttribute('aria-current',i===index?'true':'false')});if(manual)restart()}function restart(){clearInterval(timer);timer=setInterval(()=>show(index+1),5000)}root.querySelector('.prev').addEventListener('click',()=>show(index-1,true));root.querySelector('.next').addEventListener('click',()=>show(index+1,true));root.addEventListener('mouseenter',()=>clearInterval(timer));root.addEventListener('mouseleave',restart);show(0);restart()})();</script>
