@@ -1170,6 +1170,71 @@ img, video, iframe, canvas {
 }
 </style>
 
+<style id="ryuza-premium-ui-overrides">
+/* RYUZA UI POLISH — presentation-only overrides; existing HTML/JS and Firebase logic preserved */
+:root{color-scheme:dark;--rz-bg:#0b0c10;--rz-panel:#14161c;--rz-panel2:#191c24;--rz-line:rgba(255,255,255,.09);--rz-muted:#9da4b3;--rz-blue:#7ba7ff;--rz-radius:20px}
+html{scroll-behavior:smooth;scroll-padding-top:100px}
+body{background:radial-gradient(ellipse at 50% -12%,rgba(87,119,204,.17),transparent 42%),var(--rz-bg)!important;color:#f5f6fa;padding:24px 18px 88px!important;font-family:Inter,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif!important;letter-spacing:.005em}
+.container{max-width:1120px!important}
+.header{border:1px solid var(--rz-line)!important;border-radius:26px!important;background:linear-gradient(145deg,rgba(24,26,34,.98),rgba(16,17,23,.98))!important;box-shadow:0 18px 48px rgba(0,0,0,.22)!important;padding:27px 22px!important}
+.header h1{text-shadow:none!important;letter-spacing:-.04em;font-weight:800!important}
+.header p{color:#aeb4c2!important}
+.top-nav{border:1px solid var(--rz-line)!important;background:rgba(19,21,28,.92)!important;box-shadow:0 10px 32px rgba(0,0,0,.24)!important;backdrop-filter:blur(18px)!important;-webkit-backdrop-filter:blur(18px)!important;border-radius:18px!important}
+.nav-link{border-radius:12px!important;transition:background .18s ease,color .18s ease,transform .18s ease!important}
+.nav-link.active{background:linear-gradient(135deg,#537ce5,#739cff)!important;box-shadow:0 5px 18px rgba(89,127,239,.2)!important}
+.search{background:rgba(21,23,30,.94)!important;border-color:var(--rz-line)!important;border-radius:18px!important;box-shadow:0 12px 32px rgba(0,0,0,.2)!important;backdrop-filter:blur(18px)!important;-webkit-backdrop-filter:blur(18px)!important}
+input,select,textarea{background:#0e1016!important;border-color:rgba(255,255,255,.12)!important;color:#f6f7fb!important;border-radius:13px!important}
+input:focus,select:focus,textarea:focus{border-color:#7ba7ff!important;box-shadow:0 0 0 3px rgba(123,167,255,.12)!important}
+#list{grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:14px!important}
+.card,.card.skin,.recal-index-card{background:linear-gradient(150deg,#191c24,#13151b)!important;border:1px solid var(--rz-line)!important;border-radius:20px!important;box-shadow:0 9px 26px rgba(0,0,0,.16)!important}
+.card.skin{padding:17px!important;min-width:0;transition:transform .18s ease,border-color .18s ease,box-shadow .18s ease!important}
+.card.skin:hover,.recal-index-card:hover{transform:translateY(-2px);border-color:rgba(123,167,255,.35)!important;box-shadow:0 14px 30px rgba(0,0,0,.24)!important}
+.card.skin .title{font-size:16px!important;line-height:1.35!important;border-color:var(--rz-line)!important;overflow-wrap:anywhere}
+.btn,.wa,.download-tool,.popup-action,.payment-wa,.report-wa{border-radius:13px!important;transition:transform .16s ease,filter .16s ease!important}
+.btn{background:linear-gradient(135deg,#557ce8,#7ba7ff)!important;box-shadow:none!important}
+.btn:active,.download-tool:active,.popup-action:active{transform:scale(.985)!important}
+.skip{background:linear-gradient(145deg,#1a1925,#151720)!important;border:1px solid rgba(173,139,255,.25)!important;box-shadow:none!important;border-radius:20px!important}
+.popup-box,.payment-box,.report-box{border:1px solid var(--rz-line)!important;background:linear-gradient(150deg,#1b1e27,#111319)!important;box-shadow:0 24px 80px rgba(0,0,0,.5)!important;border-radius:24px!important}
+.empty,.recal-index-empty{background:#15171e!important;border-color:rgba(255,255,255,.16)!important;border-radius:18px!important}
+button,a{-webkit-tap-highlight-color:transparent}
+@media(max-width:760px){body{padding:14px 11px 82px!important}.header{padding:21px 16px!important;border-radius:22px!important}.header h1{font-size:clamp(22px,6vw,29px)!important}.top-nav{top:7px!important;margin-bottom:14px!important}.nav-link{font-size:11px!important;padding:9px 10px!important}.search{top:62px!important;padding:10px!important}#list{grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:10px!important}.card.skin{padding:12px!important;border-radius:16px!important}.card.skin .title{font-size:14px!important;margin-bottom:10px!important;padding-bottom:10px!important}.rep{margin-top:9px!important}.repname{font-size:11px!important}.btn{font-size:12px!important;padding:11px 8px!important;min-height:40px!important}.skip{padding:17px 13px!important}.skipt{font-size:17px!important}.price{font-size:23px!important}.popup-box,.payment-box{padding:23px 17px!important;border-radius:23px 23px 16px 16px!important}.report-overlay{align-items:flex-end!important;padding:0!important}.report-box{border-radius:24px 24px 0 0!important;max-height:90dvh;overflow:auto;padding:24px 18px calc(20px + env(safe-area-inset-bottom))!important}}
+@media(max-width:370px){#list{grid-template-columns:1fr!important}.card.skin{padding:15px!important}.nav-link{font-size:10px!important;padding:8px 7px!important}}
+@media(prefers-reduced-motion:reduce){*,*::before,*::after{scroll-behavior:auto!important;animation-duration:.01ms!important;transition-duration:.01ms!important}}
+
+</style>
+
+<style id="ryuza-hero-card-backgrounds">
+/* Hero artwork di belakang card: gambar tetap redup agar teks dan tombol terbaca. */
+#list > .card.skin, #recalList > .card, #recalList > .card.skin {
+  position:relative!important; isolation:isolate!important; overflow:hidden!important;
+  background-color:#15171e!important;
+}
+#list > .card.skin::after, #recalList > .card.skin::after {
+  content:""; position:absolute; inset:0; z-index:0; pointer-events:none;
+  background-image:
+    linear-gradient(90deg,rgba(17,19,26,.97) 0%,rgba(17,19,26,.84) 52%,rgba(17,19,26,.48) 100%),
+    linear-gradient(0deg,rgba(17,19,26,.96) 0%,rgba(17,19,26,.22) 100%),
+    var(--rz-hero-bg, none);
+  background-size:cover,cover,cover;
+  background-position:center,center,center 24%;
+  background-repeat:no-repeat;
+  opacity:1;
+  transition:background-position .25s ease, filter .25s ease;
+}
+#list > .card.skin > *, #recalList > .card.skin > * { position:relative; z-index:1; }
+#list > .card.skin::before, #recalList > .card.skin::before { z-index:2!important; }
+#list > .card.skin.hero-bg-ready::after, #recalList > .card.skin.hero-bg-ready::after {
+  background-image:
+    linear-gradient(90deg,rgba(17,19,26,.96) 0%,rgba(17,19,26,.78) 48%,rgba(17,19,26,.42) 100%),
+    linear-gradient(0deg,rgba(17,19,26,.95) 0%,rgba(17,19,26,.15) 100%),
+    var(--rz-hero-bg);
+}
+@media (hover:hover) {
+  #list > .card.skin.hero-bg-ready:hover::after, #recalList > .card.skin.hero-bg-ready:hover::after { background-position:center,center,center 20%; }
+}
+@media(prefers-reduced-motion:reduce){#list > .card.skin::after,#recalList > .card.skin::after{transition:none}}
+</style>
+
 </head><body>
 <style id="ryuza-chrome-gate-style">
 #ryuzaChromeGate{
@@ -2806,4 +2871,106 @@ if(window.MutationObserver){const clickCounterObserver=new MutationObserver(reco
   },true);
 })();
 </script>
+
+<script id="ryuza-hero-card-background-loader">
+(function(){
+  'use strict';
+  if (window.__RYUZA_HERO_CARD_BG__) return;
+  window.__RYUZA_HERO_CARD_BG__ = true;
+  const API = 'https://mobile-legends.fandom.com/api.php';
+  const CACHE_KEY = 'ryuzaHeroArtworkCacheV1';
+  const memory = Object.create(null);
+  let saved = {};
+  try { saved = JSON.parse(localStorage.getItem(CACHE_KEY) || '{}') || {}; } catch (_) {}
+  const pending = Object.create(null);
+  const norm = value => String(value || '').trim().replace(/\s+/g,' ');
+  function cardHero(card){
+    const img = card.querySelector('.hero-icon');
+    let name = norm(img && (img.dataset.hero || img.getAttribute('alt')));
+    if (!name) {
+      const title = norm(card.querySelector('.hero-title-text')?.textContent || card.querySelector('.title')?.textContent);
+      name = title.split(/[|—–,:()[\]{}]/)[0].replace(/\b(no password|no pw|collector|legend|epic|starlight|special|specials|default|basic|elite|season|summer|zodiac|kof|recal|skin)\b/ig,'').trim();
+      // Judul playlist sering memuat nama skin; gunakan kata pertama sebagai pencarian cadangan.
+      if (name.split(' ').length > 3) name = name.split(' ').slice(0,2).join(' ');
+    }
+    return name;
+  }
+  function safeImageUrl(value){
+    try {
+      const u = new URL(value);
+      if (u.protocol !== 'https:' || !/(^|\.)static\.wikia\.nocookie\.net$/.test(u.hostname)) return '';
+      return u.href;
+    } catch (_) { return ''; }
+  }
+  async function lookup(name){
+    const key = norm(name).toLowerCase();
+    if (!key) return '';
+    if (memory[key]) return memory[key];
+    if (saved[key] && safeImageUrl(saved[key])) return memory[key] = saved[key];
+    if (pending[key]) return pending[key];
+    pending[key] = (async()=>{
+      try {
+        const params = new URLSearchParams({
+          action:'query', generator:'search', gsrsearch:norm(name), gsrnamespace:'0', gsrlimit:'5',
+          prop:'pageimages', piprop:'thumbnail', pithumbsize:'1000', format:'json', origin:'*'
+        });
+        const response = await fetch(API + '?' + params.toString(), {mode:'cors',credentials:'omit'});
+        if (!response.ok) throw new Error('Fandom API HTTP ' + response.status);
+        const data = await response.json();
+        const results = Object.values(data?.query?.pages || {});
+        const cleanTarget = key.replace(/[^a-z0-9]/g,'');
+        let ranked = results.map(item=>{
+          const title = norm(item.title).toLowerCase().replace(/[^a-z0-9]/g,'');
+          const exact = title === cleanTarget ? 100 : (title.startsWith(cleanTarget) ? 60 : 0);
+          const url = safeImageUrl(item.thumbnail?.source || '');
+          return {url,score:exact + (url ? 10 : 0)};
+        }).filter(x=>x.url).sort((a,b)=>b.score-a.score);
+        const url = ranked[0]?.url || '';
+        if (url) {
+          memory[key] = url; saved[key] = url;
+          try { localStorage.setItem(CACHE_KEY, JSON.stringify(saved)); } catch (_) {}
+        }
+        return url;
+      } catch (err) {
+        // API bisa diblokir oleh jaringan/adblock; kartu tetap tampil dengan gradasi cadangan.
+        return '';
+      } finally { delete pending[key]; }
+    })();
+    return pending[key];
+  }
+  async function decorate(card){
+    if (!card || card.dataset.rzHeroBgLoading === '1' || card.classList.contains('hero-bg-ready')) return;
+    const name = cardHero(card);
+    if (!name) return;
+    card.dataset.rzHeroBgLoading = '1';
+    const url = await lookup(name);
+    if (url && card.isConnected) {
+      card.style.setProperty('--rz-hero-bg', 'url("' + url.replace(/["\\]/g,'') + '")');
+      card.classList.add('hero-bg-ready');
+    }
+    card.dataset.rzHeroBgLoading = '0';
+  }
+  function scan(root){
+    if (!root) return;
+    if (root.matches?.('#list > .card.skin, #recalList > .card.skin')) decorate(root);
+    root.querySelectorAll?.('#list > .card.skin, #recalList > .card.skin').forEach(card=>observe(card));
+  }
+  let observer = null;
+  function observe(card){
+    if (observer) observer.observe(card); else decorate(card);
+  }
+  function start(){
+    if ('IntersectionObserver' in window) {
+      observer = new IntersectionObserver(entries=>{
+        entries.forEach(entry=>{ if(entry.isIntersecting){ observer.unobserve(entry.target); decorate(entry.target); } });
+      }, {rootMargin:'250px 0px'});
+    }
+    scan(document);
+    const roots = [document.getElementById('list'),document.getElementById('recalList')].filter(Boolean);
+    if ('MutationObserver' in window) roots.forEach(root=>new MutationObserver(records=>records.forEach(record=>record.addedNodes.forEach(node=>{if(node.nodeType===1)scan(node)}))).observe(root,{childList:true,subtree:true}));
+  }
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded',start,{once:true}); else start();
+})();
+</script>
+
 </body></html>
