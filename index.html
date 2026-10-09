@@ -1204,35 +1204,24 @@ button,a{-webkit-tap-highlight-color:transparent}
 </style>
 
 <style id="ryuza-hero-card-backgrounds">
-/* Hero artwork di belakang card: gambar tetap redup agar teks dan tombol terbaca. */
-#list > .card.skin, #recalList > .card, #recalList > .card.skin {
+/* Hero artwork card: selector dibuat tidak bergantung pada struktur anak langsung. */
+#list .card.skin, #recalList .card.skin {
   position:relative!important; isolation:isolate!important; overflow:hidden!important;
   background-color:#15171e!important;
 }
-#list > .card.skin::after, #recalList > .card.skin::after {
+#list .card.skin::after, #recalList .card.skin::after {
   content:""; position:absolute; inset:0; z-index:0; pointer-events:none;
-  background-image:
-    linear-gradient(90deg,rgba(17,19,26,.97) 0%,rgba(17,19,26,.84) 52%,rgba(17,19,26,.48) 100%),
-    linear-gradient(0deg,rgba(17,19,26,.96) 0%,rgba(17,19,26,.22) 100%),
-    var(--rz-hero-bg, none);
-  background-size:cover,cover,cover;
-  background-position:center,center,center 24%;
-  background-repeat:no-repeat;
-  opacity:1;
-  transition:background-position .25s ease, filter .25s ease;
+  background-image:linear-gradient(90deg,rgba(17,19,26,.94) 0%,rgba(17,19,26,.78) 52%,rgba(17,19,26,.48) 100%),linear-gradient(0deg,rgba(17,19,26,.96) 0%,rgba(17,19,26,.22) 100%),var(--rz-hero-bg,none);
+  background-size:cover,cover,cover; background-position:center,center,center 24%; background-repeat:no-repeat;
+  transition:background-position .25s ease,filter .25s ease;
 }
-#list > .card.skin > *, #recalList > .card.skin > * { position:relative; z-index:1; }
-#list > .card.skin::before, #recalList > .card.skin::before { z-index:2!important; }
-#list > .card.skin.hero-bg-ready::after, #recalList > .card.skin.hero-bg-ready::after {
-  background-image:
-    linear-gradient(90deg,rgba(17,19,26,.96) 0%,rgba(17,19,26,.78) 48%,rgba(17,19,26,.42) 100%),
-    linear-gradient(0deg,rgba(17,19,26,.95) 0%,rgba(17,19,26,.15) 100%),
-    var(--rz-hero-bg);
+#list .card.skin > *, #recalList .card.skin > * { position:relative; z-index:1; }
+#list .card.skin::before, #recalList .card.skin::before { z-index:2!important; }
+#list .card.skin.hero-bg-ready::after, #recalList .card.skin.hero-bg-ready::after {
+  background-image:linear-gradient(90deg,rgba(17,19,26,.92) 0%,rgba(17,19,26,.72) 48%,rgba(17,19,26,.38) 100%),linear-gradient(0deg,rgba(17,19,26,.95) 0%,rgba(17,19,26,.12) 100%),var(--rz-hero-bg);
 }
-@media (hover:hover) {
-  #list > .card.skin.hero-bg-ready:hover::after, #recalList > .card.skin.hero-bg-ready:hover::after { background-position:center,center,center 20%; }
-}
-@media(prefers-reduced-motion:reduce){#list > .card.skin::after,#recalList > .card.skin::after{transition:none}}
+@media(hover:hover){#list .card.skin.hero-bg-ready:hover::after,#recalList .card.skin.hero-bg-ready:hover::after{background-position:center,center,center 20%;}}
+@media(prefers-reduced-motion:reduce){#list .card.skin::after,#recalList .card.skin::after{transition:none;}}
 </style>
 
 </head><body>
@@ -2875,101 +2864,138 @@ if(window.MutationObserver){const clickCounterObserver=new MutationObserver(reco
 <script id="ryuza-hero-card-background-loader">
 (function(){
   'use strict';
-  if (window.__RYUZA_HERO_CARD_BG__) return;
-  window.__RYUZA_HERO_CARD_BG__ = true;
-  const API = 'https://mobile-legends.fandom.com/api.php';
-  const CACHE_KEY = 'ryuzaHeroArtworkCacheV1';
-  const memory = Object.create(null);
-  let saved = {};
-  try { saved = JSON.parse(localStorage.getItem(CACHE_KEY) || '{}') || {}; } catch (_) {}
-  const pending = Object.create(null);
-  const norm = value => String(value || '').trim().replace(/\s+/g,' ');
+  if(window.__RYUZA_HERO_CARD_BG_V2__) return;
+  window.__RYUZA_HERO_CARD_BG_V2__=true;
+  const API='https://mobile-legends.fandom.com/api.php';
+  const CACHE_KEY='ryuzaHeroArtworkCacheV2';
+  const memory=Object.create(null), pending=Object.create(null);
+  let saved={}; try{saved=JSON.parse(localStorage.getItem(CACHE_KEY)||'{}')||{};}catch(_){saved={};}
+  const norm=v=>String(v||'').trim().replace(/\s+/g,' ');
+  const slug=v=>norm(v).toLowerCase().replace(/[^a-z0-9]/g,'');
   function cardHero(card){
-    const img = card.querySelector('.hero-icon');
-    let name = norm(img && (img.dataset.hero || img.getAttribute('alt')));
-    if (!name) {
-      const title = norm(card.querySelector('.hero-title-text')?.textContent || card.querySelector('.title')?.textContent);
-      name = title.split(/[|—–,:()[\]{}]/)[0].replace(/\b(no password|no pw|collector|legend|epic|starlight|special|specials|default|basic|elite|season|summer|zodiac|kof|recal|skin)\b/ig,'').trim();
-      // Judul playlist sering memuat nama skin; gunakan kata pertama sebagai pencarian cadangan.
-      if (name.split(' ').length > 3) name = name.split(' ').slice(0,2).join(' ');
+    const img=card.querySelector('.hero-icon');
+    let name=norm(img&&(img.dataset.hero||img.getAttribute('alt')));
+    if(!name||name.length<2||name.toLowerCase()==='ryuza'){
+      const title=norm(card.querySelector('.hero-title-text')?.textContent||card.querySelector('.title')?.textContent);
+      name=title.split(/[|—–,:()[\]{}]/)[0].replace(/\b(no password|no pw|collector|legend|epic|starlight|special|specials|default|basic|elite|season|summer|zodiac|kof|recal|skin|new|baru)\b/ig,'').trim();
+      const words=name.split(/\s+/); if(words.length>2) name=words.slice(0,2).join(' ');
     }
     return name;
   }
-  function safeImageUrl(value){
-    try {
-      const u = new URL(value);
-      if (u.protocol !== 'https:' || !/(^|\.)static\.wikia\.nocookie\.net$/.test(u.hostname)) return '';
-      return u.href;
-    } catch (_) { return ''; }
+  function safeUrl(value){
+    try{const u=new URL(value);if(u.protocol!=='https:')return '';if(!/(^|\.)static\.wikia\.nocookie\.net$|(^|\.)images\.wikia\.nocookie\.net$/.test(u.hostname))return '';return u.href;}catch(_){return '';}
+  }
+  function imageLoads(url){return new Promise(resolve=>{const im=new Image();im.onload=()=>resolve(true);im.onerror=()=>resolve(false);im.referrerPolicy='no-referrer';im.src=url;});}
+  async function request(params){
+    const url=API+'?'+new URLSearchParams({...params,format:'json',origin:'*'}).toString();
+    const r=await fetch(url,{mode:'cors',credentials:'omit',cache:'force-cache'});
+    if(!r.ok)throw new Error('Fandom API '+r.status);
+    return r.json();
   }
   async function lookup(name){
-    const key = norm(name).toLowerCase();
-    if (!key) return '';
-    if (memory[key]) return memory[key];
-    if (saved[key] && safeImageUrl(saved[key])) return memory[key] = saved[key];
-    if (pending[key]) return pending[key];
-    pending[key] = (async()=>{
-      try {
-        const params = new URLSearchParams({
-          action:'query', generator:'search', gsrsearch:norm(name), gsrnamespace:'0', gsrlimit:'5',
-          prop:'pageimages', piprop:'thumbnail', pithumbsize:'1000', format:'json', origin:'*'
-        });
-        const response = await fetch(API + '?' + params.toString(), {mode:'cors',credentials:'omit'});
-        if (!response.ok) throw new Error('Fandom API HTTP ' + response.status);
-        const data = await response.json();
-        const results = Object.values(data?.query?.pages || {});
-        const cleanTarget = key.replace(/[^a-z0-9]/g,'');
-        let ranked = results.map(item=>{
-          const title = norm(item.title).toLowerCase().replace(/[^a-z0-9]/g,'');
-          const exact = title === cleanTarget ? 100 : (title.startsWith(cleanTarget) ? 60 : 0);
-          const url = safeImageUrl(item.thumbnail?.source || '');
-          return {url,score:exact + (url ? 10 : 0)};
-        }).filter(x=>x.url).sort((a,b)=>b.score-a.score);
-        const url = ranked[0]?.url || '';
-        if (url) {
-          memory[key] = url; saved[key] = url;
-          try { localStorage.setItem(CACHE_KEY, JSON.stringify(saved)); } catch (_) {}
+    const key=norm(name).toLowerCase();if(!key)return '';
+    if(memory[key])return memory[key];
+    const cached=safeUrl(saved[key]);if(cached&&await imageLoads(cached))return memory[key]=cached;
+    if(pending[key])return pending[key];
+    pending[key]=(async()=>{
+      try{
+        // Tahap 1: cari artikel hero; tahap 2: minta thumbnail artikel secara eksplisit.
+        let titles=[];
+        try{
+          const search=await request({action:'query',list:'search',srsearch:name,srnamespace:'0',srlimit:'6'});
+          titles=(search?.query?.search||[]).map(x=>x.title).filter(Boolean);
+        }catch(_){
+          const generated=await request({action:'query',generator:'search',gsrsearch:name,gsrnamespace:'0',gsrlimit:'6'});
+          titles=Object.values(generated?.query?.pages||{}).map(x=>x.title).filter(Boolean);
         }
-        return url;
-      } catch (err) {
-        // API bisa diblokir oleh jaringan/adblock; kartu tetap tampil dengan gradasi cadangan.
-        return '';
-      } finally { delete pending[key]; }
-    })();
+        // Utamakan halaman yang namanya paling cocok dengan nama hero.
+        titles.sort((a,b)=>Number(slug(b)===slug(name))-Number(slug(a)===slug(name)));
+        const unique=[...new Set(titles)];
+        if(!unique.length)unique.push(name);
+        for(const title of unique.slice(0,5)){
+          try{
+            const data=await request({action:'query',titles:title,prop:'pageimages',piprop:'thumbnail',pithumbsize:'1000'});
+            const pages=Object.values(data?.query?.pages||{});
+            for(const page of pages){
+              const url=safeUrl(page.thumbnail?.source||'');
+              if(url&&await imageLoads(url)){
+                memory[key]=url;saved[key]=url;
+                try{localStorage.setItem(CACHE_KEY,JSON.stringify(saved));}catch(_){}
+                return url;
+              }
+            }
+          }catch(_){}
+        }
+      }catch(_){}
+      return '';
+    })().finally(()=>delete pending[key]);
     return pending[key];
   }
   async function decorate(card){
-    if (!card || card.dataset.rzHeroBgLoading === '1' || card.classList.contains('hero-bg-ready')) return;
-    const name = cardHero(card);
-    if (!name) return;
-    card.dataset.rzHeroBgLoading = '1';
-    const url = await lookup(name);
-    if (url && card.isConnected) {
-      card.style.setProperty('--rz-hero-bg', 'url("' + url.replace(/["\\]/g,'') + '")');
-      card.classList.add('hero-bg-ready');
-    }
-    card.dataset.rzHeroBgLoading = '0';
+    if(!card||card.dataset.rzHeroBgLoading==='1'||card.classList.contains('hero-bg-ready'))return;
+    const name=cardHero(card);if(!name)return;
+    card.dataset.rzHeroBgLoading='1';
+    const url=await lookup(name);
+    if(url&&card.isConnected){card.style.setProperty('--rz-hero-bg','url("'+url.replace(/["\\]/g,'')+'")');card.classList.add('hero-bg-ready');}
+    card.dataset.rzHeroBgLoading='0';
   }
+  let observer=null;
+  function observe(card){if(observer)observer.observe(card);else decorate(card);}
   function scan(root){
-    if (!root) return;
-    if (root.matches?.('#list > .card.skin, #recalList > .card.skin')) decorate(root);
-    root.querySelectorAll?.('#list > .card.skin, #recalList > .card.skin').forEach(card=>observe(card));
-  }
-  let observer = null;
-  function observe(card){
-    if (observer) observer.observe(card); else decorate(card);
+    if(!root)return;
+    if(root.matches?.('#list .card.skin, #recalList .card.skin'))observe(root);
+    root.querySelectorAll?.('#list .card.skin, #recalList .card.skin').forEach(observe);
   }
   function start(){
-    if ('IntersectionObserver' in window) {
-      observer = new IntersectionObserver(entries=>{
-        entries.forEach(entry=>{ if(entry.isIntersecting){ observer.unobserve(entry.target); decorate(entry.target); } });
-      }, {rootMargin:'250px 0px'});
-    }
+    if('IntersectionObserver'in window)observer=new IntersectionObserver(entries=>entries.forEach(entry=>{if(entry.isIntersecting){observer.unobserve(entry.target);decorate(entry.target);}}),{rootMargin:'350px 0px'});
     scan(document);
-    const roots = [document.getElementById('list'),document.getElementById('recalList')].filter(Boolean);
-    if ('MutationObserver' in window) roots.forEach(root=>new MutationObserver(records=>records.forEach(record=>record.addedNodes.forEach(node=>{if(node.nodeType===1)scan(node)}))).observe(root,{childList:true,subtree:true}));
+    ['list','recalList'].map(id=>document.getElementById(id)).filter(Boolean).forEach(root=>{
+      if('MutationObserver'in window)new MutationObserver(records=>records.forEach(record=>record.addedNodes.forEach(node=>{if(node.nodeType===1)scan(node);}))).observe(root,{childList:true,subtree:true});
+    });
+    // Beberapa item awal langsung dicoba agar background terlihat tanpa perlu scroll jauh.
+    document.querySelectorAll('#list .card.skin, #recalList .card.skin').forEach((card,i)=>{if(i<6)decorate(card);});
   }
-  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded',start,{once:true}); else start();
+  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',start,{once:true});else start();
+})();
+</script>
+
+
+<style id="ryuza-bottom-navigation-ios">
+:root{--rz-bottom-bg:rgba(17,19,25,.88);--rz-bottom-line:rgba(255,255,255,.10);--rz-bottom-muted:#9298a7;--rz-bottom-active:#a9c8ff}
+@media(max-width:768px){
+ body{padding-bottom:calc(88px + env(safe-area-inset-bottom, 0px))!important}
+ #ryuzaBottomNav{position:fixed;z-index:9990;left:50%;bottom:calc(10px + env(safe-area-inset-bottom, 0px));transform:translateX(-50%);width:min(440px,calc(100% - 24px));display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:4px;padding:7px;background:var(--rz-bottom-bg);border:1px solid var(--rz-bottom-line);border-radius:24px;box-shadow:0 12px 40px rgba(0,0,0,.42);backdrop-filter:blur(22px) saturate(150%);-webkit-backdrop-filter:blur(22px) saturate(150%)}
+ #ryuzaBottomNav .rz-nav-item{appearance:none;-webkit-appearance:none;border:0;background:transparent;color:var(--rz-bottom-muted);min-width:0;min-height:52px;border-radius:17px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;padding:5px 2px;font:inherit;cursor:pointer;text-decoration:none;transition:background .18s ease,color .18s ease,transform .18s ease; -webkit-tap-highlight-color:transparent}
+ #ryuzaBottomNav .rz-nav-item:active{transform:scale(.94)}
+ #ryuzaBottomNav .rz-nav-item .rz-nav-icon{font-size:19px;line-height:1.05}
+ #ryuzaBottomNav .rz-nav-item .rz-nav-label{font-size:10px;line-height:1.15;font-weight:650;letter-spacing:.01em;white-space:nowrap}
+ #ryuzaBottomNav .rz-nav-item[aria-current="page"]{color:var(--rz-bottom-active);background:rgba(126,164,255,.13)}
+ #ryuzaBottomNav .rz-nav-item:focus-visible{outline:2px solid var(--rz-bottom-active);outline-offset:2px}
+}
+@media(min-width:769px){#ryuzaBottomNav{display:none!important}}
+@media(prefers-reduced-motion:reduce){#ryuzaBottomNav .rz-nav-item{transition:none}}
+</style>
+<nav id="ryuzaBottomNav" aria-label="Navigasi utama Ryuza">
+ <button class="rz-nav-item" type="button" data-rz-nav="home" aria-current="page"><span class="rz-nav-icon" aria-hidden="true">⌂</span><span class="rz-nav-label">Beranda</span></button>
+ <button class="rz-nav-item" type="button" data-rz-nav="search"><span class="rz-nav-icon" aria-hidden="true">⌕</span><span class="rz-nav-label">Cari</span></button>
+ <button class="rz-nav-item" type="button" data-rz-nav="favorites"><span class="rz-nav-icon" aria-hidden="true">♡</span><span class="rz-nav-label">Favorit</span></button>
+ <a class="rz-nav-item" href="https://jell-sg.github.io/ryuza-official-VIP/" data-rz-nav="member"><span class="rz-nav-icon" aria-hidden="true">♙</span><span class="rz-nav-label">Member</span></a>
+</nav>
+<script id="ryuza-bottom-navigation-js">
+(function(){
+ const nav=document.getElementById('ryuzaBottomNav'); if(!nav)return;
+ const items=[...nav.querySelectorAll('[data-rz-nav]')];
+ function active(name){items.forEach(el=>{if(el.dataset.rzNav===name){el.setAttribute('aria-current','page')}else{el.removeAttribute('aria-current')}})}
+ function goTo(el){if(!el)return;const top=el.getBoundingClientRect().top+window.scrollY-18;window.scrollTo({top:Math.max(0,top),behavior:window.matchMedia('(prefers-reduced-motion: reduce)').matches?'auto':'smooth'})}
+ nav.addEventListener('click',function(e){const btn=e.target.closest('[data-rz-nav]');if(!btn)return;const name=btn.dataset.rzNav;
+  if(name==='member'){active(name);return;}
+  e.preventDefault();active(name);
+  if(name==='home'){window.scrollTo({top:0,behavior:window.matchMedia('(prefers-reduced-motion: reduce)').matches?'auto':'smooth'});return;}
+  if(name==='search'){const input=document.getElementById('q');if(input){goTo(input);window.setTimeout(()=>input.focus({preventScroll:true}),220);}return;}
+  if(name==='favorites'){let target=document.getElementById('ryuzaFavoriteSec')||document.getElementById('ryuzaFavorite')||document.getElementById('list');if(target){target.hidden=false;target.style.display='';goTo(target);}else{const input=document.getElementById('q');if(input){input.value='';input.dispatchEvent(new Event('input',{bubbles:true}));goTo(input);}}}
+ });
+ const search=document.getElementById('q');if(search){search.addEventListener('focus',()=>active('search'));}
+ window.addEventListener('scroll',()=>{if(window.scrollY<100)active('home')},{passive:true});
 })();
 </script>
 
