@@ -362,7 +362,6 @@ body:before{animation:none!important}body{background-attachment:initial!importan
 <div id="toast" class="toast"></div>
 
 <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
-<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
 <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
 <script>
 const CFG={authDomain:'ryuza-official.firebaseapp.com',databaseURL:'https://ryuza-official-default-rtdb.firebaseio.com',projectId:'ryuza-official'};
@@ -1314,27 +1313,5 @@ $('quickImport').onclick=()=>{$('.tab[data-tab="skins"]').click();$('seedBtn').c
   const boot=setInterval(()=>{if(window.db){clearInterval(boot);load();db.ref('siteConfig/recalSkins').on('value',snap=>{recalItems=normalize(snap.val());render()})}},250);
 })();
 </script>
-
-<!-- RYUZA ADMIN GOOGLE AUTH GATE: isi apiKey Firebase Web di bawah sebelum deploy -->
-<style id="ryuza-admin-google-auth-style">
-#ryuzaAdminGoogleAuth{position:fixed;inset:0;z-index:2147483647;background:rgba(3,8,16,.98);display:flex;align-items:center;justify-content:center;padding:20px;color:#f4f8ff;font-family:Arial,sans-serif}
-#ryuzaAdminGoogleAuth .rag-card{width:min(440px,100%);padding:28px 22px;border:1px solid #294663;border-radius:22px;background:#0d1726;box-shadow:0 20px 80px #0009;text-align:center}
-#ryuzaAdminGoogleAuth .rag-logo{margin:0 auto 14px;width:58px;height:58px;border-radius:18px;display:grid;place-items:center;background:linear-gradient(135deg,#087cff,#00b7ff);font-size:26px;font-weight:900}
-#ryuzaAdminGoogleAuth h2{margin:0 0 8px}#ryuzaAdminGoogleAuth p{color:#9eb1c9;font-size:13px;line-height:1.6}#ryuzaAdminGoogleAuth button{width:100%;padding:13px;border:0;border-radius:12px;background:#fff;color:#172033;font-weight:800;cursor:pointer}#ryuzaAdminGoogleAuth .rag-error{color:#ff9b9b;font-size:12px;min-height:20px;margin-top:12px;overflow-wrap:anywhere}
-</style>
-<div id="ryuzaAdminGoogleAuth" role="dialog" aria-modal="true"><div class="rag-card"><div class="rag-logo">R</div><h2>Login Admin Ryuza</h2><p>Masuk dengan akun Google admin yang terdaftar. Hanya akun <b>litemade3@gmail.com</b> yang diizinkan membuka panel ini.</p><button id="ragGoogleBtn" type="button">G · Login dengan Google</button><div class="rag-error" id="ragError">Memeriksa konfigurasi login…</div></div></div>
-<script id="ryuza-admin-google-auth">
-(function(){
- const API_KEY='AIzaSyBrr-tIM4XYc5OQso7f4WmMOd1Z6EWMsVA';
- const CFG={apiKey:API_KEY,authDomain:'ryuza-official.firebaseapp.com',databaseURL:'https://ryuza-official-default-rtdb.firebaseio.com',projectId:'ryuza-official',appId:''};
- const ADMIN='litemade3@gmail.com',overlay=document.getElementById('ryuzaAdminGoogleAuth'),btn=document.getElementById('ragGoogleBtn'),err=document.getElementById('ragError');
- const show=t=>{err.textContent=t};if(!API_KEY||API_KEY==='PASTE_FIREBASE_WEB_API_KEY_HERE'){show('Konfigurasi belum lengkap: masukkan Firebase Web API Key pada kode file ini.');btn.disabled=true;return}
- try{let app;try{app=firebase.app('ryuza-admin-google-auth')}catch(e){app=firebase.initializeApp(CFG,'ryuza-admin-google-auth')}const auth=app.auth();
- auth.onAuthStateChanged(user=>{if(!user){overlay.style.display='flex';return}if(String(user.email||'').toLowerCase()!==ADMIN){auth.signOut().catch(()=>{});overlay.style.display='flex';show('Akses ditolak. Gunakan akun admin yang benar: '+ADMIN);return}overlay.style.display='none';document.documentElement.dataset.ryuzaAdminAuth='ok'});
- btn.disabled=false;btn.onclick=async()=>{btn.disabled=true;show('Membuka login Google…');try{const provider=new firebase.auth.GoogleAuthProvider();provider.setCustomParameters({prompt:'select_account'});await auth.signInWithPopup(provider)}catch(e){if(e.code==='auth/popup-blocked'){try{await auth.signInWithRedirect(provider)}catch(x){show(x.message||x)}}else show((e.code?e.code+': ':'')+(e.message||'Login gagal'))}finally{btn.disabled=false}};auth.getRedirectResult().catch(e=>show(e.message||'Login gagal'));
- }catch(e){show('Firebase Auth gagal dimulai: '+(e.message||e))}
-})();
-</script>
-
 </body>
 </html>
