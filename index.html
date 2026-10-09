@@ -1262,6 +1262,7 @@ html.ryuza-chrome-block #ryuzaChromeGate{display:flex!important}
 </script>
 
 <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
 <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
 
 <div class="upload-notice" id="uploadNotice">🆕 Paquito KOF Revamp baru saja di-upload!<small>No Password • 8 pilihan Replace tersedia</small></div>
@@ -1640,6 +1641,7 @@ q.oninput=search;x.onclick=()=>{q.value='';q.focus();search()};search();
 (function(){
   const popup=document.getElementById('ryuzaPopup');
   const gate=popup?.querySelector('.subscribe-gate');
+  const waStep=document.getElementById('whatsappFollow')?.closest('.subscribe-channel-step'); if(waStep)waStep.style.display='none';
   const nameInput=document.getElementById('visitorName');
   const nameHint=document.getElementById('nameHint');
   const status=document.getElementById('subscribeStatus');
@@ -1679,7 +1681,7 @@ q.oninput=search;x.onclick=()=>{q.value='';q.focus();search()};search();
   function saveUnlockTime(){setItem(UNLOCK_KEY,String(Date.now()))}
   function getSub1(){return getItem(SUB1_KEY)==='1'}
   function getSub2(){return getItem(SUB2_KEY)==='1'}
-  function getWA(){return getItem(WA_KEY)==='1'}
+  function getWA(){return true} // Syarat akses hanya dua channel YouTube
   function setSub(key){setItem(key,'1')}
   function clearCycle(){removeItem(SUB1_KEY);removeItem(SUB2_KEY);removeItem(WA_KEY);removeItem(UNLOCK_KEY);removeItem(VISITED1_KEY);removeItem(VISITED2_KEY);removeItem(WAWA_VISITED_KEY);if(confirmBtn1)confirmBtn1.style.display='none';if(confirmBtn2)confirmBtn2.style.display='none';if(confirmWhatsapp)confirmWhatsapp.style.display='none';clearTimeout(confirmTimer1);clearTimeout(confirmTimer2);clearTimeout(confirmTimerWA)}
   function remaining(){const t=getUnlockTime();return Math.max(0,SIX_HOURS-(Date.now()-t))}
@@ -1702,9 +1704,9 @@ q.oninput=search;x.onclick=()=>{q.value='';q.focus();search()};search();
   }
 
   function refreshSubscribeUI(){
-    const s1=getSub1(),s2=getSub2(),wa=getWA(),count=(s1?1:0)+(s2?1:0)+(wa?1:0);
-    progressCount.textContent=count+' / 3';
-    progressBar.style.width=(count*33.3333)+'%';
+    const s1=getSub1(),s2=getSub2(),wa=true,count=(s1?1:0)+(s2?1:0);
+    progressCount.textContent=count+' / 2';
+    progressBar.style.width=(count*50)+'%';
     subscribeBtn.textContent=s1?'✓ SUDAH DIBUKA — CHANNEL 1':'▶️ SUBSCRIBE CHANNEL 1';
     subscribeBtn2.textContent=s2?'✓ SUDAH DIBUKA — CHANNEL 2':'▶️ SUBSCRIBE CHANNEL 2';
      whatsappBtn.textContent=wa?'✓ SUDAH DIIKUTI — SALURAN WA':'💬 IKUTI SALURAN WHATSAPP';
@@ -1714,9 +1716,9 @@ q.oninput=search;x.onclick=()=>{q.value='';q.focus();search()};search();
     if(confirmBtn1) confirmBtn1.style.display=s1?'none':(getItem(VISITED1_KEY)?'block':'none');
     if(confirmBtn2) confirmBtn2.style.display=s2?'none':(getItem(VISITED2_KEY)?'block':'none');
     if(confirmWhatsapp) confirmWhatsapp.style.display=wa?'none':(getItem(WAWA_VISITED_KEY)?'block':'none');
-    if(count===0)setStatus('🔒 Subscribe 2 channel YouTube + ikuti saluran WhatsApp untuk membuka akses.',false);
-    else if(count<3)setStatus('🟡 '+count+' dari 3 selesai. Selesaikan channel yang masih tersisa lalu konfirmasi.',false);
-    else setStatus('✅ 3 dari 3 selesai. Akses siap dibuka.',true);
+    if(count===0)setStatus('🔒 Subscribe kedua channel YouTube untuk membuka akses.',false);
+    else if(count<2)setStatus('🟡 '+count+' dari 2 selesai. Selesaikan channel yang masih tersisa lalu konfirmasi.',false);
+    else setStatus('✅ Kedua channel selesai dikonfirmasi. Akses siap dibuka.',true);
   }
 
   function showGate(expired){
@@ -1761,7 +1763,7 @@ q.oninput=search;x.onclick=()=>{q.value='';q.focus();search()};search();
     if(key===SUB1_KEY)removeItem(VISITED1_KEY);
     if(key===SUB2_KEY)removeItem(VISITED2_KEY);
     refreshSubscribeUI();
-    if(getSub1()&&getSub2()&&getWA()){
+    if(getSub1()&&getSub2()){
       saveUnlockTime();
       if(successName)successName.textContent=name;
       setStatus('🎉 Semua selesai! Akses 6 jam langsung aktif.',true);
@@ -1823,14 +1825,14 @@ q.oninput=search;x.onclick=()=>{q.value='';q.focus();search()};search();
   window.addEventListener('storage',function(e){
     if([SUB1_KEY,SUB2_KEY,WA_KEY,UNLOCK_KEY,NAME_KEY,VISITED1_KEY,VISITED2_KEY,WAWA_VISITED_KEY].includes(e.key)){
       if(e.key===NAME_KEY&&e.newValue){nameInput.value=e.newValue;nameInput.readOnly=true}
-      if(getUnlockTime()&&remaining()>0&&getSub1()&&getSub2()&&getWA()){startCountdown();gate.classList.add('unlocked')}
+      if(getUnlockTime()&&remaining()>0&&getSub1()&&getSub2()){startCountdown();gate.classList.add('unlocked')}
       refreshSubscribeUI();
     }
   });
 
   popup.addEventListener('click',e=>{if(e.target===popup)e.stopPropagation()});
   refreshSubscribeUI();
-  if(getUnlockTime()&&remaining()>0&&getSub1()&&getSub2()&&getWA()){
+  if(getUnlockTime()&&remaining()>0&&getSub1()&&getSub2()){
     startCountdown();popup.style.display='none';document.body.style.overflow='';
   }else{
     if(getUnlockTime()&&remaining()<=0)clearCycle();
@@ -2806,4 +2808,36 @@ if(window.MutationObserver){const clickCounterObserver=new MutationObserver(reco
   },true);
 })();
 </script>
+
+<!-- RYUZA GOOGLE LOGIN GATE: isi apiKey dari Firebase Console > Project settings > Your apps -->
+<style id="ryuza-google-auth-style">
+#ryuzaGoogleAuth{position:fixed;inset:0;z-index:2147483646;background:rgba(4,9,18,.97);display:flex;align-items:center;justify-content:center;padding:20px;color:#f5f8ff;font-family:Arial,sans-serif}
+#ryuzaGoogleAuth .rg-card{width:min(430px,100%);background:#0d1726;border:1px solid #294663;border-radius:24px;padding:28px 22px;box-shadow:0 20px 80px #0009;text-align:center}
+#ryuzaGoogleAuth .rg-logo{width:58px;height:58px;border-radius:18px;background:linear-gradient(135deg,#1877f2,#6c63ff);display:grid;place-items:center;margin:0 auto 14px;font-size:27px;font-weight:900}
+#ryuzaGoogleAuth h2{margin:0 0 8px;font-size:23px}#ryuzaGoogleAuth p{color:#9eb1c9;font-size:13px;line-height:1.6}
+#ryuzaGoogleAuth button{width:100%;padding:13px;border:0;border-radius:12px;background:#fff;color:#172033;font-weight:800;cursor:pointer;font-size:14px}
+#ryuzaGoogleAuth .rg-error{color:#ff9b9b;min-height:18px;font-size:12px;margin-top:12px;overflow-wrap:anywhere}
+#ryuzaGoogleAuth .rg-user{font-size:12px;color:#a6bbd2;margin:10px 0}
+</style>
+<div id="ryuzaGoogleAuth" role="dialog" aria-modal="true" aria-label="Login Google Ryuza Official">
+ <div class="rg-card"><div class="rg-logo">R</div><h2>Ryuza Official</h2><p>Login dengan akun Google terlebih dahulu. Setelah login, selesaikan konfirmasi subscribe di <b>kedua channel YouTube</b> untuk membuka akses.</p><div class="rg-user" id="rgUser"></div><button id="rgGoogleBtn" type="button">G · Lanjutkan dengan Google</button><div class="rg-error" id="rgError">Memeriksa konfigurasi login…</div></div>
+</div>
+<script id="ryuza-google-auth">
+(function(){
+ const API_KEY='AIzaSyBrr-tIM4XYc5OQso7f4WmMOd1Z6EWMsVA';
+ const CFG={apiKey:API_KEY,authDomain:'ryuza-official.firebaseapp.com',databaseURL:'https://ryuza-official-default-rtdb.firebaseio.com',projectId:'ryuza-official',appId:''};
+ const overlay=document.getElementById('ryuzaGoogleAuth'),btn=document.getElementById('rgGoogleBtn'),err=document.getElementById('rgError'),userEl=document.getElementById('rgUser');
+ if(!overlay||!btn)return;
+ function showError(t){err.textContent=t}
+ if(!API_KEY||API_KEY==='PASTE_FIREBASE_WEB_API_KEY_HERE'){showError('Konfigurasi belum lengkap: masukkan Firebase Web API Key pada kode file ini.');btn.disabled=true;return}
+ try{
+  let app;try{app=firebase.app('ryuza-google-auth')}catch(e){app=firebase.initializeApp(CFG,'ryuza-google-auth')}
+  const auth=app.auth();
+  auth.onAuthStateChanged(user=>{if(user){overlay.style.display='none';userEl.textContent=user.displayName||user.email||'';try{localStorage.setItem('ryuzaGoogleUid',user.uid);localStorage.setItem('ryuzaGoogleEmail',user.email||'');localStorage.setItem('ryuzaGoogleName',user.displayName||'')}catch(e){};const nameInput=document.getElementById('visitorName');if(nameInput&&!nameInput.value&&user.displayName){nameInput.value=user.displayName;nameInput.dispatchEvent(new Event('input',{bubbles:true}))}}else{overlay.style.display='flex';showError('Login Google diperlukan untuk melanjutkan.')}});
+  btn.disabled=false;btn.onclick=async()=>{btn.disabled=true;showError('Membuka login Google…');try{const provider=new firebase.auth.GoogleAuthProvider();provider.setCustomParameters({prompt:'select_account'});await auth.signInWithPopup(provider)}catch(e){if(e.code==='auth/popup-blocked'||e.code==='auth/cancelled-popup-request'){try{await auth.signInWithRedirect(provider)}catch(x){showError(x.message||x)}}else showError((e.code?e.code+': ':'')+(e.message||'Login gagal'))}finally{btn.disabled=false}};
+  auth.getRedirectResult().catch(e=>showError(e.message||'Login Google gagal'));
+ }catch(e){showError('Firebase Auth gagal dimulai: '+(e.message||e))}
+})();
+</script>
+
 </body></html>
