@@ -1554,13 +1554,15 @@ q.oninput=search;x.onclick=()=>{q.value='';q.focus();search()};search();
   const trackSearch=()=>{
     const term=clean(q?.value||'');
     if(term.length<2)return;
-    const sessionKey='ryuza-search-'+term;
-    try{if(sessionStorage.getItem(sessionKey))return;sessionStorage.setItem(sessionKey,'1')}catch(e){}
+    const now=Date.now();
+    if(window.__ryuzaSearchLast && window.__ryuzaSearchLast.term===term && now-window.__ryuzaSearchLast.at<1200)return;
+    window.__ryuzaSearchLast={term,at:now};
     const ref=db.ref('searchStats/queries/'+key(term));
     ref.transaction(v=>{v=v&&typeof v==='object'?v:{count:0,term};return {...v,term,count:Number(v.count||0)+1,lastAt:Date.now()}}).catch(()=>{});
        try{window.ryuzaLogActivity?.('SEARCH','Pencarian',term)}catch(e){}
   };
   q?.addEventListener('keydown',e=>{if(e.key==='Enter')trackSearch()});
+  let searchInputTimer; q?.addEventListener('input',()=>{clearTimeout(searchInputTimer);searchInputTimer=setTimeout(trackSearch,900)});
   document.addEventListener('click',e=>{
     const btn=e.target.closest?.('.replace-download');
     if(!btn)return;
@@ -2279,14 +2281,16 @@ if(window.MutationObserver){const clickCounterObserver=new MutationObserver(reco
   const trackSearch=()=>{
     const term=clean(document.getElementById('q')?.value||'');
     if(term.length<2)return;
-    const sessionKey='ryuza-search-fixed-'+term;
-    try{if(sessionStorage.getItem(sessionKey))return;sessionStorage.setItem(sessionKey,'1')}catch(e){}
+    const now=Date.now();
+    if(window.__ryuzaSearchLast && window.__ryuzaSearchLast.term===term && now-window.__ryuzaSearchLast.at<1200)return;
+    window.__ryuzaSearchLast={term,at:now};
     db.ref('searchStats/queries/'+key(term)).transaction(v=>{
       v=v&&typeof v==='object'?v:{count:0};
       return {...v,term,count:Number(v.count||0)+1,lastAt:Date.now()};
     }).catch(err=>console.warn('[Ryuza Stats] search gagal',err));
   };
   document.getElementById('q')?.addEventListener('keydown',e=>{if(e.key==='Enter')trackSearch()});
+  let searchInputTimerFixed; document.getElementById('q')?.addEventListener('input',()=>{clearTimeout(searchInputTimerFixed);searchInputTimerFixed=setTimeout(trackSearch,900)});
   document.addEventListener('click',e=>{
     const btn=e.target.closest?.('.replace-download'); if(!btn)return;
     const card=btn.closest('.skin'); if(!card)return;

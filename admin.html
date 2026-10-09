@@ -67,6 +67,16 @@ body:before{animation:none!important}body{background-attachment:initial!importan
 .request-count{display:none;min-width:19px;height:19px;padding:0 5px;border-radius:99px;background:#ff4d67;color:#fff;font-size:10px;font-weight:900;align-items:center;justify-content:center;box-shadow:0 0 0 3px rgba(255,77,103,.12)}
 @media(max-width:900px){.nav-modern{gap:7px;padding:8px}.nav-group{padding:2px 6px}.nav-modern .tab{min-height:38px;padding:8px 10px;font-size:12px}.nav-group-title{font-size:8px;margin-bottom:5px}}
 @media(max-width:600px){.nav-modern{margin:12px 0 10px;border-radius:14px}.nav-modern .tab{gap:6px;padding:8px 9px}.tab-icon{width:20px;height:20px;flex-basis:20px;font-size:12px}.nav-group{border-right:0}}
+/* Fix navigasi: tampilkan semua grup tanpa potongan horizontal */
+.nav-modern{display:flex;flex-wrap:wrap;align-items:flex-start;overflow:visible;gap:8px;padding:10px;scrollbar-width:auto}
+.nav-modern::-webkit-scrollbar{display:none}
+.nav-group{flex:1 1 260px;min-width:0;max-width:100%;padding:4px 8px 8px;border-right:0;border-bottom:1px solid #19344d}
+.nav-group-last{border-bottom:0}
+.nav-items{display:flex;flex-wrap:wrap;gap:6px;align-items:center}
+.nav-modern .tab{max-width:100%;white-space:normal;text-align:left;line-height:1.2}
+.nav-modern .tab span:last-child{overflow-wrap:anywhere}
+@media(max-width:700px){.nav-group{flex:1 1 100%;padding:4px 2px 9px}.nav-items{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));width:100%}.nav-modern .tab{width:100%;justify-content:flex-start;padding:8px}.nav-modern .tab span:last-child{font-size:12px}}
+@media(max-width:380px){.nav-items{grid-template-columns:1fr}}
 </style>
 
 <style id="ryuza-recal-playlist-ui">
@@ -710,15 +720,18 @@ if($('clearActivity'))$('clearActivity').onclick=async()=>{if(!confirm('Yakin ha
 if($('clearFilteredActivity'))$('clearFilteredActivity').onclick=async()=>{const q=String($('activitySearch')?.value||'').toLowerCase().trim(),type=$('activityType')?.value||'ALL',who=$('activityVisitor')?.value||'ALL';const rows=Object.entries(activityData||{}).filter(([id,x])=>x&&(!type||type==='ALL'||x.type===type)&&(!who||who==='ALL'||x.visitorId===who)&&(!q||[x.name,x.title,x.detail,x.type].some(v=>String(v||'').toLowerCase().includes(q))));if(!rows.length)return toast('Tidak ada activity yang cocok dengan filter');if(!confirm('Hapus '+rows.length+' activity sesuai filter?'))return;if(!confirm('Konfirmasi terakhir: data yang dipilih akan dihapus permanen.'))return;try{const updates={};rows.forEach(([id])=>updates[id]=null);await db.ref('searchStats/activityLog').update(updates);toast('🧹 '+rows.length+' activity berhasil dihapus')}catch(e){toast('❌ Gagal menghapus: '+e.message)}};
 if($('clearOldActivity'))$('clearOldActivity').onclick=async()=>{const limit=Date.now()-7*86400000;const rows=Object.entries(activityData||{}).filter(([id,x])=>Number(x?.at||0)>0&&Number(x.at)<limit);if(!rows.length)return toast('Tidak ada activity lebih dari 7 hari');if(!confirm('Hapus '+rows.length+' activity yang lebih dari 7 hari?'))return;try{const updates={};rows.forEach(([id])=>updates[id]=null);await db.ref('searchStats/activityLog').update(updates);toast('🕒 Activity lama berhasil dihapus')}catch(e){toast('❌ Gagal menghapus activity lama: '+e.message)}};
 let analyticsActivity=[];
+let downloadStatsData={}, searchQueriesData={};
+function statTotal(data){return Object.values(data||{}).reduce((sum,v)=>sum+Math.max(0,Number((v&&typeof v==='object')?v.count:v)||0),0)}
+function renderStatTotals(){const d=$('anDownloads'),q=$('anSearches');if(d)d.textContent=statTotal(downloadStatsData).toLocaleString('id-ID');if(q)q.textContent=statTotal(searchQueriesData).toLocaleString('id-ID');const rows=Object.entries(downloadStatsData||{}).map(([id,v])=>[String(v?.title||id),Math.max(0,Number(v?.count)||0)]).filter(x=>x[1]>0).sort((a,b)=>b[1]-a[1]).slice(0,10);const trend=$('trendingList');if(trend)trend.innerHTML=rows.length?rows.map((x,i)=>`<div class="trend-item"><span class="trend-rank">#${i+1}</span><span class="trend-name">${escActivity(x[0])}</span><span class="trend-count">${x[1]}x</span></div>`).join(''):'<div class="visitor-empty">Belum ada data download.</div>';const best=$('anTrending');if(best)best.textContent=rows[0]?.[0]||'-';}
+db.ref('downloadStats').on('value',s=>{downloadStatsData=s.val()||{};renderStatTotals()},e=>console.warn('[Analytics] downloadStats gagal',e));
+db.ref('searchStats/queries').on('value',s=>{searchQueriesData=s.val()||{};renderStatTotals()},e=>console.warn('[Analytics] searchStats/queries gagal',e));
 function activityEntries(){return Object.entries(activityData||{}).map(([id,x])=>({id,...(x||{})})).filter(x=>x&&x.at).sort((a,b)=>Number(b.at)-Number(a.at));}
 function renderAnalytics(){
  const arr=activityEntries(),now=Date.now(),day=now-86400000,dayArr=arr.filter(x=>Number(x.at)>=day);
  $('anVisitors').textContent=new Set(dayArr.map(x=>x.visitorId||x.name||'')).size.toLocaleString('id-ID');
- $('anDownloads').textContent=dayArr.filter(x=>x.type==='DOWNLOAD').length.toLocaleString('id-ID');
- $('anSearches').textContent=dayArr.filter(x=>x.type==='SEARCH').length.toLocaleString('id-ID');
+ renderStatTotals();
  const counts={}; dayArr.filter(x=>x.type==='DOWNLOAD').forEach(x=>{const k=x.title||x.detail||'Skin';counts[k]=(counts[k]||0)+1});
- const top=Object.entries(counts).sort((a,b)=>b[1]-a[1]).slice(0,10); $('anTrending').textContent=top[0]?.[0]||'-';
- const trend=$('trendingList'); trend.innerHTML=top.length?top.map((x,i)=>`<div class="trend-item"><span class="trend-rank">#${i+1}</span><span class="trend-name">${escActivity(x[0])}</span><span class="trend-count">${x[1]}x</span></div>`).join(''):'<div class="visitor-empty">Belum ada download.</div>';
+ const top=Object.entries(counts).sort((a,b)=>b[1]-a[1]).slice(0,10);
  const note=$('notificationList'); const recent=arr.slice(0,20); note.innerHTML=recent.length?recent.map(x=>`<div class="notification-item"><span>${x.type==='DOWNLOAD'?'📥':'🔎'}</span><div><b>${escActivity(x.name||'Pengunjung')}</b> ${x.type==='DOWNLOAD'?'mendownload':'mencari'} <b>${escActivity(x.title||x.detail||'-')}</b></div><span class="notification-time">${activityTime(x.at)}</span></div>`).join(''):'<div class="visitor-empty">Belum ada aktivitas.</div>';
  const sel=$('detailVisitor'); if(sel){const cur=sel.value,map={};arr.forEach(x=>{if(x.visitorId)map[x.visitorId]=x.name||'Pengunjung'});sel.innerHTML='<option value="">Pilih pengunjung...</option>'+Object.entries(map).sort((a,b)=>a[1].localeCompare(b[1],'id')).map(([id,n])=>`<option value="${escActivity(id)}">${escActivity(n)}</option>`).join('');if(map[cur])sel.value=cur;}
  renderVisitorDetail(); renderActivityChart(dayArr);
