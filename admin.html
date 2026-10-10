@@ -267,8 +267,8 @@ input:focus,select:focus,textarea:focus{border-color:#7ba7ff!important;box-shado
     <div class="field"><label>Judul Halaman</label><input id="setPageTitle" placeholder="Ryuza Official"></div>
     <div class="field"><label>Judul Utama</label><input id="setName" placeholder="RYUZA OFFICIAL UPLOADER SCRIPT NO 1"></div>
     <div class="field"><label>Subjudul</label><input id="setSubtitle" placeholder="No Password • Cari Skin Dengan Mudah"></div>
-    <div class="field"><label>Channel YouTube 1</label><input id="setYoutube" placeholder="https://youtube.com/@..."></div>
-     <div class="field"><label>Channel YouTube 2</label><input id="setYoutube2" placeholder="https://youtube.com/@..."></div>
+    <div class="field"><label>Wajib Subscribe YouTube (1 channel)</label><input id="setYoutube" value="https://youtube.com/@ryuzaofficialr-x5r?si=FHmkLA7u6flq5Cv1" placeholder="https://youtube.com/@..."></div>
+     <div class="field"><label>Wajib Ikuti Saluran WhatsApp</label><input id="setYoutube2" value="https://whatsapp.com/channel/0029VbAR6qO8kyyWG2te832B" placeholder="https://whatsapp.com/channel/..."></div>
     <div class="field"><label>Request Free</label><input id="setFree" placeholder="https://forms.gle/..."></div>
     <div class="field"><label>Request Berbayar</label><input id="setPaid" placeholder="https://saweria.co/..."></div>
    </div>
@@ -490,8 +490,8 @@ function watchRankings(){
 }
 function loadSettings(){
   $('setPageTitle').value=settings.pageTitle||'';$('setName').value=settings.name||'';$('setSubtitle').value=settings.subtitle||'';
-  $('setYoutube').value=settings.youtube||settings.youtube1||'';
-  const y2=$('setYoutube2'); if(y2)y2.value=settings.youtube2||'';
+  $('setYoutube').value=settings.youtube||settings.youtube1||'https://youtube.com/@ryuzaofficialr-x5r?si=FHmkLA7u6flq5Cv1';
+  const y2=$('setYoutube2'); if(y2)y2.value=settings.youtube2||'https://whatsapp.com/channel/0029VbAR6qO8kyyWG2te832B';
   $('setFree').value=settings.requestFree||'';$('setPaid').value=settings.requestPaid||'';$('setDownload').value=settings.defaultDownload||'';$('setAnnouncement').value=settings.announcement||'';
   $('setMaintenance').checked=!!settings.maintenance;$('setShowAnnouncement').checked=settings.showAnnouncement!==false;$('setBannerEnabled').checked=settings.bannerEnabled!==false;renderBanners(settings.banners||[])
 }
