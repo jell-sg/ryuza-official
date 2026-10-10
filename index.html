@@ -1354,10 +1354,10 @@ html.ryuza-chrome-block #ryuzaChromeGate{display:flex!important}
       <div class="subscribe-success-icon">🔓</div>
       <div class="subscribe-success-title">AKSES BERHASIL DIBUKA!</div>
       <div class="subscribe-success-text">Selamat datang, <span id="subscribeWelcomeName">Ryuza User</span> 👋</div>
-      <div class="subscribe-countdown" id="subscribeCountdown">48:00:00</div>
-      <div class="subscribe-success-text">Akses aktif selama 2 hari</div>
+      <div class="subscribe-countdown" id="subscribeCountdown">AKSES AKTIF</div>
+      <div class="subscribe-success-text">Akses tetap aktif sampai Admin melakukan reset.</div>
     </div>
-    <div class="subscribe-note">Subscribe hanya perlu dilakukan setiap <b>2 hari sekali</b>. Status tersimpan otomatis.</div>
+    <div class="subscribe-note">Subscribe cukup dilakukan <b>satu kali</b>. Status tersimpan otomatis sampai Admin melakukan reset.</div>
   </div>
 </div>
 <div aria-labelledby="reportTitle" aria-modal="true" class="report-overlay" id="reportPopup" role="dialog"><div class="report-box"><button aria-label="Tutup" class="popup-close" id="reportClose" type="button">×</button><h2 id="reportTitle">⚠️ Report Link Error</h2><p>Jika link download error, kirim laporan agar link bisa diperbaiki. Contoh laporan:</p><div class="report-example"><strong>Nolan 11.11 — Replace Default</strong><code>Link error: link tidak bisa dibuka / redirect gagal.</code></div><div class="report-field"><label for="reportSkin">Nama Skin</label><input id="reportSkin" placeholder="Contoh: Nolan 11.11" type="text" value="Nolan 11.11"/></div><div class="report-field"><label for="reportReplace">Nama Replace</label><input autocomplete="off" id="reportReplace" placeholder="Contoh: Default, Nolan 11.11, atau nama replace lainnya" type="text" value="Default"/></div><div class="report-field"><label for="reportNote">Keterangan Error</label><input id="reportNote" placeholder="Jelaskan error singkat" type="text" value="Link error / tidak bisa dibuka"/></div><button class="report-wa" id="reportWhatsApp" type="button">📨 KIRIM REPORT KE ADMIN</button><button class="report-cancel" id="reportCancel" type="button">Batal</button></div></div><div class="container"><section aria-label="Banner skin unggulan" class="ryuza-banner"><div class="ryuza-slides"><div class="ryuza-slide"><img alt="Obsidia — Imperatrix Arashi" loading="lazy" src="https://static.wikia.nocookie.net/mobile-legends/images/9/94/Obsidia_%28Imperatrix_Arashi%29.jpg/revision/latest/scale-to-width-down/1000?cb=20260912033155"/><div class="ryuza-slide-shade"></div><div class="ryuza-slide-caption"><span>RYUZA OFFICIAL • FEATURED SKIN</span><h2>Obsidia — Imperatrix Arashi</h2></div></div><div class="ryuza-slide"><img alt="Selena — Silverbolt Raiko" loading="lazy" src="https://static.wikia.nocookie.net/mobile-legends/images/0/0d/Selena_%28Silverbolt_Raiko%29.jpg/revision/latest/scale-to-width-down/1000?cb=20260912033216"/><div class="ryuza-slide-shade"></div><div class="ryuza-slide-caption"><span>RYUZA OFFICIAL • FEATURED SKIN</span><h2>Selena — Silverbolt Raiko</h2></div></div><div class="ryuza-slide"><img alt="Argus — Raiden Maru" loading="lazy" src="https://static.wikia.nocookie.net/mobile-legends/images/9/92/Argus_%28Raiden_Maru%29.jpg/revision/latest/scale-to-width-down/1000?cb=20260824013840"/><div class="ryuza-slide-shade"></div><div class="ryuza-slide-caption"><span>RYUZA OFFICIAL • FEATURED SKIN</span><h2>Argus — Raiden Maru</h2></div></div><div class="ryuza-slide"><img alt="Sun — Celestial Rebel" loading="lazy" src="https://static.wikia.nocookie.net/mobile-legends/images/f/f5/Sun_%28Celestial_Rebel%29.jpg/revision/latest/scale-to-width-down/1000?cb=20260912033123"/><div class="ryuza-slide-shade"></div><div class="ryuza-slide-caption"><span>RYUZA OFFICIAL • FEATURED SKIN</span><h2>Sun — Celestial Rebel</h2></div></div></div><button aria-label="Banner sebelumnya" class="ryuza-arrow prev" type="button">‹</button><button aria-label="Banner berikutnya" class="ryuza-arrow next" type="button">›</button><div aria-label="Pilih banner" class="ryuza-dots"></div></section><div class="header" id="download"><h1>RYUZA OFFICIAL UPLOADER SCRIPT NO 1</h1><p>No Password • Cari Skin Dengan Mudah</p></div>
@@ -1690,7 +1690,7 @@ q.oninput=search;x.onclick=()=>{q.value='';q.focus();search()};search();
   window.addEventListener('load',()=>setTimeout(syncName,700));
   setInterval(()=>{if(document.visibilityState==='visible')syncName()},120000);
 })();
-/* ===== Wajib Subscribe setiap 2 hari ===== */
+/* ===== Wajib Subscribe sekali; reset manual melalui Admin ===== */
 (function(){
   const popup=document.getElementById('ryuzaPopup');
   const gate=popup?.querySelector('.subscribe-gate');
@@ -1718,7 +1718,7 @@ q.oninput=search;x.onclick=()=>{q.value='';q.focus();search()};search();
   const VISITED2_KEY='ryuzaSubscribeVisited2At';
   const WAWA_VISITED_KEY='ryuzaSubscribeVisitedWAAt';
   const CONFIRM_DELAY=7000;
-  const TWO_DAYS=2*24*60*60*1000;
+
   let countdownTimer=null;
   let autoCloseTimer=null;
   let confirmTimer1=null,confirmTimer2=null,confirmTimerWA=null;
@@ -1736,7 +1736,7 @@ q.oninput=search;x.onclick=()=>{q.value='';q.focus();search()};search();
   function getWA(){return getItem(WA_KEY)==='1'}
   function setSub(key){setItem(key,'1')}
   function clearCycle(){removeItem(SUB1_KEY);removeItem(SUB2_KEY);removeItem(WA_KEY);removeItem(UNLOCK_KEY);removeItem(VISITED1_KEY);removeItem(VISITED2_KEY);removeItem(WAWA_VISITED_KEY);if(confirmBtn1)confirmBtn1.style.display='none';if(confirmBtn2)confirmBtn2.style.display='none';if(confirmWhatsapp)confirmWhatsapp.style.display='none';clearTimeout(confirmTimer1);clearTimeout(confirmTimer2);clearTimeout(confirmTimerWA)}
-  function remaining(){const t=getUnlockTime();return Math.max(0,TWO_DAYS-(Date.now()-t))}
+  function remaining(){return getUnlockTime()?1:0}
   function formatTime(ms){let sec=Math.ceil(ms/1000);const h=Math.floor(sec/3600);sec%=3600;const m=Math.floor(sec/60);sec%=60;return [h,m,sec].map(v=>String(v).padStart(2,'0')).join(':')}
 
   const savedName=getName().trim();
@@ -1747,12 +1747,8 @@ q.oninput=search;x.onclick=()=>{q.value='';q.focus();search()};search();
   function stopCountdown(){if(countdownTimer){clearInterval(countdownTimer);countdownTimer=null}}
   function startCountdown(){
     stopCountdown();
-    const tick=()=>{
-      const left=remaining();
-      if(countdown)countdown.textContent=formatTime(left);
-      if(left<=0){stopCountdown();clearCycle();gate.classList.remove('unlocked');showGate(true)}
-    };
-    tick(); countdownTimer=setInterval(tick,1000);
+    // Akses tidak kedaluwarsa otomatis. Hanya tombol reset di Admin yang membuka gate lagi.
+    if(countdown)countdown.textContent='AKSES AKTIF';
   }
 
   function refreshSubscribeUI(){
@@ -1776,7 +1772,7 @@ q.oninput=search;x.onclick=()=>{q.value='';q.focus();search()};search();
   function showGate(expired){
     stopCountdown();
     gate.classList.remove('unlocked');
-    if(expired){clearCycle();refreshSubscribeUI();setStatus('⏰ Masa akses 2 hari sudah habis. Silakan subscribe kembali untuk membuka akses.',false)}
+    if(expired){clearCycle();refreshSubscribeUI();setStatus('🔒 Admin meminta verifikasi subscribe ulang. Selesaikan langkah di bawah.',false)}
     else refreshSubscribeUI();
     popup.style.display='flex';document.body.style.overflow='hidden';
   }
@@ -1818,7 +1814,7 @@ q.oninput=search;x.onclick=()=>{q.value='';q.focus();search()};search();
     if(getSub1()&&getSub2()&&getWA()){
       saveUnlockTime();
       if(successName)successName.textContent=name;
-      setStatus('🎉 Semua selesai! Akses 2 hari langsung aktif.',true);
+      setStatus('🎉 Semua selesai! Akses berhasil dibuka dan tetap aktif sampai Admin melakukan reset.',true);
       closeGateAndWelcome(name);
     }
     return true;
@@ -1887,7 +1883,7 @@ q.oninput=search;x.onclick=()=>{q.value='';q.focus();search()};search();
   if(getUnlockTime()&&remaining()>0&&getSub1()&&getSub2()&&getWA()){
     startCountdown();popup.style.display='none';document.body.style.overflow='';
   }else{
-    if(getUnlockTime()&&remaining()<=0)clearCycle();
+    if(!getUnlockTime())clearCycle();
     showGate(false);
   }
 })();
