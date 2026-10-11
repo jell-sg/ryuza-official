@@ -162,8 +162,6 @@ input:focus,select:focus,textarea:focus{border-color:#7ba7ff!important;box-shado
  <div class="nav-group">
   <div class="nav-group-title">MONITORING</div>
   <div class="nav-items">
-   <button class="tab" data-tab="activity"><span class="tab-icon">◉</span><span>Live Activity</span></button>
-   <button class="tab" data-tab="analytics"><span class="tab-icon">⌁</span><span>Analytics</span></button>
    <button class="tab" data-tab="recalPlaylist"><span class="tab-icon">🔄</span><span>Playlist Recal</span></button>
    <button class="tab" data-tab="indexFeatures"><span class="tab-icon">✣</span><span>Index Features</span></button>
   </div>
@@ -299,17 +297,7 @@ input:focus,select:focus,textarea:focus{border-color:#7ba7ff!important;box-shado
  </div>
 </section>
 
-<section id="activity" class="panel">
- <div class="cards"><div class="stat"><div class="l">AKTIVITAS LIVE</div><div class="v" id="activityTotal">0</div></div><div class="stat"><div class="l">DOWNLOAD</div><div class="v" id="activityDownloads">0</div></div><div class="stat"><div class="l">PENCARIAN</div><div class="v" id="activitySearches">0</div></div></div>
- <div class="card"><h3 style="margin:0 0 6px">📡 LIVE ACTIVITY</h3><div class="hint" style="margin-bottom:12px">Aktivitas pengunjung masuk realtime dan dikaitkan dengan nama.</div><div class="visitor-toolbar"><input id="activitySearch" placeholder="🔎 Cari nama / skin / aktivitas..."><select id="activityType"><option value="ALL">Semua aktivitas</option><option value="DOWNLOAD">📥 Download</option><option value="SEARCH">🔎 Pencarian</option></select><select id="activityVisitor"><option value="ALL">Semua pengunjung</option></select><span id="activityStatus" class="badge">● Menunggu...</span><button class="danger" id="clearActivity">🗑️ Hapus Riwayat Activity</button><button class="secondary" id="clearFilteredActivity">🧹 Hapus Hasil Filter</button><button class="secondary" id="clearOldActivity">🕒 Hapus &gt; 7 Hari</button></div><div id="activityList" class="activity-list"><div class="visitor-empty">Memuat aktivitas...</div></div></div>
-</section>
 
-<section id="analytics" class="panel">
- <div class="cards"><div class="stat"><div class="l">PENGUNJUNG</div><div class="v" id="anVisitors">0</div></div><div class="stat"><div class="l">DOWNLOAD</div><div class="v" id="anDownloads">0</div></div><div class="stat"><div class="l">PENCARIAN</div><div class="v" id="anSearches">0</div></div><div class="stat"><div class="l">TRENDING</div><div class="v" id="anTrending">-</div></div></div>
- <div class="card"><h3 style="margin:0 0 8px">📈 Aktivitas 24 Jam</h3><div id="activityChart" class="bar-chart"></div></div>
- <div class="analytics-grid"><div class="card"><h3 style="margin:0 0 8px">🔥 Skin Trending</h3><div id="trendingList" class="trend-list"><div class="visitor-empty">Memuat...</div></div></div><div class="card"><h3 style="margin:0 0 8px">🔔 Notifikasi Realtime</h3><div id="notificationList" class="notification-list"><div class="visitor-empty">Memuat...</div></div></div></div>
- <div class="card"><h3 style="margin:0 0 8px">👤 Detail Pengunjung</h3><div class="visitor-toolbar"><select id="detailVisitor"><option value="">Pilih pengunjung...</option></select></div><div id="visitorDetail" class="detail-box">Pilih nama untuk melihat statistik pengunjung.</div></div>
-</section>
 
 
 <section id="requests" class="panel">
@@ -470,7 +458,7 @@ db.ref('siteConfig/indexFeatures').on('value',s=>{settings.indexFeatures=s.val()
  db.ref('onlineUsers').on('value',s=>{$('statOnline').textContent=Object.keys(s.val()||{}).length});
  db.ref('linkClicks').on('value',s=>{const v=s.val()||{};$('statClicks').textContent=Object.values(v).reduce((n,x)=>n+Number(x?.count||0),0)});
  watchRankings();
- watchActivity();
+ /* Live Activity dinonaktifkan untuk mengurangi beban Firebase. */
  watchVisitors();
 }catch(e){$('status').textContent='Firebase error';$('status').className='badge err';$('systemInfo').textContent=e.message}
 function renderRanking(elId,data,type){
@@ -1346,5 +1334,35 @@ $('quickImport').onclick=()=>{$('.tab[data-tab="skins"]').click();$('seedBtn').c
   const boot=setInterval(()=>{if(window.db){clearInterval(boot);load();db.ref('siteConfig/recalSkins').on('value',snap=>{recalItems=normalize(snap.val());render()})}},250);
 })();
 </script>
+
+<script id="ryuza-daily-analytics-cleanup">
+/* Bersihkan data analitik selain data nama pengunjung setiap 24 jam.
+   searchStats/visitors, onlineUsers, dan siteVisits sengaja dipertahankan. */
+(function(){
+  const KEY='ryuzaAnalyticsCleanupAtV1', DAY=24*60*60*1000;
+  async function cleanup(){
+    if(!window.db || typeof window.db.ref!=='function') return;
+    let last=0;
+    try{last=Number(localStorage.getItem(KEY)||0)}catch(e){}
+    if(Date.now()-last < DAY) return;
+    try{
+      await Promise.all([
+        db.ref('searchStats/queries').remove(),
+        db.ref('searchStats/activityLog').remove(),
+        db.ref('downloadStats').remove(),
+        db.ref('downloadStatsByOption').remove(),
+        db.ref('linkClicks').remove()
+      ]);
+      try{localStorage.setItem(KEY,String(Date.now()))}catch(e){}
+      console.info('[Ryuza] Data analitik dibersihkan; data pengunjung/nama tetap disimpan.');
+      const status=document.getElementById('status');
+      if(status && /Firebase/i.test(status.textContent||'')) status.textContent='Firebase terhubung • analitik dibersihkan';
+    }catch(err){console.warn('[Ryuza] Pembersihan analitik gagal:',err)}
+  }
+  document.addEventListener('DOMContentLoaded',function(){setTimeout(cleanup,1800)});
+  window.addEventListener('load',function(){setTimeout(cleanup,2400)});
+})();
+</script>
+
 </body>
 </html>
