@@ -240,9 +240,6 @@ input{
 @keyframes uploadNoticeOut{to{opacity:0;transform:translateY(-15px);pointer-events:none}}
 </style>
 <style>
-.link-click-count{display:block;text-align:center;margin-top:7px;color:#8fa3bb;font-size:12px}.link-click-count strong{color:#d5e8ff}.link-click-count.loading{opacity:.65}
-</style>
-<style>
 /* Ryuza Gaming Launcher refresh — visual only; all existing content/data/scripts remain intact */
 :root{--ry-bg:#080d18;--ry-panel:#111b2b;--ry-line:#253954;--ry-blue:#268bff;--ry-cyan:#22d3ee;--ry-purple:#8b5cf6}
 body{background:radial-gradient(ellipse at 50% -15%,rgba(38,139,255,.22),transparent 42%),linear-gradient(180deg,#080d18 0%,#090f1b 55%,#070b13 100%);color:#f4f7ff}
@@ -267,7 +264,7 @@ input{background:#0a1321;border-color:#2b405d}input:focus{border-color:#35a7ff;b
 .replace-select:focus{border-color:#2b9bff!important}
 .card.skin .btn{background:linear-gradient(115deg,#1878f5,#11a9d4);box-shadow:0 7px 18px rgba(17,137,239,.2);transition:filter .2s,transform .2s}
 .card.skin .btn:hover{filter:brightness(1.12);transform:translateY(-1px)}
-.link-click-count{color:#a3b5cd}.link-click-count strong{color:#e0f2ff}
+
 .empty{background:#111b2b;border-color:#304762}
 .skip,.tutorial{border-radius:18px}
 @media(min-width:1100px){#list{grid-template-columns:repeat(3,minmax(0,1fr))}}
@@ -1469,7 +1466,6 @@ html.ryuza-chrome-block #ryuzaChromeGate{display:flex!important}
   <div class="ryuza-smartbar" id="ryuzaSmartbar">
     <button class="ryuza-filter active" data-mode="ALL">✨ Semua Skin</button>
     <button class="ryuza-filter" data-mode="POPULAR">🏆 Terpopuler</button>
-    <button class="ryuza-filter" data-mode="TRENDING">🔥 Trending</button>
     <button class="ryuza-filter" data-mode="NEW">🆕 Terbaru</button>
     <button class="ryuza-filter" data-mode="FEATURED">⭐ Pilihan Admin</button>
     <button class="ryuza-filter" data-mode="RECENT">🕘 Terakhir Dilihat</button>
@@ -1477,14 +1473,13 @@ html.ryuza-chrome-block #ryuzaChromeGate{display:flex!important}
     <button class="ryuza-filter" data-mode="RECAL">🔄 Recal</button>
   </div>
   <div class="ryuza-tab-note" id="ryuzaTabNote">Semua skin</div>
-  <div class="ryuza-section ryuza-tab-section" id="ryuzaTrendingSec"><div class="ryuza-section-head"><h3>🔥 Trending Skin</h3><span>berdasarkan download</span></div><div class="ryuza-mini-grid" id="ryuzaTrending"></div></div>
   <div class="ryuza-section ryuza-tab-section" id="ryuzaFeaturedSec"><div class="ryuza-section-head"><h3>⭐ Pilihan Admin</h3><span>rekomendasi Ryuza</span></div><div class="ryuza-mini-grid" id="ryuzaFeatured"></div></div>
   <div class="ryuza-section ryuza-tab-section" id="ryuzaNewSec"><div class="ryuza-section-head"><h3>🆕 Skin Terbaru</h3><span>update terbaru</span></div><div class="ryuza-mini-grid" id="ryuzaNew"></div></div>
   <div class="ryuza-section ryuza-tab-section" id="ryuzaRecentSec"><div class="ryuza-section-head"><h3>🕘 Terakhir Dilihat</h3><span>tersimpan di perangkat</span></div><div class="ryuza-mini-grid" id="ryuzaRecent"></div></div>
   <div class="ryuza-section ryuza-tab-section" id="ryuzaFavoriteSec"><div class="ryuza-section-head"><h3>❤️ Skin Favorit</h3><span>favorit kamu</span></div><div class="ryuza-mini-grid" id="ryuzaFavorite"></div></div>
 </div>
 <nav class="ryuza-bottom" aria-label="Navigasi cepat">
-  <button data-jump="top"><b>⌂</b>Home</button><button data-jump="search"><b>🔎</b>Cari</button><button data-jump="trending"><b>🔥</b>Trending</button><button data-jump="list"><b>📦</b>Semua</button>
+  <button data-jump="top"><b>⌂</b>Home</button><button data-jump="search"><b>🔎</b>Cari</button><button data-jump="list"><b>📦</b>Semua</button>
 </nav>
 <!-- RYUZA_STATIC_CONFIG_START -->
 <script id="ryuza-static-config">window.__RYUZA_STATIC_CONFIG__={"version":1,"updatedAt":1791344444736,"skins":{},"settings":{"announcement":"","bannerEnabled":true,"banners":[{"image":"https://i.ibb.co.com/p658qTJj/4109-F27-E-3876-47-D3-AAC2-092150366109.png","kicker":"RYUZA OFFICIAL","link":"","title":""},{"image":"","kicker":"RYUZA OFFICIAL","link":"","title":""},{"image":"","kicker":"RYUZA OFFICIAL","link":"","title":""},{"image":"","kicker":"RYUZA OFFICIAL","link":"","title":""}],"defaultDownload":"","iconMode":"initials","indexFeatures":{"bottomNav":true,"favorite":true,"featured":true,"newest":false,"recent":false,"sectionLimit":10,"stats":true,"trending":false,"trendingLimit":8,"updatedAt":1791304747212},"maintenance":false,"name":"","pageTitle":"","requestFree":"","requestPaid":"","showAnnouncement":true,"siteTitle":"","subscribeResetAt":1791301733874,"subtitle":"AG STYLE","updatedAt":1791222625673,"youtube":"","youtube1":"","youtube2":"https://youtube.com/@ryuzaofficialreall7-z6d?si=m8R4SQhOn0ttuI9F"},"indexFeatures":{"bottomNav":true,"favorite":true,"featured":true,"newest":false,"recent":false,"sectionLimit":10,"stats":true,"trending":false,"trendingLimit":8,"updatedAt":1791304747212}};</script>
@@ -1497,15 +1492,13 @@ html.ryuza-chrome-block #ryuzaChromeGate{display:flex!important}
   const clean=s=>String(s||'').replace(/\s+/g,' ').trim();
   const getLS=(k,d)=>{try{return JSON.parse(localStorage.getItem(k)||'null')??d}catch(e){return d}};
   const setLS=(k,v)=>{try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}};
-  let db=null, skinData={}, downloadCounts={}, playlistData={}, mode='ALL', ready=false, applyTimer=0, featureCfg={trending:true,featured:true,newest:true,recent:true,favorite:true,stats:true,bottomNav:true,trendingLimit:8,sectionLimit:8};
+  let db=null, skinData={}, playlistData={}, mode='ALL', ready=false, applyTimer=0, featureCfg={featured:true,newest:true,recent:true,favorite:true,bottomNav:true,sectionLimit:8};
   const ids={list:'list',q:'q'};
   function wait(){if(window.firebase&&firebase.database){start()}else setTimeout(wait,500)}
   function start(){
     try{let app;try{app=firebase.app('ryuza-super-features')}catch(e){app=firebase.initializeApp(CFG,'ryuza-super-features')}db=app.database();
       db.ref('siteConfig/skins').on('value',s=>{skinData=s.val()||{};scheduleApply()});
       db.ref('siteConfig/playlists').on('value',s=>{playlistData=s.val()||{};scheduleApply()});
-      /* Jangan subscribe activityLog di index: admin saja yang perlu membaca riwayat. */
-      db.ref('downloadStats').on('value',s=>{downloadCounts=s.val()||{};scheduleApply()});
       db.ref('siteConfig/settings').on('value',s=>{const st=s.val()||{};const a=document.getElementById('ryuzaAnnouncement');if(a){a.querySelector('span').textContent=clean(st.announcement||'');a.classList.toggle('show',!!st.showAnnouncement&&!!clean(st.announcement));} if(st.maintenance){showMaintenance()} });
       db.ref('siteConfig/indexFeatures').on('value',s=>{featureCfg={...featureCfg,...(s.val()||{})};const reset=Number(featureCfg.favoriteResetAt||0);if(reset){try{localStorage.removeItem('ryuzaFavorites')}catch(e){}}applyFeatureVisibility();scheduleApply();});
       document.addEventListener('click',trackView,true);
@@ -1530,16 +1523,12 @@ html.ryuza-chrome-block #ryuzaChromeGate{display:flex!important}
   }
   function slug(s){return clean(s).toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'')}
   function cards(){return [...document.querySelectorAll('#list .skin[data-rtdb-id]')].filter(x=>x.offsetParent!==null||document.getElementById('list'))}
-  function stats(){const out={};Object.entries(downloadCounts||{}).forEach(([id,x])=>{const n=Number(x?.count||0);if(n>0)out[slug(x?.title||id)]=n});return out}
-  function matchCount(title){const k=slug(title), st=stats();if(st[k]!=null)return st[k];let n=0;Object.entries(st).forEach(([a,v])=>{if(a.includes(k)||k.includes(a))n+=v});return n}
   function findCard(id,title){return document.querySelector('#list .skin[data-rtdb-id="'+CSS.escape(id)+'"]')||cards().find(c=>slug(titleOf(c))===slug(title))}
-  function mini(card,rank){const id=keyOf(card),title=titleOf(card),img=card.querySelector('.hero-icon')?.src||'',count=matchCount(title),fav=getLS('ryuzaFavorites',[]).includes(id);return `<div class="ryuza-mini" data-card="${esc(id)}"><span class="ryuza-mini-rank">${rank?('#'+rank):''}</span><div class="ryuza-mini-top"><div class="ryuza-mini-icon">${img?`<img src="${esc(img)}" alt="">`:esc(title.slice(0,2).toUpperCase())}</div><div class="ryuza-mini-title">${esc(title)}</div></div><div class="ryuza-mini-meta">📥 ${count} download${count===1?'':'s'}</div><button class="ryuza-mini-fav" title="Favorit" data-fav="${esc(id)}">${fav?'❤️':'♡'}</button></div>`}
+  function mini(card,rank){const id=keyOf(card),title=titleOf(card),img=card.querySelector('.hero-icon')?.src||'',fav=getLS('ryuzaFavorites',[]).includes(id);return `<div class="ryuza-mini" data-card="${esc(id)}"><span class="ryuza-mini-rank">${rank?('#'+rank):''}</span><div class="ryuza-mini-top"><div class="ryuza-mini-icon">${img?`<img src="${esc(img)}" alt="">`:esc(title.slice(0,2).toUpperCase())}</div><div class="ryuza-mini-title">${esc(title)}</div></div><button class="ryuza-mini-fav" title="Favorit" data-fav="${esc(id)}">${fav?'❤️':'♡'}</button></div>`}
   function renderBox(id,list){const el=document.getElementById(id);if(!el)return;if(!list.length){el.innerHTML='<div class="ryuza-empty">Belum ada data.</div>';return}el.innerHTML=list.map((c,i)=>mini(c,i+1)).join('')}
-  function sortByDownload(cs){return cs.slice().sort((a,b)=>matchCount(titleOf(b))-matchCount(titleOf(a)))}
   function scheduleApply(delay=0){clearTimeout(applyTimer);applyTimer=setTimeout(()=>{applyTimer=0;applyAll()},delay)}
-  function applyAll(){if(!ready)return;const cs=cards();if(!cs.length)return;const featured=cs.filter(c=>skinData[keyOf(c)]?.featured), newest=cs.slice().sort((a,b)=>(Number(skinData[keyOf(b)]?.createdAt)||0)-(Number(skinData[keyOf(a)]?.createdAt)||0));const lim=Math.max(3,Math.min(20,Number(featureCfg.sectionLimit)||8)),tlim=Math.max(3,Math.min(20,Number(featureCfg.trendingLimit)||8));renderBox('ryuzaTrending',sortByDownload(cs).slice(0,tlim));renderBox('ryuzaFeatured',featured.slice(0,lim));renderBox('ryuzaNew',newest.slice(0,lim));const recent=getLS('ryuzaRecent',[]).map(id=>cs.find(c=>keyOf(c)===id)).filter(Boolean).slice(0,lim);renderBox('ryuzaRecent',recent);const favorites=getLS('ryuzaFavorites',[]).map(id=>cs.find(c=>keyOf(c)===id)).filter(Boolean).slice(0,lim);renderBox('ryuzaFavorite',favorites);applyCardStats(cs);filterCards();applyFeatureVisibility()}
-  function applyCardStats(cs){cs.forEach(c=>{const title=titleOf(c),count=matchCount(title);let box=c.querySelector('.ryuza-card-stats');if(!box){box=document.createElement('div');box.className='ryuza-card-stats';const anchor=c.querySelector('.replace-dropdown')||c.lastElementChild;c.insertBefore(box,anchor||null)}box.innerHTML=(featureCfg.stats?`<span class="ryuza-chip hot">📥 ${count} Download</span>`:'')+(featureCfg.featured&&skinData[keyOf(c)]?.featured?'<span class="ryuza-chip">⭐ Pilihan</span>':'')+(featureCfg.newest&&skinData[keyOf(c)]?.isNew?'<span class="ryuza-chip">🆕 NEW</span>':'')+(featureCfg.favorite&&getLS('ryuzaFavorites',[]).includes(keyOf(c))?'<span class="ryuza-chip">❤️ Favorit</span>':'')})}
-  function filterCards(){const cs=cards(),q=clean(document.getElementById(ids.q)?.value).toLowerCase(),fav=getLS('ryuzaFavorites',[]);let recalVisible=0;cs.forEach(c=>{const id=keyOf(c),title=titleOf(c).toLowerCase(),search=(c.dataset.search||'').toLowerCase();let ok=!q||(title+' '+search).includes(q);if(mode==='TRENDING')ok=ok&&featureCfg.trending&&matchCount(titleOf(c))>0;if(mode==='NEW')ok=ok&&featureCfg.newest&&!!skinData[id]?.isNew;if(mode==='FEATURED')ok=ok&&featureCfg.featured&&!!skinData[id]?.featured;if(mode==='FAVORITE')ok=ok&&featureCfg.favorite&&fav.includes(id);if(mode==='RECAL')ok=ok&&isRecalCard(c);if(mode==='RECAL'&&ok)recalVisible++;c.style.display=ok?'':'none'});if(mode==='RECAL'){let n=document.getElementById('recalEmpty');if(!n){n=document.createElement('div');n.id='recalEmpty';n.className='empty';n.style.display='none';n.innerHTML='🔄 Belum ada skin di playlist Recal.';document.getElementById('list')?.appendChild(n)}n.style.display=recalVisible?'none':'block';}else{document.getElementById('recalEmpty')?.style.setProperty('display','none')}}
+  function applyAll(){if(!ready)return;const cs=cards();if(!cs.length)return;const featured=cs.filter(c=>skinData[keyOf(c)]?.featured), newest=cs.slice().sort((a,b)=>(Number(skinData[keyOf(b)]?.createdAt)||0)-(Number(skinData[keyOf(a)]?.createdAt)||0));const lim=Math.max(3,Math.min(20,Number(featureCfg.sectionLimit)||8));renderBox('ryuzaFeatured',featured.slice(0,lim));renderBox('ryuzaNew',newest.slice(0,lim));const recent=getLS('ryuzaRecent',[]).map(id=>cs.find(c=>keyOf(c)===id)).filter(Boolean).slice(0,lim);renderBox('ryuzaRecent',recent);const favorites=getLS('ryuzaFavorites',[]).map(id=>cs.find(c=>keyOf(c)===id)).filter(Boolean).slice(0,lim);renderBox('ryuzaFavorite',favorites);filterCards();applyFeatureVisibility()}
+  function filterCards(){const cs=cards(),q=clean(document.getElementById(ids.q)?.value).toLowerCase(),fav=getLS('ryuzaFavorites',[]);let recalVisible=0;cs.forEach(c=>{const id=keyOf(c),title=titleOf(c).toLowerCase(),search=(c.dataset.search||'').toLowerCase();let ok=!q||(title+' '+search).includes(q);if(mode==='NEW')ok=ok&&featureCfg.newest&&!!skinData[id]?.isNew;if(mode==='FEATURED')ok=ok&&featureCfg.featured&&!!skinData[id]?.featured;if(mode==='FAVORITE')ok=ok&&featureCfg.favorite&&fav.includes(id);if(mode==='RECAL')ok=ok&&isRecalCard(c);if(mode==='RECAL'&&ok)recalVisible++;c.style.display=ok?'':'none'});if(mode==='RECAL'){let n=document.getElementById('recalEmpty');if(!n){n=document.createElement('div');n.id='recalEmpty';n.className='empty';n.style.display='none';n.innerHTML='🔄 Belum ada skin di playlist Recal.';document.getElementById('list')?.appendChild(n)}n.style.display=recalVisible?'none':'block';}else{document.getElementById('recalEmpty')?.style.setProperty('display','none')}}
   function syncFeatureTabs(){
     const bar=document.getElementById('ryuzaSmartbar'), list=document.getElementById('list'), lb=document.getElementById('skinLeaderboard');
     if(!bar)return;
@@ -1547,18 +1536,18 @@ html.ryuza-chrome-block #ryuzaChromeGate{display:flex!important}
     const note=document.getElementById('ryuzaTabNote');
     if(lb&&bar&&lb.parentNode){lb.parentNode.insertBefore(bar,lb);if(note)lb.parentNode.insertBefore(note,lb)}
     if(lb&&!lb.classList.contains('ryuza-tab-popular')) lb.classList.add('ryuza-tab-popular');
-    const map={TRENDING:'ryuzaTrendingSec',FEATURED:'ryuzaFeaturedSec',NEW:'ryuzaNewSec',RECENT:'ryuzaRecentSec',FAVORITE:'ryuzaFavoriteSec'};
+    const map={FEATURED:'ryuzaFeaturedSec',NEW:'ryuzaNewSec',RECENT:'ryuzaRecentSec',FAVORITE:'ryuzaFavoriteSec'};
     Object.entries(map).forEach(([m,id])=>{const el=document.getElementById(id);if(el)el.classList.toggle('active',mode===m)});
     if(lb)lb.classList.toggle('active',mode==='POPULAR');
     if(list)list.style.display=mode==='ALL'?'':'none';
-    const labels={ALL:'Semua skin',POPULAR:'Skin & Replace terpopuler berdasarkan klik download',TRENDING:'Trending berdasarkan aktivitas download',FEATURED:'Pilihan Admin yang direkomendasikan Ryuza',NEW:'Skin terbaru yang ditambahkan',RECENT:'Skin yang terakhir kamu lihat',FAVORITE:'Skin yang kamu tandai sebagai favorit',RECAL:'Koleksi Recal / Recall yang disiapkan Ryuza'};
+    const labels={ALL:'Semua skin',POPULAR:'Skin & Replace pilihan Ryuza',FEATURED:'Pilihan Admin yang direkomendasikan Ryuza',NEW:'Skin terbaru yang ditambahkan',RECENT:'Skin yang terakhir kamu lihat',FAVORITE:'Skin yang kamu tandai sebagai favorit',RECAL:'Koleksi Recal / Recall yang disiapkan Ryuza'};
     if(note)note.textContent=labels[mode]||'Semua skin';
   }
 
-  function applyFeatureVisibility(){const map=[['ryuzaTrendingSec',featureCfg.trending],['ryuzaFeaturedSec',featureCfg.featured],['ryuzaNewSec',featureCfg.newest],['ryuzaRecentSec',featureCfg.recent],['ryuzaFavoriteSec',featureCfg.favorite]];map.forEach(([id,on])=>{const el=document.getElementById(id);if(el)el.style.display=on?'':'none'});document.querySelectorAll('#ryuzaSmartbar [data-mode="TRENDING"]').forEach(x=>x.style.display=featureCfg.trending?'':'none');document.querySelectorAll('#ryuzaSmartbar [data-mode="NEW"]').forEach(x=>x.style.display=featureCfg.newest?'':'none');document.querySelectorAll('#ryuzaSmartbar [data-mode="FEATURED"]').forEach(x=>x.style.display=featureCfg.featured?'':'none');document.querySelectorAll('#ryuzaSmartbar [data-mode="RECENT"]').forEach(x=>x.style.display=featureCfg.recent?'':'none');document.querySelectorAll('#ryuzaSmartbar [data-mode="FAVORITE"]').forEach(x=>x.style.display=featureCfg.favorite?'':'none');document.querySelectorAll('[data-fav]').forEach(x=>x.style.display=featureCfg.favorite?'':'none');syncFeatureTabs();const bottom=document.querySelector('.ryuza-bottom');if(bottom)bottom.style.display=featureCfg.bottomNav?'':'none';}
+  function applyFeatureVisibility(){const map=[['ryuzaFeaturedSec',featureCfg.featured],['ryuzaNewSec',featureCfg.newest],['ryuzaRecentSec',featureCfg.recent],['ryuzaFavoriteSec',featureCfg.favorite]];map.forEach(([id,on])=>{const el=document.getElementById(id);if(el)el.style.display=on?'':'none'});document.querySelectorAll('#ryuzaSmartbar [data-mode="NEW"]').forEach(x=>x.style.display=featureCfg.newest?'':'none');document.querySelectorAll('#ryuzaSmartbar [data-mode="FEATURED"]').forEach(x=>x.style.display=featureCfg.featured?'':'none');document.querySelectorAll('#ryuzaSmartbar [data-mode="RECENT"]').forEach(x=>x.style.display=featureCfg.recent?'':'none');document.querySelectorAll('#ryuzaSmartbar [data-mode="FAVORITE"]').forEach(x=>x.style.display=featureCfg.favorite?'':'none');document.querySelectorAll('[data-fav]').forEach(x=>x.style.display=featureCfg.favorite?'':'none');syncFeatureTabs();const bottom=document.querySelector('.ryuza-bottom');if(bottom)bottom.style.display=featureCfg.bottomNav?'':'none';}
   function trackView(e){if(!featureCfg.recent)return;const card=e.target.closest?.('#list .skin[data-rtdb-id]');if(!card)return;if(e.target.closest('select,button'))return;const id=keyOf(card),arr=getLS('ryuzaRecent',[]).filter(x=>x!==id);arr.unshift(id);setLS('ryuzaRecent',arr.slice(0,12));setTimeout(applyAll,50)}
   document.addEventListener('click',e=>{const fav=e.target.closest?.('[data-fav]');if(fav&&featureCfg.favorite){e.preventDefault();e.stopPropagation();const id=fav.dataset.fav,a=getLS('ryuzaFavorites',[]),n=a.includes(id)?a.filter(x=>x!==id):[...a,id];setLS('ryuzaFavorites',n);applyAll();return}const m=e.target.closest?.('.ryuza-mini');if(m&&!e.target.closest('[data-fav]')){const c=document.querySelector('#list .skin[data-rtdb-id="'+CSS.escape(m.dataset.card)+'"]');if(c){c.scrollIntoView({behavior:'smooth',block:'center'});c.style.outline='2px solid rgba(100,190,255,.55)';setTimeout(()=>c.style.outline='',1200)}}});
-  function jump(x){if(x==='search'){document.getElementById('q')?.focus();document.getElementById('q')?.scrollIntoView({behavior:'smooth',block:'center'})}else if(x==='trending'){const b=document.querySelector('#ryuzaSmartbar [data-mode="TRENDING"]');b?.click();document.getElementById('ryuzaTrendingSec')?.scrollIntoView({behavior:'smooth',block:'start'})}else if(x==='list'){const b=document.querySelector('#ryuzaSmartbar [data-mode="ALL"]');b?.click();document.getElementById('list')?.scrollIntoView({behavior:'smooth',block:'start'})}else window.scrollTo({top:0,behavior:'smooth'})}
+  function jump(x){if(x==='search'){document.getElementById('q')?.focus();document.getElementById('q')?.scrollIntoView({behavior:'smooth',block:'center'})}else if(x==='list'){const b=document.querySelector('#ryuzaSmartbar [data-mode="ALL"]');b?.click();document.getElementById('list')?.scrollIntoView({behavior:'smooth',block:'start'})}else window.scrollTo({top:0,behavior:'smooth'})}
   function showMaintenance(){let a=document.getElementById('ryuzaAnnouncement');if(a){a.querySelector('span').textContent='Website sedang dalam maintenance. Beberapa fitur mungkin sementara tidak tersedia.';a.classList.add('show')}}
   wait();
 })();
@@ -1597,44 +1586,6 @@ html.ryuza-chrome-block #ryuzaChromeGate{display:flex!important}
 const q=document.getElementById('q'),x=document.getElementById('x'),c=document.getElementById('count'),e=document.getElementById('empty');
 function search(){const cards=[...document.querySelectorAll('.skin')];let v=q.value.toLowerCase().trim(),n=0;cards.forEach(a=>{let ok=!v||String(a.dataset.search||'').includes(v);a.style.display=ok?'block':'none';if(ok)n++});x.style.display=v?'block':'none';c.textContent=v?n+' skin ditemukan':cards.length+' skin tersedia';e.style.display=n?'none':'block'}
 q.oninput=search;x.onclick=()=>{q.value='';q.focus();search()};search();
-
-/* Statistik pencarian & download Ryuza */
-(function(){
-  const CFG={authDomain:'ryuza-official.firebaseapp.com',databaseURL:'https://ryuza-official-default-rtdb.firebaseio.com',projectId:'ryuza-official'};
-  if(!window.firebase)return;
-  let app;
-  try{app=firebase.app('ryuza-stats');}catch(e){try{app=firebase.initializeApp(CFG,'ryuza-stats')}catch(err){console.warn('[Ryuza Stats] Firebase gagal',err);return;}}
-  const db=app.database();
-  const clean=s=>String(s||'').toLowerCase().trim().replace(/\s+/g,' ');
-  const key=s=>encodeURIComponent(clean(s)).replace(/\./g,'%2E');
-  const trackSearch=()=>{
-    const term=clean(q?.value||'');
-    if(term.length<2)return;
-    const now=Date.now();
-    if(window.__ryuzaSearchLast && window.__ryuzaSearchLast.term===term && now-window.__ryuzaSearchLast.at<1200)return;
-    window.__ryuzaSearchLast={term,at:now};
-    const ref=db.ref('searchStats/queries/'+key(term));
-    ref.transaction(v=>{v=v&&typeof v==='object'?v:{count:0,term};return {...v,term,count:Number(v.count||0)+1,lastAt:Date.now()}}).catch(()=>{});
-       try{window.ryuzaLogActivity?.('SEARCH','Pencarian',term)}catch(e){}
-  };
-  q?.addEventListener('keydown',e=>{if(e.key==='Enter')trackSearch()});
-  let searchInputTimer; q?.addEventListener('input',()=>{clearTimeout(searchInputTimer);searchInputTimer=setTimeout(trackSearch,900)});
-  document.addEventListener('click',e=>{
-    const btn=e.target.closest?.('.replace-download');
-    if(!btn)return;
-    const card=btn.closest('.skin');
-    if(!card)return;
-    const id=card.getAttribute('data-rtdb-id')||'';
-    const title=(card.querySelector('.hero-title-text')?.textContent||card.querySelector('.title')?.textContent||id).trim();
-    if(!id)return;
-    const ref=db.ref('downloadStats/'+id);
-    ref.transaction(v=>{v=v&&typeof v==='object'?v:{};return {...v,title,count:Number(v.count||0)+1,lastAt:Date.now()}}).catch(()=>{});
-    const sel=card.querySelector('.replace-select'),opt=sel?.options?.[sel.selectedIndex],label=(opt?.dataset?.label||opt?.textContent||'Default').trim();
-    const optionRef=db.ref('downloadStatsByOption/'+id+'/'+key(label));
-    optionRef.transaction(v=>{v=v&&typeof v==='object'?v:{};return {...v,label,count:Number(v.count||0)+1,lastAt:Date.now()}}).catch(()=>{});
-    try{window.ryuzaLogActivity?.('DOWNLOAD',title,label)}catch(e){}
-  },true);
-})();
 
 // Rapikan nama hero/skin agar konsisten dan mudah dibaca.
 (function cleanSkinNames(){
@@ -1985,85 +1936,7 @@ document.querySelectorAll('.replace-dropdown').forEach(function(box){
  select.addEventListener('change',update); update();
 });
 </script>
-<script>
-/* ===== LIVE ACTIVITY pengunjung realtime ===== */
-(function(){
-  const CFG={authDomain:'ryuza-official.firebaseapp.com',databaseURL:'https://ryuza-official-default-rtdb.firebaseio.com',projectId:'ryuza-official'};
-  function get(k){try{return localStorage.getItem(k)||''}catch(e){return ''}}
-  function clean(v){return String(v||'').replace(/\s+/g,' ').trim().slice(0,120)}
-  let db=null;
-  try{if(window.firebase){let app;try{app=firebase.app('ryuza-activity')}catch(e){app=firebase.initializeApp(CFG,'ryuza-activity')}db=app.database()}}catch(e){console.warn('[Ryuza Activity] Firebase gagal',e)}
-  window.ryuzaLogActivity=function(type,title,detail){if(!db)return;const visitorId=get('ryuzaVisitorId'),name=clean(get('ryuzaVisitorName'))||'Pengunjung';if(!visitorId)return;db.ref('searchStats/activityLog').push().set({visitorId,name,type:clean(type)||'ACTIVITY',title:clean(title)||'-',detail:clean(detail)||'',at:firebase.database.ServerValue.TIMESTAMP}).catch(()=>{})};
-})();
 
-/* Statistik klik global melalui Firebase Realtime Database. */
-const RTDB_URL = 'https://ryuza-official-default-rtdb.firebaseio.com';
-const numberFormat = n => Number(n || 0).toLocaleString('id-ID');
-function stableKey(card, label) {
-  const title = card.querySelector('.title')?.textContent.trim() || 'skin';
-  return (title + '-' + label).toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '')
-    .replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '').slice(0, 140);
-}
-function getCountElement(btn) {
-  let el = btn.nextElementSibling;
-  if (!el || !el.classList.contains('link-click-count')) {
-    el = document.createElement('div'); el.className = 'link-click-count loading';
-    el.textContent = '👁️ Memuat klik...'; btn.insertAdjacentElement('afterend', el);
-  }
-  return el;
-}
-/* Penghitung klik Firebase: delegated listeners mendukung kartu yang dirender dinamis.
-   transaction() mencegah dua klik bersamaan saling menimpa hitungan. */
-let ryuzaClickDb = null;
-function getClickDb(){
-  if(ryuzaClickDb)return ryuzaClickDb;
-  if(!window.firebase || !firebase.database)throw new Error('Firebase Database SDK belum dimuat');
-  const cfg={authDomain:'ryuza-official.firebaseapp.com',databaseURL:RTDB_URL,projectId:'ryuza-official'};
-  let app;try{app=firebase.app('ryuza-click-counter')}catch(e){app=firebase.initializeApp(cfg,'ryuza-click-counter')}
-  ryuzaClickDb=app.database();return ryuzaClickDb;
-}
-async function showCount(btn) {
-  if(!btn)return;
-  const card = btn.closest('.skin'); if (!card) return;
-  const select = card.querySelector('.replace-select');
-  const label = select ? (select.options[select.selectedIndex]?.dataset.label || select.value) : 'download';
-  const key = stableKey(card, label), el = getCountElement(btn); el.dataset.key = key;
-  try {
-    const snap=await getClickDb().ref('linkClicks/'+key).once('value');
-    if(el.dataset.key!==key)return;
-    el.classList.remove('loading'); el.innerHTML = `👁️ <strong>${numberFormat(snap.val()?.count)} klik</strong>`;
-  } catch (err) {
-    console.error('Gagal memuat statistik:', err); el.classList.remove('loading');
-    el.innerHTML = '👁️ <strong>Statistik tidak tersedia</strong>';
-  }
-}
-async function incrementCount(key) {
-  const ref=getClickDb().ref('linkClicks/'+key);
-  const result=await ref.transaction(old=>({...((old&&typeof old==='object')?old:{}),count:Number(old?.count||0)+1,updatedAt:firebase.database.ServerValue.TIMESTAMP}));
-  if(!result.committed)throw new Error('Hitungan klik tidak tersimpan');
-  return Number(result.snapshot.val()?.count||0);
-}
-function initRyuzaClickCounters(root=document){
-  root.querySelectorAll?.('.replace-dropdown .replace-download').forEach(btn=>showCount(btn));
-}
-document.addEventListener('change',e=>{if(e.target.matches('.replace-select'))showCount(e.target.closest('.replace-dropdown')?.querySelector('.replace-download'))});
-document.addEventListener('click',async event=>{
-  const btn=event.target.closest?.('.replace-dropdown .replace-download');
-  if(!btn)return;
-  const card=btn.closest('.skin'); if(!card)return;
-  const select=card.querySelector('.replace-select');
-  const label=select?(select.options[select.selectedIndex]?.dataset.label||select.value):'download';
-  const key=stableKey(card,label),destination=btn.href;
-  event.preventDefault();
-  // Buka tab secara sinkron pada event pengguna agar tidak terblokir popup blocker.
-  if(destination)window.open(destination,'_blank','noopener,noreferrer');
-  const el=getCountElement(btn);el.classList.add('loading');
-  try{const count=await incrementCount(key);el.dataset.key=key;el.classList.remove('loading');el.innerHTML=`👁️ <strong>${numberFormat(count)} klik</strong>`}
-  catch(err){console.error('Gagal menyimpan klik:',err);el.classList.remove('loading');el.innerHTML='👁️ <strong>Klik belum tersimpan</strong>'}
-});
-initRyuzaClickCounters();
-if(window.MutationObserver){const clickCounterObserver=new MutationObserver(records=>records.forEach(r=>r.addedNodes.forEach(n=>{if(n.nodeType===1)initRyuzaClickCounters(n)})));clickCounterObserver.observe(document.getElementById('list')||document.body,{childList:true,subtree:true});}
-</script>
 <style id="ryuza-banner-style">.ryuza-banner{position:relative;overflow:hidden;margin:18px 0 20px;border:1px solid #29364b;border-radius:18px;background:#0c1422;aspect-ratio:16/6;min-height:180px;max-height:390px;box-shadow:0 14px 36px rgba(0,0,0,.25)}.ryuza-slides,.ryuza-slide{position:absolute;inset:0}.ryuza-slide{opacity:0;transition:opacity .65s ease;pointer-events:none}.ryuza-slide.active{opacity:1}.ryuza-slide img{width:100%;height:100%;object-fit:cover;object-position:center 35%;display:block}.ryuza-slide-shade{position:absolute;inset:0;background:linear-gradient(90deg,rgba(5,10,20,.84),rgba(5,10,20,.24) 75%),linear-gradient(0deg,rgba(5,10,20,.45),transparent 55%)}.ryuza-slide-caption{position:absolute;left:clamp(18px,5%,54px);bottom:clamp(24px,8%,48px);color:#fff;max-width:75%;text-shadow:0 2px 12px #000}.ryuza-slide-caption span{font-size:clamp(9px,1.2vw,12px);font-weight:800;letter-spacing:2px;color:#8edbff}.ryuza-slide-caption h2{font-size:clamp(20px,4vw,42px);line-height:1.1;margin:8px 0 0;font-weight:900}.ryuza-arrow{position:absolute;top:50%;transform:translateY(-50%);z-index:3;width:38px;height:38px;border:1px solid #ffffff55;border-radius:50%;background:#08111dcc;color:#fff;font-size:27px;line-height:1;cursor:pointer;backdrop-filter:none;}.ryuza-arrow.prev{left:12px}.ryuza-arrow.next{right:12px}.ryuza-dots{position:absolute;z-index:3;bottom:14px;right:20px;display:flex;gap:7px}.ryuza-dot{width:8px;height:8px;border:0;border-radius:99px;background:#ffffff88;padding:0;cursor:pointer;transition:width .2s,background .2s}.ryuza-dot.active{width:23px;background:#69c9ff}@media(max-width:600px){.ryuza-banner{aspect-ratio:4/3;min-height:190px;border-radius:14px;margin:14px 0}.ryuza-slide img{object-position:center}.ryuza-slide-caption{max-width:78%;bottom:35px}.ryuza-arrow{width:32px;height:32px;font-size:23px}.ryuza-dots{bottom:12px;right:14px}}@media(prefers-reduced-motion:reduce){.ryuza-slide,.ryuza-dot{transition:none}}</style>
 <script id="ryuza-banner-script">(()=>{const root=document.querySelector('.ryuza-banner');if(!root)return;const slides=[...root.querySelectorAll('.ryuza-slide')],dots=root.querySelector('.ryuza-dots');let index=0,timer;slides.forEach((_,i)=>{const b=document.createElement('button');b.type='button';b.className='ryuza-dot'+(i===0?' active':'');b.setAttribute('aria-label','Tampilkan banner '+(i+1));b.addEventListener('click',()=>show(i,true));dots.appendChild(b)});const buttons=[...dots.children];function show(n,manual=false){index=(n+slides.length)%slides.length;slides.forEach((s,i)=>{s.classList.toggle('active',i===index);s.setAttribute('aria-hidden',i!==index?'true':'false')});buttons.forEach((b,i)=>{b.classList.toggle('active',i===index);b.setAttribute('aria-current',i===index?'true':'false')});if(manual)restart()}function restart(){clearInterval(timer);timer=setInterval(()=>show(index+1),5000)}root.querySelector('.prev').addEventListener('click',()=>show(index-1,true));root.querySelector('.next').addEventListener('click',()=>show(index+1,true));root.addEventListener('mouseenter',()=>clearInterval(timer));root.addEventListener('mouseleave',restart);show(0);restart()})();</script>
 <script id="ryuza-banner-fallback">
@@ -2089,35 +1962,7 @@ if(window.MutationObserver){const clickCounterObserver=new MutationObserver(reco
   });
 })();
 </script>
-<script>
-/* ===== LIVE ACTIVITY FIX - aktif setelah Firebase siap ===== */
-(function(){
-  const CFG={authDomain:'ryuza-official.firebaseapp.com',databaseURL:'https://ryuza-official-default-rtdb.firebaseio.com',projectId:'ryuza-official'};
-  const get=k=>{try{return localStorage.getItem(k)||''}catch(e){return ''}};
-  const clean=v=>String(v||'').replace(/\s+/g,' ').trim().slice(0,160);
-  function init(){
-    try{
-      let app;
-      try{app=firebase.app('ryuza-activity-fixed')}catch(e){app=firebase.initializeApp(CFG,'ryuza-activity-fixed')}
-      const db=app.database();
-      window.ryuzaLogActivity=function(type,title,detail){
-        const visitorId=get('ryuzaVisitorId'),name=clean(get('ryuzaVisitorName'))||'Pengunjung';
-        if(!visitorId)return Promise.resolve();
-        const data={visitorId,name,type:clean(type)||'ACTIVITY',title:clean(title)||'-',detail:clean(detail)||'',at:firebase.database.ServerValue.TIMESTAMP};
-        return db.ref('searchStats/activityLog').push(data).catch(err=>console.warn('[Ryuza Activity] gagal:',err));
-      };
-      window.ryuzaSyncVisitorName=function(){
-        const visitorId=get('ryuzaVisitorId'),name=clean(get('ryuzaVisitorName'));
-        if(!visitorId||!name)return;
-        db.ref('searchStats/visitors/'+visitorId).update({visitorId,name,lastSeen:firebase.database.ServerValue.TIMESTAMP}).catch(()=>{});
-      };
-      window.ryuzaSyncVisitorName();
-      console.log('[Ryuza Activity] aktif');
-    }catch(e){console.warn('[Ryuza Activity] init gagal',e);setTimeout(init,1000)}
-  }
-  if(window.firebase)init();else setTimeout(init,500);
-})();
-</script>
+
 <script>
 /* ===== Admin realtime reset semua subscribe ===== */
 (function(){
@@ -2321,49 +2166,7 @@ if(window.MutationObserver){const clickCounterObserver=new MutationObserver(reco
 
 <div id="ryuzaWelcome" role="status" aria-live="polite"><span class="ryuzaWelcomeIcon">👋</span><div class="ryuzaWelcomeText"><b id="ryuzaWelcomeTitle">Selamat datang!</b><span>Senang melihat kamu kembali di Ryuza Official.</span></div></div>
 <div id="recalList" aria-label="Skin Recal"></div>
-<script id="ryuza-stats-fixed">
-/* Statistik Ryuza — versi stabil, dijalankan setelah Firebase tersedia. */
-(function(){
-  const CFG={authDomain:'ryuza-official.firebaseapp.com',databaseURL:'https://ryuza-official-default-rtdb.firebaseio.com',projectId:'ryuza-official'};
-  if(!window.firebase)return;
-  let app;
-  try{app=firebase.app('ryuza-stats-fixed')}catch(e){try{app=firebase.initializeApp(CFG,'ryuza-stats-fixed')}catch(err){console.warn('[Ryuza Stats] init gagal',err);return;}}
-  const db=app.database();
-  const clean=s=>String(s||'').toLowerCase().trim().replace(/\s+/g,' ');
-  const key=s=>encodeURIComponent(clean(s)).replace(/\./g,'%2E');
-  const trackSearch=()=>{
-    const term=clean(document.getElementById('q')?.value||'');
-    if(term.length<2)return;
-    const now=Date.now();
-    if(window.__ryuzaSearchLast && window.__ryuzaSearchLast.term===term && now-window.__ryuzaSearchLast.at<1200)return;
-    window.__ryuzaSearchLast={term,at:now};
-    db.ref('searchStats/queries/'+key(term)).transaction(v=>{
-      v=v&&typeof v==='object'?v:{count:0};
-      return {...v,term,count:Number(v.count||0)+1,lastAt:Date.now()};
-    }).catch(err=>console.warn('[Ryuza Stats] search gagal',err));
-  };
-  document.getElementById('q')?.addEventListener('keydown',e=>{if(e.key==='Enter')trackSearch()});
-  let searchInputTimerFixed; document.getElementById('q')?.addEventListener('input',()=>{clearTimeout(searchInputTimerFixed);searchInputTimerFixed=setTimeout(trackSearch,900)});
-  document.addEventListener('click',e=>{
-    const btn=e.target.closest?.('.replace-download'); if(!btn)return;
-    const card=btn.closest('.skin'); if(!card)return;
-    const id=card.getAttribute('data-rtdb-id')||'';
-    const title=(card.querySelector('.hero-title-text')?.textContent||card.querySelector('.title')?.textContent||id).trim();
-    if(!id)return;
-    db.ref('downloadStats/'+id).transaction(v=>{
-      v=v&&typeof v==='object'?v:{};
-      return {...v,id,title,count:Number(v.count||0)+1,lastAt:Date.now()};
-    }).catch(err=>console.warn('[Ryuza Stats] download gagal',err));
-    const sel=card.querySelector('.replace-select'),opt=sel?.options?.[sel.selectedIndex];
-    const label=(opt?.dataset?.label||opt?.textContent||'Default').trim();
-    db.ref('downloadStatsByOption/'+id+'/'+key(label)).transaction(v=>{
-      v=v&&typeof v==='object'?v:{};
-      return {...v,id,title,label,count:Number(v.count||0)+1,lastAt:Date.now()};
-    }).catch(()=>{});
-  },true);
-  console.log('[Ryuza Stats] pencarian & download aktif');
-})();
-</script>
+
 <!-- RYUZA ADVANCED SKIN BADGES --><style>
 .ryuza-skin-badges{position:absolute;top:10px;right:10px;z-index:4;display:flex;gap:5px;flex-wrap:wrap;justify-content:flex-end}.ryuza-skin-badge{font-size:10px;font-weight:900;padding:5px 8px;border-radius:999px;background:#10283b;border:1px solid #315878;box-shadow:0 4px 12px #0005}.ryuza-skin-badge.featured{background:#3a2b0b;border-color:#9b7a25;color:#ffd86b}.ryuza-skin-badge.new{background:#0b3a29;border-color:#24845c;color:#75f0a5}.skin{position:relative}
 </style><script>
@@ -2376,59 +2179,7 @@ if(window.MutationObserver){const clickCounterObserver=new MutationObserver(reco
  start();
 })();
 </script><!-- RYUZA_ACTIVITY_FINAL -->
-<script>
-(function(){
-  if(window.__ryuzaActivityFinal)return; window.__ryuzaActivityFinal=true;
-  const CFG={authDomain:'ryuza-official.firebaseapp.com',databaseURL:'https://ryuza-official-default-rtdb.firebaseio.com',projectId:'ryuza-official'};
-  const get=k=>{try{return localStorage.getItem(k)||''}catch(e){return ''}};
-  const clean=(v,n=160)=>String(v||'').replace(/\s+/g,' ').trim().slice(0,n);
-  let db=null;
-  function start(){
-    try{
-      if(!window.firebase || !firebase.database) return setTimeout(start,500);
-      let app;
-      try{app=firebase.app('ryuza-live-activity')}catch(e){app=firebase.initializeApp(CFG,'ryuza-live-activity')}
-      db=app.database();
-      window.ryuzaLogActivity=function(type,title,detail){
-        const visitorId=get('ryuzaVisitorId');
-        const name=clean(get('ryuzaVisitorName'),40)||'Pengunjung';
-        if(!visitorId)return;
-        return db.ref('searchStats/activityLog').push({
-          visitorId,name,type:clean(type,30),title:clean(title),detail:clean(detail,160),
-          at:firebase.database.ServerValue.TIMESTAMP
-        }).catch(err=>console.warn('[Ryuza Activity]',err));
-      };
-      // Simpan/update nama pengunjung juga.
-      const visitorId=get('ryuzaVisitorId'), name=clean(get('ryuzaVisitorName'),40);
-      if(visitorId && name) db.ref('searchStats/visitors/'+visitorId).update({visitorId,name,lastSeen:firebase.database.ServerValue.TIMESTAMP}).catch(()=>{});
 
-      // Pencarian: hanya saat Enter dan minimal 2 karakter.
-      const q=document.getElementById('q');
-      q?.addEventListener('keydown',function(e){
-        if(e.key==='Enter'){
-          const term=clean(q.value,100);
-          if(term.length>=2) window.ryuzaLogActivity('SEARCH','Pencarian',term);
-        }
-      });
-
-      // Download: event capture supaya tetap tertangkap walau elemen berubah.
-      document.addEventListener('click',function(e){
-        const btn=e.target.closest?.('.replace-download');
-        if(!btn)return;
-        const card=btn.closest('.skin');
-        if(!card)return;
-        const title=clean(card.querySelector('.hero-title-text')?.textContent || card.querySelector('.title')?.textContent || card.dataset.rtdbId || 'Skin');
-        const sel=card.querySelector('.replace-select');
-        const opt=sel?.options?.[sel.selectedIndex];
-        const label=clean(opt?.dataset?.label || opt?.textContent || 'Default',80);
-        window.ryuzaLogActivity('DOWNLOAD',title,label);
-      },true);
-      console.log('[Ryuza Activity] FINAL aktif');
-    }catch(err){console.warn('[Ryuza Activity] init error',err);setTimeout(start,1000)}
-  }
-  start();
-})();
-</script>
 
 
 
