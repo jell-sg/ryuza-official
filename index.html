@@ -2986,32 +2986,49 @@ document.querySelectorAll('.replace-dropdown').forEach(function(box){
   function getConfiguredImage(card){
     try{
       const skins=(window.__RYUZA_STATIC_CONFIG__||{}).skins||{};
-      const normKey=s=>String(s||'').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/[^a-z0-9]/g,'');
-      const id=card.getAttribute('data-rtdb-id')||card.getAttribute('data-id')||'';
-      const title=norm(card.querySelector('.hero-title-text')?.textContent||card.querySelector('.title')?.textContent||'');
-      const hero=cardHero(card);
-      let item=id&&skins[id]?skins[id]:null;
-      if(!item){
-        const entries=Object.entries(skins), candidates=[title,hero].map(normKey).filter(Boolean);
-        item=entries.find(([key,x])=>candidates.includes(normKey(key))||candidates.includes(normKey(x?.title))||candidates.includes(normKey(x?.name))||candidates.includes(normKey(x?.hero)))?.[1]||null;
+      const normKey=v=>String(v||'').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/[^a-z0-9]/g,'');
+      const title=normKey(card.querySelector('.hero-title-text')?.textContent||card.querySelector('.title')?.textContent||'');
+      const hero=normKey(cardHero(card));
+      const id=normKey(card.getAttribute('data-rtdb-id')||card.getAttribute('data-id')||'');
+      let item=null;
+      for(const [key,x] of Object.entries(skins)){
+        if(!x||typeof x!=='object')continue;
+        const k=normKey(key), xid=normKey(x.id), xt=normKey(x.title), xh=normKey(x.hero);
+        if((id&&(id===k||id===xid))||(title&&(title===xt||title===k))||(hero&&(hero===xh||hero===xt||hero===k))||
+           (title&&xt&&(title.includes(xt)||xt.includes(title)))){
+          item=x; if((id&&(id===k||id===xid))||(title&&(title===xt||title===k)))break;
+        }
       }
-      return safeUrl(item?.imageUrl||item?.backgroundImage||item?.cardBackground||item?.backgroundUrl||item?.bannerImage||'');
+      if(!item)return '';
+      return safeUrl(item.imageUrl||item.backgroundImage||item.cardBackground||item.backgroundUrl||item.bannerImage||item.image||item.background||'');
     }catch(_){return '';}
   }
   async function decorate(card, force){
     if(!card||card.dataset.rzHeroBgLoading==='1')return;
-    if(card.classList.contains('hero-bg-ready')&&!force)return;
     const customUrl=getConfiguredImage(card);
     if(customUrl){
-      card.style.setProperty('--rz-hero-bg','url("'+customUrl.replace(/["\\]/g,'')+'")');
-      card.classList.add('hero-bg-ready');card.dataset.rzHeroBgLoading='0';return;
+      card.dataset.rzHeroBgLoading='1';
+      const ok=await imageLoads(customUrl);
+      if(card.isConnected&&ok){
+        card.style.setProperty('--rz-hero-bg','url("'+customUrl.replace(/["\\]/g,'')+'")');
+        card.classList.add('hero-bg-ready');
+      }else if(card.isConnected){
+        card.style.removeProperty('--rz-hero-bg');
+        card.classList.remove('hero-bg-ready');
+        card.dataset.rzHeroBgError='true';
+        console.warn('[Ryuza] Background image gagal dimuat:',customUrl);
+      }
+      card.dataset.rzHeroBgLoading='0';
+      return;
     }
+    if(card.classList.contains('hero-bg-ready')&&!force)return;
     if(force){card.style.removeProperty('--rz-hero-bg');card.classList.remove('hero-bg-ready');}
     const name=cardHero(card);if(!name)return;
     card.dataset.rzHeroBgLoading='1';
     const url=await lookup(name);
     if(url&&card.isConnected&&!getConfiguredImage(card)){
-      card.style.setProperty('--rz-hero-bg','url("'+url.replace(/["\\]/g,'')+'")');card.classList.add('hero-bg-ready');
+      card.style.setProperty('--rz-hero-bg','url("'+url.replace(/["\\]/g,'')+'")');
+      card.classList.add('hero-bg-ready');
     }
     card.dataset.rzHeroBgLoading='0';
   }
