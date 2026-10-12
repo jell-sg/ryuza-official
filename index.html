@@ -1223,6 +1223,227 @@ button,a{-webkit-tap-highlight-color:transparent}
 @media(prefers-reduced-motion:reduce){#list .card.skin::after,#recalList .card.skin::after{transition:none;}}
 </style>
 
+
+<style id="ryuza-kaijich-style">
+/* Card redesign inspired by the supplied reference screenshot */
+#list{display:grid!important;grid-template-columns:repeat(3,minmax(0,1fr))!important;gap:24px!important;align-items:stretch!important}
+#list .card.skin{padding:0!important;margin:0!important;overflow:hidden!important;border:1px solid #123f52!important;border-radius:22px!important;background:#101a30!important;box-shadow:0 8px 24px rgba(0,0,0,.24)!important;min-width:0!important}
+#list .card.skin:before{display:none!important}
+#list .card.skin .ryuza-card-art{display:none;width:100%;height:clamp(145px,17vw,235px);background-color:#17243a;background-size:cover;background-position:center;background-repeat:no-repeat;border-bottom:1px solid #1d2c43}
+#list .card.skin .title{min-height:0!important;margin:0!important;padding:22px 17px 12px!important;border:0!important;text-align:center!important;font-family:Georgia,'Times New Roman',serif!important;font-size:clamp(17px,1.5vw,25px)!important;font-weight:900!important;line-height:1.25!important;letter-spacing:1px!important;text-transform:uppercase!important;color:#eaf7ff!important}
+#list .card.skin .hero-title{justify-content:center!important;flex-wrap:wrap!important}
+#list .card.skin .hero-icon-link{display:none!important}
+#list .card.skin .hero-title-text{font-family:Georgia,'Times New Roman',serif!important;font-size:inherit!important;color:#eaf7ff!important;text-align:center!important}
+#list .card.skin .title:after{content:"";display:block;width:58%;height:1px;margin:14px auto 0;background:linear-gradient(90deg,transparent,#00d9f5,transparent)}
+#list .card.skin .replace-dropdown{margin:0!important;padding:10px 20px 20px!important;border:0!important;background:transparent!important}
+#list .card.skin .replace-dropdown label{color:#8493a9!important;font-size:12px!important}
+#list .card.skin .replace-select{background:#102a3a!important;border:1px solid #15566b!important;border-radius:999px!important;color:#16e4f6!important}
+#list .card.skin .replace-download{display:flex!important;align-items:center;justify-content:center;min-height:52px!important;margin-top:13px!important;border-radius:13px!important;background:linear-gradient(110deg,#4ba8ff,#6410ff)!important;box-shadow:none!important;color:white!important;font-size:15px!important}
+#list .card.skin .card-report-btn{border-radius:11px!important}
+#list .card.skin .ryuza-card-meta{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:13px 0 14px;margin:2px 0 10px;border-top:1px solid #263147;color:#8794a8;font-size:12px}
+#list .card.skin .ryuza-card-meta b{font-weight:500}
+#list .card.skin .new-badge,#list .card.skin .new-upload-badge{font-family:Arial,sans-serif}
+@media(max-width:900px){#list{grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:14px!important}}
+@media(max-width:560px){#list{grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:10px!important}#list .card.skin .ryuza-card-art{height:120px}#list .card.skin .title{padding:14px 9px 8px!important;font-size:15px!important;letter-spacing:.4px!important}#list .card.skin .replace-dropdown{padding:8px 10px 12px!important}#list .card.skin .ryuza-card-meta{font-size:10px;gap:4px}#list .card.skin .replace-download{font-size:12px!important;min-height:42px!important}#list .card.skin .replace-select{font-size:11px!important}}
+</style>
+
+<style id="ryuza-kaijich-card-final">
+/* Card cleanup: wider image-led cards, centered title, no view/download counters */
+#list{
+  width:100%!important;max-width:1240px!important;margin:18px auto 28px!important;
+  display:grid!important;grid-template-columns:repeat(3,minmax(0,1fr))!important;
+  gap:22px!important;align-items:stretch!important;
+}
+#list .card.skin{
+  width:100%!important;min-width:0!important;max-width:none!important;
+  padding:0!important;overflow:hidden!important;border-radius:21px!important;
+  border:1px solid #17465a!important;
+  background:linear-gradient(155deg,#111c31,#0d1527 70%,#101827)!important;
+  box-shadow:0 10px 28px rgba(0,0,0,.24)!important;
+}
+#list .card.skin:before{display:none!important}
+#list .card.skin .ryuza-card-art{
+  display:block;width:100%;height:clamp(150px,17vw,235px);min-height:150px;
+  background-size:cover!important;background-position:center!important;
+  border-radius:0!important;position:relative;
+}
+#list .card.skin .title{
+  text-align:center!important;display:block!important;
+  font-family:Georgia,"Times New Roman",serif!important;
+  font-size:clamp(17px,1.5vw,23px)!important;line-height:1.3!important;
+  letter-spacing:1px!important;text-transform:uppercase;
+  min-height:0!important;margin:0!important;padding:20px 16px 15px!important;
+  border-bottom:0!important;color:#eef8ff!important;
+}
+#list .card.skin .hero-title{justify-content:center!important;flex-wrap:wrap}
+#list .card.skin .hero-title-text{text-align:center!important}
+#list .card.skin .new-upload-badge{margin:0 auto 12px!important}
+#list .card.skin .ryuza-card-meta,
+#list .card.skin .ryuza-mini,
+#list .card.skin .ryuza-card-stats{display:none!important}
+#list .card.skin .replace-dropdown{
+  margin:0 18px 14px!important;padding:13px!important;
+  border:1px solid #1c3b53!important;border-radius:14px!important;
+  background:rgba(6,13,25,.5)!important;
+}
+#list .card.skin .replace-dropdown label{display:block;margin-bottom:8px!important}
+#list .card.skin .replace-select{min-height:44px!important;border-radius:12px!important}
+#list .card.skin .replace-download{
+  margin:0 18px 10px!important;width:calc(100% - 36px)!important;
+  min-height:52px!important;border-radius:13px!important;
+  display:flex!important;align-items:center!important;justify-content:center!important;
+  text-align:center!important;white-space:normal!important;overflow-wrap:anywhere;
+  font-size:14px!important;line-height:1.25!important;
+}
+#list .card.skin .card-report-btn{width:calc(100% - 36px)!important;margin:0 18px 18px!important}
+@media(min-width:1000px){#list .card.skin .replace-dropdown{margin-top:0!important}}
+@media(max-width:900px){
+ #list{grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:14px!important}
+ #list .card.skin .ryuza-card-art{height:clamp(145px,28vw,210px)}
+}
+@media(max-width:520px){
+ #list{grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:10px!important}
+ #list .card.skin{border-radius:15px!important}
+ #list .card.skin .ryuza-card-art{height:clamp(105px,34vw,160px);min-height:105px}
+ #list .card.skin .title{font-size:15px!important;letter-spacing:.4px!important;padding:13px 9px 10px!important}
+ #list .card.skin .replace-dropdown{margin:0 9px 9px!important;padding:9px!important}
+ #list .card.skin .replace-dropdown label{font-size:11px!important}
+ #list .card.skin .replace-select{min-height:38px!important;padding:8px!important;font-size:12px!important}
+ #list .card.skin .replace-download{width:calc(100% - 18px)!important;margin:0 9px 8px!important;min-height:43px!important;font-size:11px!important;padding:9px!important}
+ #list .card.skin .card-report-btn{width:calc(100% - 18px)!important;margin:0 9px 10px!important;min-height:35px!important;padding:8px!important;font-size:10px!important}
+}
+</style>
+
+
+<style id="ryuza-top-ui-total-redesign">
+/* Ryuza Official — top section complete visual refresh */
+:root{--top-bg:#090d16;--top-panel:#111a2a;--top-line:#263953;--top-blue:#398bff;--top-cyan:#28d8e8;--top-purple:#7c35ff}
+body{background:radial-gradient(ellipse at 50% 0%,rgba(35,103,190,.17),transparent 38%),#090d16!important}
+.container{width:min(1160px,100%)!important;max-width:1160px!important;margin-inline:auto!important}
+.ryuza-banner{width:100%!important;max-width:100%!important;aspect-ratio:16/5.2!important;min-height:220px!important;max-height:410px!important;margin:18px auto 16px!important;border:1px solid #314c70!important;border-radius:22px!important;box-shadow:0 22px 60px #0007,0 0 30px #168cff12!important}
+.ryuza-slide-caption{left:clamp(20px,4vw,52px)!important;bottom:clamp(25px,5vw,45px)!important;max-width:75%!important}
+.header#download{min-height:0!important;margin:0 auto 15px!important;padding:25px 24px!important;text-align:center!important;border:1px solid #293b55!important;border-radius:20px!important;background:linear-gradient(120deg,#121d30,#101521 68%,#19152b)!important;box-shadow:0 12px 35px #0003!important}
+.header#download:after{width:210px!important;height:210px!important;right:-85px!important;top:-95px!important;opacity:.55}
+.header#download h1{font-size:clamp(22px,3vw,34px)!important;line-height:1.2!important;letter-spacing:.4px!important}
+.header#download p{font-size:13px!important;color:#9fb5d0!important;margin:9px auto 0!important}
+.download-tools{max-width:100%!important;margin:0 auto 15px!important;gap:10px!important}
+.download-tool{min-height:44px!important;padding:12px 20px!important;border-radius:12px!important;font-size:12px!important}
+.download-tool.request{background:linear-gradient(120deg,#087db8,#1768b8)!important;border-color:#299be2!important}
+.download-tool.inbox{background:linear-gradient(120deg,#4b2390,#6329a6)!important;border-color:#8455d5!important}
+.search{position:relative!important;top:auto!important;max-width:100%!important;margin:0 auto 15px!important;padding:12px 14px!important;border:1px solid #26374e!important;border-radius:16px!important;background:#111722!important;box-shadow:0 10px 30px #0003!important}
+.search input,#q{min-height:48px!important;border-radius:12px!important;background:#090e17!important;border:1px solid #2b3c54!important;font-size:14px!important;padding:13px 44px!important}
+.search .count{margin-top:8px!important;color:#8295af!important;font-size:11px!important}
+.card.tutorial{width:100%!important;max-width:100%!important;margin:0 auto 15px!important;padding:16px 18px!important;border:1px solid #283951!important;border-radius:16px!important;background:linear-gradient(135deg,#121c2b,#0e1420)!important;box-shadow:0 8px 25px #0002!important}
+.card.tutorial .title{font-size:15px!important;margin:0 0 6px!important;padding:0!important;border:0!important;min-height:0!important}
+.card.tutorial p{font-size:12px!important;color:#9bacc2!important;margin:0 0 12px!important;line-height:1.5!important}
+.card.tutorial .btn{min-height:42px!important;border-radius:11px!important;background:linear-gradient(100deg,#398bff,#7040ff)!important;box-shadow:none!important}
+.site-stats{width:100%!important;max-width:100%!important;display:grid!important;grid-template-columns:repeat(3,minmax(0,1fr))!important;gap:12px!important;margin:0 auto 20px!important}
+.site-stats .stat-card{min-width:0!important;padding:16px!important;border:1px solid #293d58!important;border-radius:15px!important;background:linear-gradient(145deg,#142238,#0e1725)!important;box-shadow:0 8px 22px #0002!important}
+.site-stats .stat-icon{width:38px;height:38px;display:grid;place-items:center;flex:0 0 38px;border-radius:12px;background:#1d3552;font-size:19px!important}
+.site-stats .stat-label{font-size:10px!important;letter-spacing:.8px!important;color:#9cb4d1!important}
+.site-stats .stat-value{font-size:clamp(19px,2vw,25px)!important;overflow-wrap:anywhere;color:#f4f8ff!important}
+.site-stats .stat-sub{font-size:10px!important;color:#7e91aa!important}
+@media(min-width:761px){
+  .container{padding-inline:4px!important}
+  .ryuza-banner{margin-top:22px!important}
+  .card.tutorial{max-width:100%!important}
+}
+@media(max-width:760px){
+  body{padding:10px 12px 35px!important}
+  .container{width:100%!important;max-width:100%!important}
+  .ryuza-banner{aspect-ratio:16/8!important;min-height:165px!important;max-height:260px!important;border-radius:16px!important;margin:8px auto 12px!important}
+  .header#download{padding:19px 14px!important;border-radius:16px!important;margin-bottom:12px!important}
+  .header#download h1{font-size:clamp(19px,5vw,26px)!important}
+  .download-tools{display:grid!important;grid-template-columns:1fr 1fr!important;gap:8px!important}
+  .download-tool{min-width:0!important;width:100%!important;padding:10px 6px!important;font-size:11px!important}
+  .search{padding:10px!important;margin-bottom:12px!important}
+  .search input,#q{font-size:13px!important;min-height:45px!important}
+  .card.tutorial{padding:14px!important;margin-bottom:12px!important}
+  .site-stats{grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:8px!important}
+  .site-stats .stat-card{padding:12px 10px!important;gap:8px!important;border-radius:13px!important}
+  .site-stats .stat-icon{width:31px;height:31px;flex-basis:31px;font-size:16px!important;border-radius:10px}
+  .site-stats .stat-label{font-size:9px!important;letter-spacing:.4px!important}
+  .site-stats .stat-value{font-size:19px!important}
+  .site-stats .stat-sub{font-size:9px!important}
+}
+@media(max-width:380px){
+  .site-stats{grid-template-columns:1fr 1fr!important}
+  .site-stats .stat-card{align-items:flex-start!important}
+  .site-stats .stat-icon{display:none!important}
+}
+</style>
+
+
+<style id="ryuza-kaijich-accurate-v2">
+/* Rebuild the skin cards to match the reference: wide artwork header + navy content body. */
+#list{
+  width:calc(100% - 48px)!important;max-width:1548px!important;margin:28px auto 42px!important;
+  display:grid!important;grid-template-columns:repeat(3,minmax(0,1fr))!important;
+  gap:28px 40px!important;align-items:stretch!important;
+}
+#list .card.skin{
+  position:relative!important;isolation:isolate!important;display:flex!important;flex-direction:column!important;
+  min-width:0!important;width:100%!important;max-width:none!important;min-height:0!important;
+  margin:0!important;padding:230px 26px 26px!important;overflow:hidden!important;
+  border:1px solid #12475c!important;border-radius:22px!important;
+  background:#101a30!important;box-shadow:0 8px 24px rgba(0,0,0,.22)!important;
+}
+/* Art occupies a separate horizontal banner across the full top of each card. */
+#list .card.skin::after{
+  content:""!important;position:absolute!important;z-index:0!important;top:0!important;left:0!important;right:0!important;
+  height:230px!important;pointer-events:none!important;border-bottom:1px solid rgba(0,224,255,.12)!important;
+  background-color:#18253a!important;
+  background-image:linear-gradient(0deg,rgba(16,26,48,.18),rgba(8,12,23,.02)),var(--rz-hero-bg,linear-gradient(135deg,#17263b,#26374d,#111b2d))!important;
+  background-size:cover!important;background-position:center 28%!important;background-repeat:no-repeat!important;
+}
+#list .card.skin .ryuza-card-art{
+  display:block!important;position:absolute!important;z-index:0!important;top:0!important;left:0!important;right:0!important;
+  width:100%!important;height:230px!important;min-height:230px!important;margin:0!important;padding:0!important;
+  border:0!important;border-radius:0!important;background-color:#17243a!important;background-size:cover!important;
+  background-position:center 28%!important;background-repeat:no-repeat!important;
+}
+#list .card.skin > *{position:relative!important;z-index:1!important}
+#list .card.skin .title{
+  min-height:0!important;margin:0!important;padding:20px 0 0!important;border:0!important;text-align:center!important;
+  font-family:Georgia,'Times New Roman',serif!important;font-size:clamp(20px,1.65vw,27px)!important;
+  font-weight:900!important;line-height:1.25!important;letter-spacing:1.1px!important;text-transform:uppercase!important;
+  color:#e8f7ff!important;text-shadow:0 1px 1px rgba(0,0,0,.3)!important;
+}
+#list .card.skin .hero-title{display:flex!important;align-items:center!important;justify-content:center!important;gap:0!important;flex-wrap:wrap!important}
+#list .card.skin .hero-icon-link{display:none!important}
+#list .card.skin .hero-title-text{display:block!important;min-width:0!important;font-family:Georgia,'Times New Roman',serif!important;
+  font-size:inherit!important;font-weight:900!important;line-height:inherit!important;color:#e8f7ff!important;text-align:center!important;overflow-wrap:anywhere!important}
+#list .card.skin .title:after{content:""!important;display:block!important;width:58%!important;height:2px!important;margin:15px auto 0!important;
+  background:linear-gradient(90deg,transparent,#00d9f5 48%,transparent)!important;position:relative!important}
+#list .card.skin .title:before{content:""!important;display:block!important;width:5px!important;height:5px!important;border-radius:50%!important;
+  background:#00e4ff!important;position:absolute!important;left:50%!important;transform:translateX(-50%)!important;margin-top:calc(20px + 1.25em + 15px)!important;z-index:2!important}
+#list .card.skin .ryuza-card-meta{display:flex!important;align-items:center!important;justify-content:space-between!important;gap:10px!important;
+  margin:18px 0 12px!important;padding:14px 0 0!important;border-top:1px solid #263147!important;color:#8997aa!important;font-size:13px!important}
+#list .card.skin .replace-dropdown{margin:0!important;padding:0!important;border:0!important;background:transparent!important}
+#list .card.skin .replace-dropdown label{display:block!important;margin:2px 0 8px!important;color:#b6c5d9!important;font-size:13px!important;font-weight:700!important}
+#list .card.skin .replace-select{display:block!important;width:100%!important;min-height:46px!important;padding:10px 15px!important;border:1px solid #15566b!important;
+  border-radius:999px!important;background:#102a3a!important;color:#00e4f5!important;font-size:14px!important;outline:none!important}
+#list .card.skin .replace-download{display:flex!important;align-items:center!important;justify-content:center!important;width:100%!important;min-height:54px!important;
+  margin-top:14px!important;padding:12px 14px!important;border:0!important;border-radius:13px!important;
+  background:linear-gradient(110deg,#4ba8ff 0%,#654cff 55%,#7000ff 100%)!important;box-shadow:none!important;color:#fff!important;
+  text-align:center!important;font-size:15px!important;font-weight:900!important;line-height:1.2!important;text-decoration:none!important;white-space:normal!important}
+#list .card.skin .card-report-btn{display:flex!important;align-items:center!important;justify-content:center!important;width:100%!important;min-height:42px!important;
+  margin-top:8px!important;border:1px solid rgba(255,77,109,.38)!important;border-radius:11px!important;background:linear-gradient(135deg,#2a1620,#351923)!important;color:#ffb7c3!important;font-size:12px!important}
+#list .card.skin .new-badge,#list .card.skin .new-upload-badge{font-family:Arial,sans-serif!important}
+@media(max-width:1100px){#list{width:calc(100% - 32px)!important;grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:22px!important}#list .card.skin{padding:205px 20px 22px!important}#list .card.skin::after,#list .card.skin .ryuza-card-art{height:205px!important;min-height:205px!important}}
+@media(max-width:600px){#list{width:calc(100% - 20px)!important;grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:12px!important;margin-top:16px!important}#list .card.skin{padding:125px 10px 12px!important;border-radius:15px!important}#list .card.skin::after,#list .card.skin .ryuza-card-art{height:125px!important;min-height:125px!important;background-position:center!important}#list .card.skin .title{padding-top:12px!important;font-size:clamp(13px,3.5vw,17px)!important;letter-spacing:.35px!important}#list .card.skin .title:after{margin-top:10px!important;width:65%!important}#list .card.skin .title:before{display:none!important}#list .card.skin .ryuza-card-meta{font-size:10px!important;gap:4px!important;margin:11px 0 8px!important;padding-top:9px!important}#list .card.skin .replace-dropdown label{font-size:10px!important;margin-bottom:5px!important}#list .card.skin .replace-select{min-height:37px!important;padding:7px 9px!important;font-size:11px!important}#list .card.skin .replace-download{min-height:42px!important;margin-top:8px!important;padding:8px 6px!important;font-size:11px!important;border-radius:10px!important}#list .card.skin .card-report-btn{min-height:34px!important;font-size:10px!important;margin-top:6px!important;border-radius:9px!important}}
+</style>
+
+
+<style id="ryuza-kaijich-card-image-polish">
+/* Kaijich-inspired card polish: wider landscape artwork and balanced content */
+#list .card.skin,#recalList .card.skin{min-width:0;border-radius:22px!important;overflow:hidden!important;background:#101a31!important;border:1px solid #123f55!important;box-shadow:0 10px 28px rgba(0,0,0,.22)!important}
+#list .card.skin::after,#recalList .card.skin::after{background-size:cover,cover,cover!important;background-position:center,center,center 24%!important}
+#list .card.skin.hero-bg-ready::after,#recalList .card.skin.hero-bg-ready::after{background-image:linear-gradient(0deg,rgba(13,22,42,.98) 0%,rgba(13,22,42,.48) 48%,rgba(13,22,42,.08) 100%),linear-gradient(90deg,rgba(13,22,42,.12),rgba(13,22,42,.08)),var(--rz-hero-bg)!important}
+@media(min-width:900px){#list{grid-template-columns:repeat(3,minmax(0,1fr))!important;gap:24px!important}}
+@media(max-width:899px) and (min-width:560px){#list{grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:16px!important}}
+@media(max-width:559px){#list{grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:10px!important}#list .card.skin,#recalList .card.skin{border-radius:16px!important}}
+</style>
 </head><body>
 <style id="ryuza-chrome-gate-style">
 #ryuzaChromeGate{
@@ -2070,6 +2291,19 @@ document.querySelectorAll('.replace-dropdown').forEach(function(box){
     const select=card.querySelector('.replace-select'),btn=card.querySelector('.replace-download');
     if(!select) return false;
     const oldValue=select.value, options=Array.isArray(item.options)?item.options:[];
+    // Card artwork can be supplied from Admin/Firebase background URL fields.
+    const artUrl=String(item.backgroundImage||item.cardBackground||item.backgroundUrl||item.bannerImage||'').trim();
+    let art=card.querySelector('.ryuza-card-art');
+    if(artUrl){
+      if(!art){art=document.createElement('div');art.className='ryuza-card-art';card.insertBefore(art,card.firstChild)}
+      art.style.backgroundImage='linear-gradient(0deg,rgba(8,13,24,.12),rgba(8,13,24,.02)),url("'+artUrl.replace(/["\\]/g,'')+'")';
+      art.style.display='block';
+    }else if(art){art.style.display='none'}
+    let meta=card.querySelector('.ryuza-card-meta');
+    if(!meta){meta=document.createElement('div');meta.className='ryuza-card-meta';meta.innerHTML='<span>◉ <b class="ryuza-views">0</b> Dilihat</span><span>⇩ <b class="ryuza-downloads">0</b> Didownload</span>';const area=card.querySelector('.replace-dropdown');if(area)area.insertBefore(meta,area.firstChild)}
+    const views=Number(item.views||item.viewCount||0), downloads=Number(item.downloads||item.downloadCount||0);
+    meta.querySelector('.ryuza-views').textContent=views.toLocaleString('id-ID');
+    meta.querySelector('.ryuza-downloads').textContent=downloads.toLocaleString('id-ID');
     select.innerHTML='';
     options.forEach((o,i)=>{const opt=document.createElement('option');opt.value=String(o?.url||'');opt.textContent=String(o?.label||('Replace '+(i+1)));opt.dataset.label=opt.textContent;if(o?.selected)opt.selected=true;select.appendChild(opt)});
     if(!options.some(o=>o?.selected)&&oldValue){const found=[...select.options].find(o=>o.value===oldValue);if(found)found.selected=true}
@@ -2723,7 +2957,15 @@ document.querySelectorAll('.replace-dropdown').forEach(function(box){
     if(!card||card.dataset.rzHeroBgLoading==='1'||card.classList.contains('hero-bg-ready'))return;
     const name=cardHero(card);if(!name)return;
     card.dataset.rzHeroBgLoading='1';
-    const url=await lookup(name);
+    let url='';
+    try{
+      const state=window.__RYUZA_STATIC_CONFIG__||{};
+      const skins=state.skins||{};
+      const norm=s=>String(s||'').toLowerCase().replace(/[^a-z0-9]/g,'');
+      const match=Object.values(skins).find(x=>norm(x.title)===norm(name)||norm(x.name)===norm(name));
+      url=safeUrl(match?.imageUrl||match?.backgroundUrl||'');
+    }catch(_){}
+    if(!url)url=await lookup(name);
     if(url&&card.isConnected){card.style.setProperty('--rz-hero-bg','url("'+url.replace(/["\\]/g,'')+'")');card.classList.add('hero-bg-ready');}
     card.dataset.rzHeroBgLoading='0';
   }
