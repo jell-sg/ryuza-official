@@ -157,23 +157,6 @@ input:focus,select:focus,textarea:focus{border-color:#7ba7ff!important;box-shado
 @media(max-width:700px){#fileManager>.card{padding:14px;border-radius:15px}#fileManager .github-grid{grid-template-columns:1fr!important}#fileManager .github-grid input[style*="grid-column"]{grid-column:auto!important}#fileManager .toolbar button,#fileManager .actions button{flex:1 1 100%}#fileManager .badge{white-space:normal}}
 </style>
 
-
-<style id="ryuza-admin-reference-polish">
-/* Keep admin tools intact while matching the reference site's blue neon, compact card language */
-:root{--rz-bg:#070d18;--rz-panel:#0b1930;--rz-line:#17486b;--rz-muted:#8ca9c4;--rz-blue:#19baff}
-html,body{max-width:100%;overflow-x:hidden!important}body{background:radial-gradient(ellipse at 50% -10%,#12325a66,transparent 48%),#070d18!important;color:#edf7ff!important}
-.wrap{width:100%!important;max-width:1500px!important;padding:clamp(10px,2vw,26px)!important;margin-inline:auto!important}
-.nav{background:#071426ee!important;border:1px solid #17486b!important;border-radius:17px!important;box-shadow:0 8px 24px #0003!important}
-.nav button.active{background:linear-gradient(110deg,#159ff2,#721aff)!important;box-shadow:0 0 15px #159ff233!important}
-.card,.stat,.skin,.recal-skin-card{background:linear-gradient(155deg,#0d1d35,#091427)!important;border:1px solid #17486b!important;border-radius:17px!important;box-shadow:0 8px 24px #0003!important}
-.cards{grid-template-columns:repeat(3,minmax(0,1fr))!important;gap:14px!important}
-.skin{min-width:0!important;padding:12px!important}
-.skin-image-field input.imageUrlInput{width:100%!important;min-width:0!important;box-sizing:border-box!important}
-.skin-image-preview{height:150px!important;background-size:cover!important;background-position:center!important;background-color:#0a1b30!important;border:1px solid #17618b!important;border-radius:12px!important;position:relative!important;overflow:hidden!important}
-button{border-radius:11px!important}input,select,textarea{min-width:0!important;max-width:100%!important;box-sizing:border-box!important;background:#07182b!important;border-color:#205273!important}
-@media(max-width:1000px){.cards{grid-template-columns:repeat(2,minmax(0,1fr))!important}.wrap{padding:14px!important}}
-@media(max-width:600px){.wrap{padding:10px!important}.cards{grid-template-columns:minmax(0,1fr)!important;gap:11px!important}.card{padding:13px!important}.nav{position:sticky!important;top:4px!important;overflow-x:auto!important;flex-wrap:nowrap!important}.nav button{flex:0 0 auto!important}.skin{padding:12px!important}.skin-image-preview{height:180px!important}.actions{gap:6px!important;flex-wrap:wrap!important}.actions button{min-height:38px!important}.replace-box .row{grid-template-columns:minmax(0,1fr) 38px!important}.replace-box .row .label,.replace-box .row .url{grid-column:1!important}.replace-box .row .delOpt{grid-column:2!important;grid-row:1/3!important}}
-</style>
 </head>
 </head>
 <body>
@@ -1486,3 +1469,25 @@ $('quickImport').onclick=()=>{$('.tab[data-tab="skins"]').click();$('seedBtn').c
 </script>
 </body>
 </html>
+
+<style id="ryuza-sync-audit-style">
+#ryuzaSyncAudit{position:fixed;right:12px;bottom:12px;z-index:99999;width:min(340px,calc(100vw - 24px));background:#100d1b;color:#f4eaff;border:1px solid #8b5cf6;border-radius:14px;box-shadow:0 0 22px #8b5cf655;padding:12px;font:12px/1.45 Arial,sans-serif}#ryuzaSyncAudit summary{cursor:pointer;font-weight:800;color:#d8b4fe}#ryuzaSyncAudit .audit-status{margin:7px 0;color:#c4b5fd}#ryuzaSyncAudit .audit-list{display:grid;gap:4px}#ryuzaSyncAudit .audit-row{display:flex;justify-content:space-between;gap:8px;border-top:1px solid #ffffff16;padding-top:4px}#ryuzaSyncAudit .ok{color:#86efac}#ryuzaSyncAudit .bad{color:#fda4af}#ryuzaSyncAudit button{background:#7c3aed;color:white;border:0;border-radius:8px;padding:6px 9px;margin-top:8px;cursor:pointer}
+</style>
+<details id="ryuzaSyncAudit" open><summary>🔄 Audit Sinkronisasi Index ↔ Admin</summary><div class="audit-status" id="ryuzaSyncAuditStatus">Memeriksa koneksi Firebase…</div><div class="audit-list" id="ryuzaSyncAuditList"></div><button type="button" id="ryuzaSyncAuditCheck">Periksa sekarang</button><div style="opacity:.7;margin-top:5px">Pemeriksaan otomatis setiap 60 detik. Tidak mengubah atau menghapus data.</div></details>
+<script id="ryuza-sync-audit-script">
+(function(){
+ const $=id=>document.getElementById(id); let db=null, timer=null, busy=false;
+ const paths=['siteConfig/settings','siteConfig/skins','siteConfig/indexFeatures','siteConfig/playlists','siteConfig/recalSkins'];
+ const names={'siteConfig/settings':'Pengaturan index','siteConfig/skins':'Skin & Replace','siteConfig/indexFeatures':'Fitur index','siteConfig/playlists':'Playlist','siteConfig/recalSkins':'Skin Recal'};
+ function row(path,state,detail){return '<div class="audit-row"><span>'+names[path]+'</span><b class="'+(state?'ok':'bad')+'">'+(state?'✓ OK':'⚠ '+detail)+'</b></div>'}
+ async function check(){if(busy)return;busy=true;const status=$('ryuzaSyncAuditStatus'),list=$('ryuzaSyncAuditList');status.textContent='Memeriksa '+new Date().toLocaleTimeString('id-ID')+'…';let html='',failed=0;
+ try{if(!db){if(!window.firebase||!firebase.database)throw Error('Firebase SDK belum siap');let app;try{app=firebase.app('ryuza-sync-audit')}catch(e){app=firebase.initializeApp({authDomain:'ryuza-official.firebaseapp.com',databaseURL:'https://ryuza-official-default-rtdb.firebaseio.com',projectId:'ryuza-official'},'ryuza-sync-audit')}db=app.database()}
+ for(const path of paths){try{const snap=await db.ref(path).once('value');const val=snap.val();if(val===null && path!=='siteConfig/playlists' && path!=='siteConfig/recalSkins'){html+=row(path,false,'data kosong');failed++}else html+=row(path,true,'Sinkron');}catch(e){html+=row(path,false,'gagal baca');failed++}}
+ status.textContent=failed?('Ditemukan '+failed+' masalah. Cek rules/koneksi Firebase.'):'Semua jalur data bisa dibaca. Cek terakhir '+new Date().toLocaleTimeString('id-ID');
+ }catch(e){status.textContent='Pemeriksaan gagal: '+(e.message||e);html=paths.map(p=>row(p,false,'koneksi')).join('')}
+ list.innerHTML=html;busy=false;
+ }
+ function boot(){if(!$('ryuzaSyncAudit'))return;check();timer=setInterval(check,60000);$('ryuzaSyncAuditCheck')?.addEventListener('click',check);document.addEventListener('visibilitychange',()=>{if(!document.hidden)check()});}
+ if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',boot,{once:true});else boot();
+})();
+</script>
