@@ -3165,4 +3165,34 @@ nav.ryuza-bottom[aria-label="Navigasi cepat"]{display:none!important}
 })();
 </script>
 
+
+<style id="ryuza-gusion-legend-image-fix">
+/* Force the exact background on the Gusion Legend card; independent of Firebase field matching. */
+#list .card.skin[data-rtdb-id="gusion-legend"]::after {
+  background-image: linear-gradient(90deg,rgba(17,19,26,.48) 0%,rgba(17,19,26,.20) 52%,rgba(17,19,26,.12) 100%), linear-gradient(0deg,rgba(17,19,26,.82) 0%,rgba(17,19,26,.05) 100%), url("https://static.wikia.nocookie.net/mobile-legends/images/4/41/Gusion_%28Cosmic_Gleam%29.jpg/revision/latest/scale-to-width-down/1000?cb=20211011033726") !important;
+  background-size: cover,cover,cover !important;
+  background-position: center,center,center 24% !important;
+}
+#list .card.skin[data-rtdb-id="gusion-legend"] .ryuza-card-art { background-image:url("https://static.wikia.nocookie.net/mobile-legends/images/4/41/Gusion_%28Cosmic_Gleam%29.jpg/revision/latest/scale-to-width-down/1000?cb=20211011033726") !important; }
+</style>
+<script id="ryuza-gusion-legend-image-fix-js">
+(function(){
+ const URL='https://static.wikia.nocookie.net/mobile-legends/images/4/41/Gusion_%28Cosmic_Gleam%29.jpg/revision/latest/scale-to-width-down/1000?cb=20211011033726';
+ function apply(){
+   const card=document.querySelector('#list .card.skin[data-rtdb-id="gusion-legend"]');
+   if(!card) return;
+   card.style.setProperty('--rz-hero-bg','url("'+URL+'")');
+   card.classList.add('hero-bg-ready');
+   let art=card.querySelector('.ryuza-card-art');
+   if(!art){art=document.createElement('div');art.className='ryuza-card-art';card.insertBefore(art,card.firstChild);}
+   art.style.setProperty('background-image','url("'+URL+'")','important');
+   art.style.setProperty('display','block','important');
+   art.style.setProperty('background-size','cover','important');
+   art.style.setProperty('background-position','center 24%','important');
+ }
+ if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',apply,{once:true}); else apply();
+ new MutationObserver(apply).observe(document.documentElement,{childList:true,subtree:true});
+})();
+</script>
+
 </body></html>
