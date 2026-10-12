@@ -137,7 +137,26 @@ input:focus,select:focus,textarea:focus{border-color:#7ba7ff!important;box-shado
 <style>.orderBtns{display:flex;gap:5px;align-items:center}.toTop,.toBottom{font-size:11px;padding:7px 9px!important}.actions{align-items:center}</style>\n
 <style id="paste-skin-import-style">.paste-skin-import{margin-top:14px;padding:13px;border:1px solid #2a4a65;border-radius:13px;background:#081522}.paste-skin-import summary{font-weight:800;cursor:pointer;color:#a9d8ff}.paste-skin-import textarea{min-height:150px;margin-top:10px}.paste-skin-import .toolbar{align-items:center}.paste-skin-preview-list{display:flex;gap:6px;flex-wrap:wrap;margin-top:7px}.paste-skin-preview-list span{font-size:11px;padding:5px 8px;border-radius:8px;background:#10263a;border:1px solid #294761;color:#cde7ff}</style>
 
-<style id="admin-skin-image-field">.skin-image-field input{width:100%;box-sizing:border-box}.skin-image-field{padding:10px;border:1px solid #24445c;border-radius:12px;background:#081522;margin:10px 0}.skin-image-field .hint{margin-top:6px}</style></head>
+
+<style id="file-manager-cleanup">
+#fileManager{max-width:1180px;margin-inline:auto;gap:16px}
+#fileManager>.card{border:1px solid rgba(105,135,190,.22);border-radius:18px;padding:20px;background:linear-gradient(145deg,rgba(23,29,43,.98),rgba(13,17,27,.98));box-shadow:0 10px 30px rgba(0,0,0,.14);margin-bottom:14px}
+#fileManager>.card:first-child{border-color:rgba(85,153,255,.35);background:radial-gradient(ellipse at top right,rgba(74,119,255,.13),transparent 55%),linear-gradient(145deg,#171e2c,#101520)}
+#fileManager h2{font-size:22px;letter-spacing:-.35px}#fileManager h3{font-size:16px;letter-spacing:-.2px}
+#fileManager .hint{line-height:1.65;color:#9eacc4;font-size:12px}
+#fileManager .toolbar,#fileManager .actions{display:flex;align-items:center;gap:9px;flex-wrap:wrap}
+#fileManager button{min-height:40px;border-radius:11px;padding:9px 14px;font-weight:700;white-space:normal}
+#fileManager input:not([type=file]){min-height:42px;border-radius:11px;padding:10px 12px;min-width:0;width:100%;box-sizing:border-box}
+#fileManager .github-grid{grid-template-columns:repeat(2,minmax(0,1fr))!important}
+#fileManager .badge{border-radius:999px;padding:8px 11px;white-space:nowrap}
+#fileManager .fm-step{display:flex;gap:12px;align-items:flex-start;padding:12px 0;border-bottom:1px solid rgba(130,150,190,.13)}
+#fileManager .fm-step:last-child{border-bottom:0;padding-bottom:0}
+#fileManager .fm-number{flex:0 0 28px;height:28px;border-radius:9px;display:grid;place-items:center;background:rgba(79,135,255,.16);color:#9dc2ff;font-weight:800}
+#fileManager .fm-note{border:1px solid rgba(245,185,66,.24);background:rgba(245,185,66,.06);border-radius:12px;padding:11px 13px;margin-top:12px;color:#e9d4a1;font-size:12px;line-height:1.6}
+@media(max-width:700px){#fileManager>.card{padding:14px;border-radius:15px}#fileManager .github-grid{grid-template-columns:1fr!important}#fileManager .github-grid input[style*="grid-column"]{grid-column:auto!important}#fileManager .toolbar button,#fileManager .actions button{flex:1 1 100%}#fileManager .badge{white-space:normal}}
+</style>
+
+</head>
 </head>
 <body>
 <div class="wrap">
@@ -214,19 +233,20 @@ Replace : Basic
 <section id="fileManager" class="panel">
  <div class="card">
   <h2 style="margin:0 0 6px">📁 File Manager</h2>
-  <div class="hint">Semua fitur upload, download, import, dan publish file dipisahkan dari <b>Skin &amp; Replace</b> supaya halaman pengelolaan skin tetap rapi.</div>
+  <div class="hint">Pilih tindakan sesuai kebutuhan. <b>Simpan konfigurasi</b> untuk menyimpan koneksi GitHub; <b>Publish pengaturan</b> untuk mengirim data skin; atau unggah file HTML jika ingin mengganti seluruh file di repository.</div>
+  <div class="fm-note">⚠️ Mengunggah <b>index.html</b> atau <b>admin.html</b> akan mengganti file tersebut di GitHub. Pastikan file yang dipilih benar sebelum mengunggah. Token GitHub bersifat rahasia—jangan bagikan kepada siapa pun.</div>
  </div>
  <div class="card">
   <div class="toolbar">
-   <button class="secondary" id="pickBtn">📁 Pilih index.html</button>
+   <button class="secondary" id="pickBtn">📁 Pilih file index lokal</button>
    <input id="fileInput" class="file" type="file" accept=".html,text/html">
-   <button class="primary" id="seedBtn">🚀 Publish ke index.html</button>
+   <button class="primary" id="seedBtn">📥 Impor data dari index</button>
   </div>
-  <div class="hint">Import/publish index lama dari komputer. Fitur ini tetap memakai sistem Skin &amp; Replace yang sudah ada.</div>
+  <div class="hint">Gunakan ini untuk membaca data dari file index.html yang dipilih dan memasukkannya ke pengelolaan Skin &amp; Replace. Ini <b>bukan</b> upload file ke GitHub.</div>
  </div>
  <div class="card" id="firebaseIndexUploadPanel">
   <div style="display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap">
-   <div><h3 style="margin:0 0 5px">📤 Upload Index langsung ke GitHub</h3><div class="hint">Pilih <b>index.html</b> dari komputer. File akan menggantikan <b>index.html</b> langsung di repository GitHub menggunakan konfigurasi GitHub di atas.</div></div>
+   <div><h3 style="margin:0 0 5px">📤 Upload Index langsung ke GitHub</h3><div class="hint">Langkah 2 — unggah seluruh file <b>index.html</b> dari komputer untuk mengganti halaman utama di repository GitHub.</div></div>
    <span id="firebaseIndexStatus" class="badge">● Belum ada file</span>
   </div>
   <div class="toolbar" style="margin-top:12px">
@@ -240,7 +260,7 @@ Replace : Basic
  </div>
  <div class="card github-publish-panel" id="githubSkinPanel">
   <div style="display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap">
-   <div><h3 style="margin:0 0 5px">🚀 GitHub Publish</h3><div class="hint">Pengaturan GitHub bisa diisi langsung dari halaman Skin &amp; Replace.</div></div>
+   <div><h3 style="margin:0 0 5px">🚀 GitHub Publish</h3><div class="hint">Langkah 1 — atur tujuan GitHub. Konfigurasi ini dipakai oleh fitur publish dan upload file di bawah.</div></div>
    <span id="ghSkinStatus" class="badge">● Belum dikonfigurasi</span>
   </div>
   <div class="github-grid" style="display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin-top:12px">
@@ -251,14 +271,14 @@ Replace : Basic
    <input id="ghSkinToken" type="password" placeholder="Fine-grained Token — Contents: Read and write" style="grid-column:1/-1">
   </div>
   <div class="actions" style="margin-top:10px">
-   <button class="secondary" id="ghSkinSave">💾 Simpan GitHub</button>
-   <button class="primary" id="ghSkinPublish">🚀 Publish Sekarang</button>
-   <button class="secondary" id="ghSkinTest">🔎 Tes Koneksi</button>
+   <button class="secondary" id="ghSkinSave">💾 Simpan konfigurasi</button>
+   <button class="primary" id="ghSkinPublish">🚀 Publish pengaturan skin</button>
+   <button class="secondary" id="ghSkinTest">🔎 Tes koneksi GitHub</button>
   </div>
  </div>
  <div class="card" id="githubAdminPanel">
   <div style="display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap">
-   <div><h3 style="margin:0 0 5px">🚀 Upload Admin langsung ke GitHub</h3><div class="hint">Pilih <b>admin.html</b> dari komputer. File akan langsung menggantikan file Admin di repository GitHub.</div></div>
+   <div><h3 style="margin:0 0 5px">🚀 Upload Admin langsung ke GitHub</h3><div class="hint">Langkah 3 — opsional. Unggah seluruh file <b>admin.html</b> untuk memperbarui panel admin di repository GitHub.</div></div>
    <span id="githubAdminStatus" class="badge">● Belum ada file</span>
   </div>
   <div class="toolbar" style="margin-top:12px">
@@ -411,7 +431,7 @@ let skinPage=1;const SKINS_PER_PAGE=20;
 function render(){const q=$('search').value.toLowerCase().trim();const allArr=normalizeOrders().filter(([id,x])=>{const hay=(cleanTitle(x.title||id)+' '+(x.options||[]).map(o=>o.label+' '+o.url).join(' ')).toLowerCase();return !q||hay.includes(q)});
 const totalPages=Math.max(1,Math.ceil(allArr.length/SKINS_PER_PAGE));if(skinPage>totalPages)skinPage=totalPages;
 const start=(skinPage-1)*SKINS_PER_PAGE;const arr=allArr.slice(start,start+SKINS_PER_PAGE);
-$('list').innerHTML=arr.map(([id,x],idx)=>{const title=cleanTitle(x.title||id);const order=x.order??idx;return `<div class="skin" data-id="${esc(id)}"><div class="skinhead"><span class="label">Skin #${String(order+1).padStart(3,'0')}</span><span class="muted small">${esc(id)}</span></div><div class="namebox"><span class="num">${String(order+1).padStart(2,'0')}</span><input class="titleInput" value="${esc(title)}" placeholder="Contoh: Natan Collector"></div><div class="preview">Tampilan: <b>${esc(title||'Nama Skin')}</b></div><div class="field" style="margin:0 0 10px"><label>Icon skin</label><div class="iconField"><div class="iconPreview">${esc(x.iconText||initials(title))}</div><input class="iconInput" maxlength="3" value="${esc(x.iconText||initials(title))}" placeholder="N"></div><div class="hint">Contoh: Natan → N, Natan Collector → NC</div></div><div class="field skin-image-field"><label>🖼️ Link gambar background card</label><input class="imageUrlInput" type="url" value="${esc(x.imageUrl||x.backgroundUrl||'')}" placeholder="https://contoh.com/gambar-skin.jpg"><div class="hint">Gunakan URL gambar langsung (HTTPS). Gambar akan tampil lebar di card index.</div></div><div class="skin-flags"><label><input class="featuredInput" type="checkbox" ${x.featured?'checked':''}> ⭐ Pilihan Admin</label><label><input class="newInput" type="checkbox" ${x.isNew?'checked':''}> 🆕 Tandai NEW</label></div><div class="replace-box"><div class="replace-top"><div><div class="replace-title">Replace</div><div class="replace-hint">Pilih Replace dari dropdown untuk mengubah link.</div></div><span class="replace-count">${(x.options||[]).length} pilihan</span></div><select class="replace-select-admin" aria-label="Pilih Replace">${(x.options||[]).map((o,i)=>`<option value="${i}">${esc(o.label||('Replace '+(i+1)))}</option>`).join('')}</select><div class="replace-editor">${(x.options||[]).map((o,i)=>`<div class="replace-row row" data-i="${i}" style="display:${i===0?'grid':'none'}"><input class="label" value="${esc(o.label||'')}" placeholder="Nama Replace"><input class="url" value="${esc(o.url||'')}" placeholder="https://..."><button class="delOpt danger" data-i="${i}" title="Hapus Replace">×</button></div>`).join('')}</div></div><div class="actions"><button class="addOpt secondary">＋ Replace</button><button class="save">💾 Simpan</button><div class="orderBtns"><button class="ghost up" title="Naik satu posisi">↑</button><button class="ghost down" title="Turun satu posisi">↓</button></div><button class="ghost toTop" title="Pindahkan ke urutan paling atas">⇈ Paling atas</button><button class="ghost toBottom" title="Pindahkan ke urutan paling bawah">⇊ Paling bawah</button><button class="delSkin danger">Hapus</button></div></div>`}).join('')||'<div class="card empty">Tidak ada skin yang cocok.</div>';
+$('list').innerHTML=arr.map(([id,x],idx)=>{const title=cleanTitle(x.title||id);const order=x.order??idx;return `<div class="skin" data-id="${esc(id)}"><div class="skinhead"><span class="label">Skin #${String(order+1).padStart(3,'0')}</span><span class="muted small">${esc(id)}</span></div><div class="namebox"><span class="num">${String(order+1).padStart(2,'0')}</span><input class="titleInput" value="${esc(title)}" placeholder="Contoh: Natan Collector"></div><div class="preview">Tampilan: <b>${esc(title||'Nama Skin')}</b></div><div class="field" style="margin:0 0 10px"><label>Icon skin</label><div class="iconField"><div class="iconPreview">${esc(x.iconText||initials(title))}</div><input class="iconInput" maxlength="3" value="${esc(x.iconText||initials(title))}" placeholder="N"></div><div class="hint">Contoh: Natan → N, Natan Collector → NC</div></div><div class="skin-flags"><label><input class="featuredInput" type="checkbox" ${x.featured?'checked':''}> ⭐ Pilihan Admin</label><label><input class="newInput" type="checkbox" ${x.isNew?'checked':''}> 🆕 Tandai NEW</label></div><div class="replace-box"><div class="replace-top"><div><div class="replace-title">Replace</div><div class="replace-hint">Pilih Replace dari dropdown untuk mengubah link.</div></div><span class="replace-count">${(x.options||[]).length} pilihan</span></div><select class="replace-select-admin" aria-label="Pilih Replace">${(x.options||[]).map((o,i)=>`<option value="${i}">${esc(o.label||('Replace '+(i+1)))}</option>`).join('')}</select><div class="replace-editor">${(x.options||[]).map((o,i)=>`<div class="replace-row row" data-i="${i}" style="display:${i===0?'grid':'none'}"><input class="label" value="${esc(o.label||'')}" placeholder="Nama Replace"><input class="url" value="${esc(o.url||'')}" placeholder="https://..."><button class="delOpt danger" data-i="${i}" title="Hapus Replace">×</button></div>`).join('')}</div></div><div class="actions"><button class="addOpt secondary">＋ Replace</button><button class="save">💾 Simpan</button><div class="orderBtns"><button class="ghost up" title="Naik satu posisi">↑</button><button class="ghost down" title="Turun satu posisi">↓</button></div><button class="ghost toTop" title="Pindahkan ke urutan paling atas">⇈ Paling atas</button><button class="ghost toBottom" title="Pindahkan ke urutan paling bawah">⇊ Paling bawah</button><button class="delSkin danger">Hapus</button></div></div>`}).join('')||'<div class="card empty">Tidak ada skin yang cocok.</div>';
 const pg=$('skinPagination');if(pg){if(totalPages<=1)pg.innerHTML='';else{let h='<button class="secondary" '+(skinPage===1?'disabled':'')+' data-page="prev">‹</button>';const from=Math.max(1,skinPage-2),to=Math.min(totalPages,skinPage+2);if(from>1)h+='<button class="secondary" data-page="1">1</button><span class="page-info">…</span>';for(let p=from;p<=to;p++)h+='<button class="'+(p===skinPage?'active':'secondary')+'" data-page="'+p+'">'+p+'</button>';if(to<totalPages)h+='<span class="page-info">…</span><button class="secondary" data-page="'+totalPages+'">'+totalPages+'</button>';h+='<button class="secondary" '+(skinPage===totalPages?'disabled':'')+' data-page="next">›</button><span class="page-info">'+(start+1)+'–'+Math.min(start+SKINS_PER_PAGE,allArr.length)+' dari '+allArr.length+'</span>';pg.innerHTML=h;pg.querySelectorAll('[data-page]').forEach(b=>b.onclick=()=>{const v=b.dataset.page;skinPage=v==='prev'?skinPage-1:v==='next'?skinPage+1:Number(v);render()})}}
 bind();updateStats();document.querySelectorAll('.titleInput').forEach(inp=>inp.addEventListener('input',()=>{const card=inp.closest('.skin');const p=card?.querySelector('.preview b');if(p)p.textContent=''+(cleanTitle(inp.value)||'Nama Skin');const icon=card?.querySelector('.iconInput'),prev=card?.querySelector('.iconPreview');if(icon&&prev&&!icon.value)prev.textContent=initials(inp.value)}));document.querySelectorAll('.iconInput').forEach(inp=>inp.addEventListener('input',()=>{inp.value=inp.value.toUpperCase().replace(/[^A-Z0-9]/g,'').slice(0,3);const p=inp.closest('.skin')?.querySelector('.iconPreview');if(p)p.textContent=inp.value||'R'}));}
 function updateStats(){const arr=Object.values(items);$('statSkins').textContent=arr.length;$('statReplace').textContent=arr.reduce((n,x)=>n+(x.options||[]).length,0)}
@@ -430,7 +450,7 @@ function promoteSkinLocal(id){
  ordered.forEach(([sid,x],i)=>{if(x) x.order=i});
  skinPage=1;
 }
-async function saveSkin(id,card){const btn=card.querySelector('.save');const old=items[id]||{};const x={...old,id,title:cleanTitle(card.querySelector('.titleInput').value)||'Skin Baru',iconText:(card.querySelector('.iconInput')?.value.trim()||initials(card.querySelector('.titleInput').value)).slice(0,3).toUpperCase(),imageUrl:(card.querySelector('.imageUrlInput')?.value.trim()||''),options:[...card.querySelectorAll('.row')].map(r=>({label:r.querySelector('.label').value.trim(),url:r.querySelector('.url').value.trim(),selected:false})),order:Number(old.order??normalizeOrders().length),featured:!!card.querySelector('.featuredInput')?.checked,isNew:!!card.querySelector('.newInput')?.checked,createdAt:old.createdAt||Date.now(),updatedAt:Date.now()};if(x.options[0])x.options[0].selected=true;try{btn.disabled=true;btn.textContent='⏳ Menyimpan...';await db.ref('siteConfig/skins/'+id).set(x);items[id]=x;btn.textContent='✅ Tersimpan';toast('Skin berhasil disimpan ke Firebase');document.dispatchEvent(new CustomEvent('ryuza-admin-data-changed'));if(document.getElementById('ghAuto')?.checked&&typeof window.ryuzaPublishIndex==='function'){try{const published=await window.ryuzaPublishIndex();if(published)toast('Skin tersimpan dan index berhasil dipublish ke GitHub')}catch(pubErr){console.warn('Auto publish gagal',pubErr)}}setTimeout(()=>{if(btn)btn.textContent='💾 Simpan'},1300)}catch(e){btn.textContent='❌ Gagal';toast('Gagal menyimpan: '+e.message);setTimeout(()=>{if(btn)btn.textContent='💾 Simpan'},1500)}finally{btn.disabled=false}}
+async function saveSkin(id,card){const btn=card.querySelector('.save');const old=items[id]||{};const x={...old,id,title:cleanTitle(card.querySelector('.titleInput').value)||'Skin Baru',iconText:(card.querySelector('.iconInput')?.value.trim()||initials(card.querySelector('.titleInput').value)).slice(0,3).toUpperCase(),options:[...card.querySelectorAll('.row')].map(r=>({label:r.querySelector('.label').value.trim(),url:r.querySelector('.url').value.trim(),selected:false})),order:Number(old.order??normalizeOrders().length),featured:!!card.querySelector('.featuredInput')?.checked,isNew:!!card.querySelector('.newInput')?.checked,createdAt:old.createdAt||Date.now(),updatedAt:Date.now()};if(x.options[0])x.options[0].selected=true;try{btn.disabled=true;btn.textContent='⏳ Menyimpan...';await db.ref('siteConfig/skins/'+id).set(x);items[id]=x;btn.textContent='✅ Tersimpan';toast('Skin berhasil disimpan ke Firebase');document.dispatchEvent(new CustomEvent('ryuza-admin-data-changed'));setTimeout(()=>{if(btn)btn.textContent='💾 Simpan'},1300)}catch(e){btn.textContent='❌ Gagal';toast('Gagal menyimpan: '+e.message);setTimeout(()=>{if(btn)btn.textContent='💾 Simpan'},1500)}finally{btn.disabled=false}}
 function bind(){document.querySelectorAll('.skin').forEach(card=>{const id=card.dataset.id;const picker=card.querySelector('.replace-select-admin');const rows=[...card.querySelectorAll('.replace-row')];if(picker){picker.onchange=()=>{const i=Number(picker.value)||0;rows.forEach((r,n)=>r.style.display=n===i?'grid':'none')};rows.forEach((r,i)=>r.querySelector('.label')?.addEventListener('input',()=>{const o=picker.options[i];if(o)o.textContent=r.querySelector('.label').value||('Replace '+(i+1))}))}card.querySelector('.addOpt').onclick=()=>{items[id].options=items[id].options||[];items[id].options.push({label:'',url:'',selected:false});promoteSkinLocal(id);render();document.querySelector(`.skin[data-id="${id}"] .replace-select-admin`)?.focus();toast('Replace baru ditambahkan. Nama dan link masih kosong.')};card.querySelectorAll('.delOpt').forEach(b=>b.onclick=()=>{items[id].options.splice(+b.dataset.i,1);render()});card.querySelector('.save').onclick=()=>saveSkin(id,card);card.querySelector('.delSkin').onclick=async()=>{if(confirm('Hapus skin ini dari Firebase?')){await db.ref('siteConfig/skins/'+id).remove();toast('Skin dihapus');document.dispatchEvent(new CustomEvent('ryuza-admin-data-changed'))}};card.querySelector('.up').onclick=()=>moveSkin(id,-1);card.querySelector('.down').onclick=()=>moveSkin(id,1);card.querySelector('.toTop').onclick=()=>moveSkinToEdge(id,'top');card.querySelector('.toBottom').onclick=()=>moveSkinToEdge(id,'bottom')})}
 async function moveSkin(id,dir){const arr=normalizeOrders();const i=arr.findIndex(x=>x[0]===id),j=i+dir;if(i<0||j<0||j>=arr.length)return;const a=arr[i][1],b=arr[j][1],ao=a.order??i,bo=b.order??j;await db.ref('siteConfig/skins/'+arr[i][0]+'/order').set(bo);await db.ref('siteConfig/skins/'+arr[j][0]+'/order').set(ao);toast('Urutan diperbarui');document.dispatchEvent(new CustomEvent('ryuza-admin-data-changed'))}
 async function moveSkinToEdge(id,edge){
@@ -567,7 +587,7 @@ async function importIndexText(txt){
     throw e;
   }
 }
-$('seedBtn').onclick=async()=>{if(window.ryuzaPublishIndex){await window.ryuzaPublishIndex();return;}try{$('seedBtn').disabled=true;$('seedBtn').textContent='Mengambil...';const r=await fetch('./index.html?seed='+Date.now());if(!r.ok)throw Error('index.html tidak bisa dibaca');await importIndexText(await r.text())}catch(e){if(location.protocol==='file:')$('fileInput').click();else toast('Gagal: '+e.message)}finally{$('seedBtn').disabled=false;$('seedBtn').textContent='🚀 Publish ke index.html'}};
+$('seedBtn').onclick=async()=>{if(window.ryuzaPublishIndex){await window.ryuzaPublishIndex();return;}try{$('seedBtn').disabled=true;$('seedBtn').textContent='Mengambil...';const r=await fetch('./index.html?seed='+Date.now());if(!r.ok)throw Error('index.html tidak bisa dibaca');await importIndexText(await r.text())}catch(e){if(location.protocol==='file:')$('fileInput').click();else toast('Gagal: '+e.message)}finally{$('seedBtn').disabled=false;$('seedBtn').textContent='📥 Impor data dari index'}};
 $('pickBtn').onclick=()=>$('fileInput').click();$('fileInput').onchange=async e=>{const f=e.target.files?.[0];if(!f)return;try{await importIndexText(await f.text())}catch(x){toast('Gagal membaca: '+x.message)}e.target.value=''};
 let visitorData={};
 let onlineVisitorData={};
