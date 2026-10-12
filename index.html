@@ -1444,7 +1444,14 @@ body{background:radial-gradient(ellipse at 50% 0%,rgba(35,103,190,.17),transpare
 @media(max-width:899px) and (min-width:560px){#list{grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:16px!important}}
 @media(max-width:559px){#list{grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:10px!important}#list .card.skin,#recalList .card.skin{border-radius:16px!important}}
 </style>
-<style id="search-filter-fix-v3">#list .skin[hidden], #recalList .skin[hidden], .skin[hidden]{display:none!important;visibility:hidden!important;content-visibility:hidden!important}</style></head><body>
+<style id="search-filter-fix-v3">#list .skin[hidden], #recalList .skin[hidden], .skin[hidden]{display:none!important;visibility:hidden!important;content-visibility:hidden!important}</style>
+<style id="ryuza-card-background-visible-fix">
+/* Admin-managed card artwork: force the image banner to be visible when a URL exists. */
+#list .card.skin .ryuza-card-art{display:block!important;width:100%!important;height:clamp(190px,20vw,270px)!important;min-height:190px!important;background-color:#17243a!important;background-size:cover!important;background-position:center center!important;background-repeat:no-repeat!important;flex:0 0 auto!important;border-bottom:1px solid #1d2c43!important;}
+#list .card.skin .ryuza-card-art[hidden]{display:none!important}
+@media(max-width:560px){#list .card.skin .ryuza-card-art{height:clamp(125px,34vw,190px)!important;min-height:125px!important}}
+</style>
+</head><body>
 <style id="ryuza-chrome-gate-style">
 #ryuzaChromeGate{
   display:none;position:fixed;inset:0;z-index:2147483647;
@@ -2314,7 +2321,7 @@ document.querySelectorAll('.replace-dropdown').forEach(function(box){
     let art=card.querySelector('.ryuza-card-art');
     if(artUrl){
       if(!art){art=document.createElement('div');art.className='ryuza-card-art';card.insertBefore(art,card.firstChild)}
-      art.style.backgroundImage='linear-gradient(0deg,rgba(8,13,24,.12),rgba(8,13,24,.02)),url("'+artUrl.replace(/\\/g,'\\\\').replace(/"/g,'%22').replace(/[\r\n]/g,'')+'")';
+      art.style.backgroundImage='linear-gradient(0deg,rgba(8,13,24,.12),rgba(8,13,24,.02)),url("'+artUrl.replace(/\\/g,'').replace(/["'()\s]/g,encodeURIComponent)+'")';
       art.setAttribute('data-image-url',artUrl);
       art.onerror=null;
       art.style.display='block';
