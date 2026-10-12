@@ -2314,7 +2314,7 @@ document.querySelectorAll('.replace-dropdown').forEach(function(box){
     let art=card.querySelector('.ryuza-card-art');
     if(artUrl){
       if(!art){art=document.createElement('div');art.className='ryuza-card-art';card.insertBefore(art,card.firstChild)}
-      art.style.backgroundImage='linear-gradient(0deg,rgba(8,13,24,.12),rgba(8,13,24,.02)),url("'+artUrl.replace(/["\\]/g,'')+'")';
+      art.style.backgroundImage='linear-gradient(0deg,rgba(8,13,24,.12),rgba(8,13,24,.02)),url("'+artUrl.replace(/\\/g,'\\\\').replace(/"/g,'%22').replace(/[\r\n]/g,'')+'")';
       art.setAttribute('data-image-url',artUrl);
       art.onerror=null;
       art.style.display='block';
