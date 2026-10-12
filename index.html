@@ -1451,6 +1451,29 @@ body{background:radial-gradient(ellipse at 50% 0%,rgba(35,103,190,.17),transpare
 #list .card.skin .ryuza-card-art[hidden]{display:none!important}
 @media(max-width:560px){#list .card.skin .ryuza-card-art{height:clamp(125px,34vw,190px)!important;min-height:125px!important}}
 </style>
+
+<style id="ryuza-reference-layout-v2">
+/* Layout inspired by the supplied reference: wide cards, artwork header, neon-blue edges */
+html,body{max-width:100%;overflow-x:hidden!important}
+body{padding:14px clamp(12px,2.7vw,44px) 32px!important;background:#070d18!important}
+.container{width:100%!important;max-width:1540px!important;margin-inline:auto!important}
+#list,#recalList{width:100%!important;max-width:1540px!important;grid-template-columns:repeat(3,minmax(0,1fr))!important;gap:18px!important;margin:18px auto!important}
+#list>.card.skin,#recalList>.card.skin{position:relative!important;isolation:isolate!important;min-width:0!important;overflow:hidden!important;padding:0 0 16px!important;border-radius:20px!important;border:1px solid #075a91!important;background:linear-gradient(180deg,#081a36,#07152d)!important;box-shadow:0 10px 26px #0005!important}
+#list .card.skin::before,#recalList .card.skin::before{content:""!important;position:absolute!important;z-index:-1!important;inset:0 0 auto!important;height:clamp(210px,24vw,340px)!important;background-image:var(--rz-hero-bg,linear-gradient(135deg,#132944,#0b1a2c))!important;background-size:cover!important;background-position:center 35%!important;background-repeat:no-repeat!important;opacity:1!important;filter:none!important;border-bottom:1px solid #17618b!important}
+#list .card.skin::after,#recalList .card.skin::after{content:""!important;position:absolute!important;z-index:-1!important;inset:0 0 auto!important;height:clamp(210px,24vw,340px)!important;background:linear-gradient(0deg,rgba(4,15,34,.20),rgba(4,15,34,.02) 65%,rgba(4,15,34,.04))!important;pointer-events:none!important}
+#list .card.skin.hero-bg-ready::before,#recalList .card.skin.hero-bg-ready::before{background-image:var(--rz-hero-bg)!important;background-size:cover!important;background-position:center 35%!important}
+#list .card.skin .title,#recalList .card.skin .title{position:relative!important;z-index:1!important;display:flex!important;align-items:flex-end!important;min-height:clamp(210px,24vw,340px)!important;margin:0 0 14px!important;padding:0 12px 10px!important;border:0!important;border-bottom:1px solid #075a91!important;border-radius:0!important;background:linear-gradient(0deg,rgba(4,14,32,.72),transparent 65%)!important;color:#fff!important;text-align:center!important;font-size:clamp(17px,1.8vw,25px)!important;font-weight:900!important;line-height:1.15!important;text-shadow:0 2px 8px #000!important;justify-content:center!important}
+#list .card.skin .hero-title,#recalList .card.skin .hero-title{justify-content:center!important;min-width:0!important;width:100%!important}
+#list .card.skin .hero-title-text,#recalList .card.skin .hero-title-text{font-size:clamp(17px,1.8vw,25px)!important;line-height:1.15!important;text-align:center!important;color:#fff!important}
+#list .card.skin .hero-icon,#recalList .card.skin .hero-icon{display:none!important}
+#list .card.skin>*:not(.title),#recalList .card.skin>*:not(.title){margin-left:clamp(12px,2vw,24px)!important;margin-right:clamp(12px,2vw,24px)!important}
+#list .card.skin .replace-dropdown,#recalList .card.skin .replace-dropdown{margin-top:10px!important;padding:10px!important;border:1px solid #075a91!important;border-radius:15px!important;background:#092b43!important}
+#list .card.skin .replace-select,#recalList .card.skin .replace-select{min-height:52px!important;border:1px solid #087ca8!important;border-radius:999px!important;background:#092c43!important;color:#25eaff!important;font-size:15px!important}
+#list .card.skin .replace-download,#recalList .card.skin .replace-download{min-height:66px!important;border:0!important;border-radius:16px!important;background:linear-gradient(105deg,#12a9ff,#7512ff)!important;box-shadow:0 7px 16px #05122c!important;font-size:16px!important;font-weight:900!important}
+#list .card.skin .card-report-btn,#recalList .card.skin .card-report-btn{border-radius:12px!important}
+@media(max-width:950px){#list,#recalList{grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:13px!important}#list .card.skin::before,#list .card.skin::after,#recalList .card.skin::before,#recalList .card.skin::after,#list .card.skin .title,#recalList .card.skin .title{height:clamp(210px,34vw,300px)!important;min-height:clamp(210px,34vw,300px)!important}}
+@media(max-width:600px){body{padding:10px 10px 26px!important}.container{max-width:100%!important}#list,#recalList{grid-template-columns:minmax(0,1fr)!important;max-width:560px!important;gap:15px!important;margin:14px auto!important}#list>.card.skin,#recalList>.card.skin{border-radius:18px!important;padding-bottom:14px!important}#list .card.skin::before,#list .card.skin::after,#recalList .card.skin::before,#recalList .card.skin::after{height:clamp(250px,72vw,350px)!important}#list .card.skin .title,#recalList .card.skin .title{height:clamp(250px,72vw,350px)!important;min-height:clamp(250px,72vw,350px)!important;font-size:21px!important;padding-bottom:12px!important}#list .card.skin .hero-title-text,#recalList .card.skin .hero-title-text{font-size:21px!important}#list .card.skin>*:not(.title),#recalList .card.skin>*:not(.title){margin-left:15px!important;margin-right:15px!important}#list .card.skin .replace-select,#recalList .card.skin .replace-select{min-height:48px!important}#list .card.skin .replace-download,#recalList .card.skin .replace-download{min-height:60px!important;font-size:15px!important}}
+</style>
 </head><body>
 <style id="ryuza-chrome-gate-style">
 #ryuzaChromeGate{
