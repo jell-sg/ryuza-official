@@ -1444,7 +1444,14 @@ body{background:radial-gradient(ellipse at 50% 0%,rgba(35,103,190,.17),transpare
 @media(max-width:899px) and (min-width:560px){#list{grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:16px!important}}
 @media(max-width:559px){#list{grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:10px!important}#list .card.skin,#recalList .card.skin{border-radius:16px!important}}
 </style>
-<style id="search-filter-fix-v3">#list .skin[hidden], #recalList .skin[hidden], .skin[hidden]{display:none!important;visibility:hidden!important;content-visibility:hidden!important}</style></head><body>
+<style id="search-filter-fix-v3">#list .skin[hidden], #recalList .skin[hidden], .skin[hidden]{display:none!important;visibility:hidden!important;content-visibility:hidden!important}</style>
+<style id="ryuza-card-background-visible-fix">
+/* Admin-managed card artwork: force the image banner to be visible when a URL exists. */
+#list .card.skin .ryuza-card-art{display:block!important;width:100%!important;height:clamp(190px,20vw,270px)!important;min-height:190px!important;background-color:#17243a!important;background-size:cover!important;background-position:center center!important;background-repeat:no-repeat!important;flex:0 0 auto!important;border-bottom:1px solid #1d2c43!important;}
+#list .card.skin .ryuza-card-art[hidden]{display:none!important}
+@media(max-width:560px){#list .card.skin .ryuza-card-art{height:clamp(125px,34vw,190px)!important;min-height:125px!important}}
+</style>
+</head><body>
 <style id="ryuza-chrome-gate-style">
 #ryuzaChromeGate{
   display:none;position:fixed;inset:0;z-index:2147483647;
@@ -2314,7 +2321,7 @@ document.querySelectorAll('.replace-dropdown').forEach(function(box){
     let art=card.querySelector('.ryuza-card-art');
     if(artUrl){
       if(!art){art=document.createElement('div');art.className='ryuza-card-art';card.insertBefore(art,card.firstChild)}
-      art.style.backgroundImage='linear-gradient(0deg,rgba(8,13,24,.12),rgba(8,13,24,.02)),url("'+artUrl.replace(/\\/g,'\\\\').replace(/"/g,'%22').replace(/[\r\n]/g,'')+'")';
+      art.style.backgroundImage='linear-gradient(0deg,rgba(8,13,24,.12),rgba(8,13,24,.02)),url("'+artUrl.replace(/\\/g,'').replace(/["'()\s]/g,encodeURIComponent)+'")';
       art.setAttribute('data-image-url',artUrl);
       art.onerror=null;
       art.style.display='block';
@@ -2344,6 +2351,9 @@ document.querySelectorAll('.replace-dropdown').forEach(function(box){
   }
   function apply(data){
     data=(data&&typeof data==='object')?data:{};
+    window.__RYUZA_STATIC_CONFIG__=window.__RYUZA_STATIC_CONFIG__||{};
+    window.__RYUZA_STATIC_CONFIG__.skins=data;
+    window.dispatchEvent(new CustomEvent('ryuza:skins-background-updated',{detail:{skins:data}}));
     const byId=new Set(Object.keys(data));let changed=0;
     document.querySelectorAll('.skin').forEach(card=>{
       const rid=card.getAttribute('data-rtdb-id')||'';
@@ -2925,7 +2935,7 @@ document.querySelectorAll('.replace-dropdown').forEach(function(box){
     return name;
   }
   function safeUrl(value){
-    try{const u=new URL(value);if(u.protocol!=='https:')return '';if(!/(^|\.)static\.wikia\.nocookie\.net$|(^|\.)images\.wikia\.nocookie\.net$/.test(u.hostname))return '';return u.href;}catch(_){return '';}
+    try{const u=new URL(String(value||'').trim());if(u.protocol!=='https:')return '';return u.href;}catch(_){return '';}
   }
   function imageLoads(url){return new Promise(resolve=>{const im=new Image();im.onload=()=>resolve(true);im.onerror=()=>resolve(false);im.referrerPolicy='no-referrer';im.src=url;});}
   async function request(params){
@@ -2973,22 +2983,39 @@ document.querySelectorAll('.replace-dropdown').forEach(function(box){
     })().finally(()=>delete pending[key]);
     return pending[key];
   }
-  async function decorate(card){
-    if(!card||card.dataset.rzHeroBgLoading==='1'||card.classList.contains('hero-bg-ready'))return;
+  function getConfiguredImage(card){
+    try{
+      const skins=(window.__RYUZA_STATIC_CONFIG__||{}).skins||{};
+      const normKey=s=>String(s||'').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/[^a-z0-9]/g,'');
+      const id=card.getAttribute('data-rtdb-id')||card.getAttribute('data-id')||'';
+      const title=norm(card.querySelector('.hero-title-text')?.textContent||card.querySelector('.title')?.textContent||'');
+      const hero=cardHero(card);
+      let item=id&&skins[id]?skins[id]:null;
+      if(!item){
+        const entries=Object.entries(skins), candidates=[title,hero].map(normKey).filter(Boolean);
+        item=entries.find(([key,x])=>candidates.includes(normKey(key))||candidates.includes(normKey(x?.title))||candidates.includes(normKey(x?.name))||candidates.includes(normKey(x?.hero)))?.[1]||null;
+      }
+      return safeUrl(item?.imageUrl||item?.backgroundImage||item?.cardBackground||item?.backgroundUrl||item?.bannerImage||'');
+    }catch(_){return '';}
+  }
+  async function decorate(card, force){
+    if(!card||card.dataset.rzHeroBgLoading==='1')return;
+    if(card.classList.contains('hero-bg-ready')&&!force)return;
+    const customUrl=getConfiguredImage(card);
+    if(customUrl){
+      card.style.setProperty('--rz-hero-bg','url("'+customUrl.replace(/["\\]/g,'')+'")');
+      card.classList.add('hero-bg-ready');card.dataset.rzHeroBgLoading='0';return;
+    }
+    if(force){card.style.removeProperty('--rz-hero-bg');card.classList.remove('hero-bg-ready');}
     const name=cardHero(card);if(!name)return;
     card.dataset.rzHeroBgLoading='1';
-    let url='';
-    try{
-      const state=window.__RYUZA_STATIC_CONFIG__||{};
-      const skins=state.skins||{};
-      const norm=s=>String(s||'').toLowerCase().replace(/[^a-z0-9]/g,'');
-      const match=Object.values(skins).find(x=>norm(x.title)===norm(name)||norm(x.name)===norm(name));
-      url=safeUrl(match?.imageUrl||match?.backgroundUrl||'');
-    }catch(_){}
-    if(!url)url=await lookup(name);
-    if(url&&card.isConnected){card.style.setProperty('--rz-hero-bg','url("'+url.replace(/["\\]/g,'')+'")');card.classList.add('hero-bg-ready');}
+    const url=await lookup(name);
+    if(url&&card.isConnected&&!getConfiguredImage(card)){
+      card.style.setProperty('--rz-hero-bg','url("'+url.replace(/["\\]/g,'')+'")');card.classList.add('hero-bg-ready');
+    }
     card.dataset.rzHeroBgLoading='0';
   }
+
   let observer=null;
   function observe(card){if(observer)observer.observe(card);else decorate(card);}
   function scan(root){
@@ -3005,6 +3032,7 @@ document.querySelectorAll('.replace-dropdown').forEach(function(box){
     // Beberapa item awal langsung dicoba agar background terlihat tanpa perlu scroll jauh.
     document.querySelectorAll('#list .card.skin, #recalList .card.skin').forEach((card,i)=>{if(i<6)decorate(card);});
   }
+  window.addEventListener('ryuza:skins-background-updated',()=>{document.querySelectorAll('#list .card.skin, #recalList .card.skin').forEach(card=>decorate(card,true));});
   if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',start,{once:true});else start();
 })();
 </script>
