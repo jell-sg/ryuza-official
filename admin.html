@@ -1463,5 +1463,9 @@ $('quickImport').onclick=()=>{$('.tab[data-tab="skins"]').click();$('seedBtn').c
 })();
 </script>
 
+
+<script id="ryuza-admin-image-live-preview-fix">
+(function(){document.addEventListener('input',function(e){const input=e.target;if(!input||!input.classList||!input.classList.contains('imageUrlInput'))return;const card=input.closest('.skin');if(!card)return;let preview=card.querySelector('.skin-image-preview');if(!preview){preview=document.createElement('div');preview.className='skin-image-preview';preview.style.cssText='margin-top:8px;height:88px;border:1px solid #29445e;border-radius:10px;background:#101c2d center/cover no-repeat';input.insertAdjacentElement('afterend',preview)}const url=String(input.value||'').trim();preview.style.display=url?'block':'none';preview.style.backgroundImage=url&&/^https?:\/\//i.test(url)?'url("'+url.replace(/["\\]/g,'')+'")':'none';});})();
+</script>
 </body>
 </html>
