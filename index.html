@@ -3632,55 +3632,8 @@ nav.ryuza-bottom[aria-label="Navigasi cepat"]{display:none!important}
 </script>
 
 
-<style id="ryuza-logo-pagination-ui">
-.ry-pagination{display:flex;align-items:center;justify-content:center;gap:8px;flex-wrap:wrap;margin:24px auto 30px;padding:12px 16px;border:1px solid rgba(168,85,247,.25);border-radius:22px;background:rgba(18,25,43,.96);max-width:max-content;color:#dce7ff;box-shadow:0 12px 35px #0003}
-.ry-pagination .ry-page-btn{min-width:42px;height:44px;padding:0 13px;border-radius:13px;border:1px solid #29354b;background:#172033;color:#f3f5ff;font-size:16px;font-weight:800;cursor:pointer;transition:.18s}
-.ry-pagination .ry-page-btn:hover:not(:disabled){border-color:#9b4dff;box-shadow:0 0 16px #8b5cf655;transform:translateY(-1px)}
-.ry-pagination .ry-page-btn.active{background:#13d9e7;border-color:#13d9e7;color:#061322;box-shadow:0 0 16px #13d9e755}
-.ry-pagination .ry-page-btn:disabled{opacity:.35;cursor:not-allowed}
-.ry-pagination .ry-page-label{display:flex;align-items:center;gap:8px;padding:5px 8px 5px 14px;border:1px solid #27344b;border-radius:24px;color:#9aa8bf;white-space:nowrap}
-.ry-pagination .ry-page-input{width:58px;height:38px;border:1px solid #13d9e7;border-radius:12px;background:#111b2c;color:white;text-align:center;font:700 15px inherit;outline:none}
-.ry-pagination .ry-page-go{height:38px;padding:0 15px;border:0;border-radius:12px;background:#13d9e7;color:#061322;font-weight:900;cursor:pointer}
-#list>.card.ry-page-hidden,#recalList>.card.ry-page-hidden{display:none!important}
-@media(max-width:600px){.ry-pagination{gap:5px;padding:9px;border-radius:16px;max-width:100%}.ry-pagination .ry-page-btn{min-width:34px;height:36px;padding:0 9px;font-size:14px}.ry-pagination .ry-page-label{gap:5px;padding:4px 6px 4px 9px;font-size:12px}.ry-pagination .ry-page-input{width:43px;height:32px}.ry-pagination .ry-page-go{height:32px;padding:0 10px}}
-</style>
-<script id="ryuza-card-pagination">
-(()=>{
- const PAGE_SIZE=20;
- const configs=[{listId:'list',pagerId:'ryMainPager',searchId:'q',page:1},{listId:'recalList',pagerId:'ryRecalPager',searchId:'q',page:1}];
- const timers=new WeakMap();
- function cardsFor(list){return Array.from(list.querySelectorAll(':scope > .card, :scope > .skin, :scope > .card.skin'));}
- function ensurePager(c,list){let p=document.getElementById(c.pagerId);if(!p){p=document.createElement('nav');p.id=c.pagerId;p.className='ry-pagination';p.setAttribute('aria-label','Navigasi halaman skin');list.insertAdjacentElement('afterend',p)}return p}
- function render(c,reset=false){
-  const list=document.getElementById(c.listId);if(!list)return;
-  const cards=cardsFor(list); if(reset)c.page=1;
-  const q=(document.getElementById(c.searchId)?.value||'').trim().toLocaleLowerCase();
-  const filtered=cards.filter(card=>!q||(`${card.innerText||''} ${card.dataset.search||''}`).toLocaleLowerCase().includes(q));
-  const totalPages=Math.max(1,Math.ceil(filtered.length/PAGE_SIZE)); c.page=Math.max(1,Math.min(c.page,totalPages));
-  const start=(c.page-1)*PAGE_SIZE; const visible=new Set(filtered.slice(start,start+PAGE_SIZE));
-  cards.forEach(card=>{const show=visible.has(card);card.classList.toggle('ry-page-hidden',!show);card.setAttribute('aria-hidden',show?'false':'true');if(show){card.style.removeProperty('display')}else{card.style.setProperty('display','none','important')}});
-  const pager=ensurePager(c,list); if(!filtered.length){pager.style.display='none';return} pager.style.display='flex';
-  const first=Math.floor((c.page-1)/5)*5+1,last=Math.min(totalPages,first+4);
-  let html=`<button type="button" class="ry-page-btn" data-nav="prev" ${c.page===1?'disabled':''}>‹ Prev</button>`;
-  for(let n=first;n<=last;n++)html+=`<button type="button" class="ry-page-btn ${n===c.page?'active':''}" data-page="${n}" ${n===c.page?'aria-current="page"':''}>${n}</button>`;
-  html+=`<button type="button" class="ry-page-btn" data-nav="next" ${c.page===totalPages?'disabled':''}>Next ›</button>`;
-  html+=`<label class="ry-page-label">Ke Hal: <input class="ry-page-input" type="number" min="1" max="${totalPages}" value="${c.page}" aria-label="Nomor halaman"> / ${totalPages} <button class="ry-page-go" type="button" data-nav="go">Go</button></label>`;
-  pager.innerHTML=html;
-  const jump=n=>{if(!Number.isFinite(n))return;c.page=Math.max(1,Math.min(totalPages,Math.trunc(n)));render(c);};
-  pager.querySelectorAll('[data-page]').forEach(btn=>btn.addEventListener('click',()=>jump(Number(btn.dataset.page))));
-  pager.querySelector('[data-nav="prev"]')?.addEventListener('click',()=>jump(c.page-1)); pager.querySelector('[data-nav="next"]')?.addEventListener('click',()=>jump(c.page+1));
-  const input=pager.querySelector('.ry-page-input'),go=()=>jump(Number(input.value)); pager.querySelector('[data-nav="go"]')?.addEventListener('click',go);input?.addEventListener('keydown',e=>{if(e.key==='Enter')go()});
- }
- configs.forEach(c=>{
-  const list=document.getElementById(c.listId);if(!list)return;ensurePager(c,list);
-  const schedule=()=>{clearTimeout(timers.get(list));timers.set(list,setTimeout(()=>render(c),120))};
-  new MutationObserver(schedule).observe(list,{childList:true});
-  document.getElementById(c.searchId)?.addEventListener('input',()=>render(c,true));
-  render(c,true);
-  let tries=0;const retry=setInterval(()=>{render(c);if(cardsFor(list).length||++tries>60)clearInterval(retry)},500);
- });
-})();
-</script>
+
+
 
 <style id="ryuza-layout-final-mobile-one-desktop-two">
 /* Layout final: desktop dua kolom, HP satu kolom */
@@ -3956,7 +3909,7 @@ body{background:radial-gradient(ellipse at 50% 0%,rgba(168,85,247,.18),transpare
   'use strict';
   function clean(v){return (v||'').replace(/\s+/g,' ').trim();}
   function slug(v){return clean(v).toLocaleLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'');}
-  function getCardName(card){var el=card.querySelector('.hero-title-text, .title, h2, h3, [data-title]');if(el&&clean(el.textContent))return clean(el.textContent);var txt=clean(card.innerText||card.textContent);return(txt.split('\n').map(clean).find(function(x){return x&&x.length<100;})||'Skin Ryuza Official');}
+  function getCardName(card){var el=card.querySelector('.hero-title-text, [data-title], h2, h3, .title');if(el&&clean(el.textContent))return clean(el.textContent);var explicit=card.getAttribute('data-name')||card.getAttribute('aria-label');if(explicit&&clean(explicit))return clean(explicit);var txt=clean(card.innerText||card.textContent);return(txt.split('\n').map(clean).find(function(x){return x&&x.length<100&&!/bagikan|download|replace|report link/i.test(x);})||'Skin Ryuza Official');}
   function getCardId(card){return card.getAttribute('data-rtdb-id')||card.getAttribute('data-skin-id')||card.getAttribute('data-id')||card.id||slug(getCardName(card));}
   function allCards(){return Array.from(document.querySelectorAll('#list .card.skin, #recalList .card, #recalList .recal-index-card'));}
   var activeShare=null;
@@ -3974,7 +3927,7 @@ body{background:radial-gradient(ellipse at 50% 0%,rgba(168,85,247,.18),transpare
   }
   function openSheet(name,url){ensureSheet();activeShare={name:name,url:url,data:{title:name+' — Ryuza Official',text:'Buka langsung skin '+name+' di Ryuza Official:',url:url}};document.getElementById('rzShareSkinName').textContent=name;var sheet=document.getElementById('ryuzaShareSheet');sheet.classList.add('is-open');document.body.style.overflow='hidden';}
   function closeSheet(){var sheet=document.getElementById('ryuzaShareSheet');if(sheet)sheet.classList.remove('is-open');document.body.style.overflow='';}
-  function addShareButtons(){allCards().forEach(function(card){if(card.querySelector(':scope > .card-share-btn'))return;var btn=document.createElement('button');btn.type='button';btn.className='card-share-btn';btn.setAttribute('aria-label','Bagikan '+getCardName(card));btn.innerHTML=iconShare()+'<span>Bagikan</span>';btn.addEventListener('click',function(e){e.preventDefault();e.stopPropagation();var name=getCardName(card),id=getCardId(card),url=new URL(location.href);url.hash='';url.search='';url.searchParams.set('ryuza_skin',id);url.searchParams.set('ryuza_skin_name',name);openSheet(name,url.href);});card.insertBefore(btn,card.firstChild);});}
+  function addShareButtons(){allCards().forEach(function(card){if(card.querySelector(':scope > .card-share-btn'))return;var btn=document.createElement('button');btn.type='button';btn.className='card-share-btn';btn.setAttribute('aria-label','Bagikan '+getCardName(card));btn.innerHTML=iconShare()+'<span>Bagikan</span>';btn.addEventListener('click',function(e){e.preventDefault();e.stopPropagation();var name=getCardName(card),id=getCardId(card),url=new URL(location.pathname,location.origin);url.searchParams.set('ryuza_skin',id);url.searchParams.set('ryuza_skin_name',name);url.hash='';openSheet(name,url.href);});card.insertBefore(btn,card.firstChild);});}
   function copyLink(url,name){function fallback(){var ta=document.createElement('textarea');ta.value=url;ta.style.position='fixed';ta.style.opacity='0';document.body.appendChild(ta);ta.select();try{document.execCommand('copy');showMessage('Link skin berhasil disalin.');}catch(e){window.prompt('Salin link skin ini:',url);}ta.remove();}if(navigator.clipboard&&navigator.clipboard.writeText)navigator.clipboard.writeText(url).then(function(){showMessage('Link skin berhasil disalin.');closeSheet();}).catch(fallback);else fallback();}
   function showMessage(message){var toast=document.getElementById('ryuzaShareToast');if(!toast){toast=document.createElement('div');toast.id='ryuzaShareToast';toast.style.cssText='position:fixed;left:50%;bottom:24px;transform:translateX(-50%);z-index:100002;max-width:calc(100vw - 28px);padding:12px 16px;border:1px solid #53cfff66;border-radius:14px;background:#102235;color:#e9faff;box-shadow:0 10px 28px #0008;font:700 13px/1.4 system-ui,sans-serif;text-align:center';document.body.appendChild(toast);}toast.textContent=message;toast.style.display='block';clearTimeout(window.__ryuzaShareToastTimer);window.__ryuzaShareToastTimer=setTimeout(function(){toast.style.display='none';},2600);}
   var targetId=null,targetName=null,finished=false,attempts=0;
@@ -3982,14 +3935,17 @@ body{background:radial-gradient(ellipse at 50% 0%,rgba(168,85,247,.18),transpare
     if((!targetId&&!targetName)||finished)return;
     attempts++;
     var cards=allCards(),targetSlug=slug(targetId||targetName),nameSlug=slug(targetName||'');
-    var card=cards.find(function(c){return (targetId&&(getCardId(c)===targetId||slug(getCardId(c))===targetSlug));});
-    if(!card&&targetName)card=cards.find(function(c){var n=slug(getCardName(c));return n===nameSlug||n.includes(nameSlug)||nameSlug.includes(n);});
+    /* Cari berdasarkan ID stabil terlebih dahulu, lalu nama lengkap, kemudian kata kunci data-search. */
+    var card=cards.find(function(c){var cid=c.getAttribute('data-rtdb-id')||c.getAttribute('data-skin-id')||c.getAttribute('data-id')||c.id||'';return !!targetId&&(cid===targetId||slug(cid)===targetSlug||slug(getCardId(c))===targetSlug);});
+    if(!card&&targetName)card=cards.find(function(c){var n=slug(getCardName(c));return n===nameSlug;});
+    if(!card&&targetName)card=cards.find(function(c){var n=slug(getCardName(c));return n&&nameSlug&&(n.includes(nameSlug)||nameSlug.includes(n));});
+    if(!card&&targetName)card=cards.find(function(c){var ds=slug(c.getAttribute('data-search')||'');return ds&&nameSlug&&ds.includes(nameSlug);});
     if(card){
       /* Jangan berhenti di card yang disembunyikan pagination. Paksa card target terlihat,
          termasuk saat berada di halaman 2+ atau di daftar Recal yang sedang tersembunyi. */
       var list=card.closest('#list, #recalList');
       var hiddenByPager=card.classList.contains('ry-page-hidden')||getComputedStyle(card).display==='none';
-      if(hiddenByPager){card.classList.remove('ry-page-hidden');card.removeAttribute('hidden');card.setAttribute('aria-hidden','false');card.style.setProperty('display','block','important');}
+      if(hiddenByPager){card.classList.remove('ry-page-hidden','d-none','hidden','filtered-out','is-hidden');card.removeAttribute('hidden');card.setAttribute('aria-hidden','false');card.style.setProperty('display','block','important');card.style.setProperty('visibility','visible','important');card.style.setProperty('opacity','1','important');}
       var parent=card;
       while(parent&&parent!==document.body){
         if(parent.hidden)parent.hidden=false;
@@ -4001,6 +3957,8 @@ body{background:radial-gradient(ellipse at 50% 0%,rgba(168,85,247,.18),transpare
       }
       /* Jika pencarian/pagination masih menyembunyikan kartu, beri satu frame untuk layout lalu scroll. */
       requestAnimationFrame(function(){
+        /* Paksa layout ulang agar posisi tepat walau daftar baru selesai dirender. */
+        card.getBoundingClientRect();
         card.scrollIntoView({behavior:'smooth',block:'center'});
         card.style.setProperty('outline','3px solid #c084fc','important');card.style.setProperty('outline-offset','4px','important');card.style.setProperty('box-shadow','0 0 28px #a855f7cc,0 0 55px #7c3aed66','important');
         setTimeout(function(){card.style.removeProperty('outline');card.style.removeProperty('outline-offset');card.style.removeProperty('box-shadow');},7000);
@@ -4008,83 +3966,33 @@ body{background:radial-gradient(ellipse at 50% 0%,rgba(168,85,247,.18),transpare
       finished=true;return;
     }
     if(targetName){var search=document.querySelector('#q, #searchInput, #search, input[type="search"], .search input, input[placeholder*="Cari"], input[placeholder*="cari"]');if(search&&search.value!==targetName){search.value=targetName;search.dispatchEvent(new Event('input',{bubbles:true}));search.dispatchEvent(new Event('change',{bubbles:true}));}}
-    if(attempts<100)setTimeout(findSharedSkin,250);
+    if(attempts<180)setTimeout(findSharedSkin,250);
   }
   function init(){addShareButtons();var params=new URLSearchParams(location.search);targetId=params.get('ryuza_skin');targetName=params.get('ryuza_skin_name');if(targetId||targetName){setTimeout(findSharedSkin,150);setTimeout(findSharedSkin,700);setTimeout(findSharedSkin,1600);}}
   if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init);else init();var observer=new MutationObserver(function(){addShareButtons();if(targetId||targetName)findSharedSkin();});observer.observe(document.documentElement,{childList:true,subtree:true});setTimeout(function(){observer.disconnect();},30000);
 })();
 </script>
 
-</body></html>
 
-<style id="ryuza-purple-neon-page-theme-final">
-/* Tema akhir: latar halaman ungu neon dan navigasi halaman ungu */
-html,body{background-color:#10051f!important;background-image:radial-gradient(ellipse at 50% -8%,rgba(192,38,211,.34) 0%,transparent 42%),radial-gradient(ellipse at 0% 30%,rgba(124,58,237,.24) 0%,transparent 38%),radial-gradient(ellipse at 100% 65%,rgba(168,85,247,.20) 0%,transparent 35%),linear-gradient(180deg,#10051f 0%,#160725 48%,#0d0618 100%)!important;background-attachment:fixed!important;color:#f5eaff!important}
-body::before{background:radial-gradient(circle at 50% 0%,rgba(217,70,239,.10),transparent 48%)!important}
-.ry-pagination{border-color:rgba(192,132,252,.5)!important;background:linear-gradient(135deg,rgba(37,12,59,.97),rgba(20,7,36,.97))!important;color:#f3e8ff!important;box-shadow:0 12px 35px rgba(0,0,0,.38),0 0 22px rgba(168,85,247,.16)!important}
-.ry-pagination .ry-page-btn{border-color:rgba(168,85,247,.35)!important;background:linear-gradient(145deg,#25113c,#1a0b2c)!important;color:#f3e8ff!important}
-.ry-pagination .ry-page-btn:hover:not(:disabled){border-color:#e879f9!important;box-shadow:0 0 18px rgba(192,38,211,.45)!important}
-.ry-pagination .ry-page-btn.active{background:linear-gradient(120deg,#7c3aed,#c026d3,#e879f9)!important;border-color:#f0abfc!important;color:#fff!important;box-shadow:0 0 18px rgba(192,38,211,.55)!important}
-.ry-pagination .ry-page-label{border-color:rgba(168,85,247,.4)!important;background:rgba(32,12,49,.8)!important;color:#d8b4fe!important}
-.ry-pagination .ry-page-input{border-color:#c026d3!important;background:#160725!important;color:#fff!important;box-shadow:inset 0 0 10px rgba(168,85,247,.14)!important}
-.ry-pagination .ry-page-go{background:linear-gradient(110deg,#7c3aed,#c026d3)!important;color:white!important;box-shadow:0 0 14px rgba(192,38,211,.35)!important}
-#list .card.skin,#recalList .card.skin{border-color:rgba(192,132,252,.55)!important;background:linear-gradient(155deg,rgba(39,17,60,.98),rgba(19,8,34,.99) 58%,rgba(42,10,52,.98))!important;box-shadow:0 10px 28px rgba(0,0,0,.32),0 0 15px rgba(168,85,247,.15)!important}
-#list .card.skin .ryuza-card-art,#recalList .card.skin .ryuza-card-art{background-color:#1a0b2a!important;border-bottom-color:rgba(217,70,239,.38)!important}
-@media(max-width:650px){html,body{background-attachment:scroll!important}}
+<style id="ryuza-show-all-skins">
+#list>.card.ry-page-hidden,#recalList>.card.ry-page-hidden{display:initial!important}
+#list>.card.skin,#recalList>.card.skin{visibility:visible!important;opacity:1!important}
 </style>
-<style id="ryuza-compact-premium-logo">
-/* Logo utama: lebih kecil, rapi, dan bergaya ungu neon */
-body :not(.popup-box) > img[alt="Logo Ryuza Official"]{width:76px!important;height:76px!important;max-width:76px!important;object-fit:cover!important;border-radius:22px!important;padding:3px!important;background:linear-gradient(135deg,#a855f7,#ec4899,#7c3aed)!important;box-shadow:0 0 0 1px #d8b4fe,0 0 20px #a855f780!important;display:block!important;margin:0 auto 10px!important;}
-body :not(.popup-box) > img[alt="Logo Ryuza Official"]:hover{transform:translateY(-2px) scale(1.035);transition:transform .22s ease,box-shadow .22s ease;box-shadow:0 0 0 1px #e9d5ff,0 0 28px #c084fc!important}
-@media(max-width:600px){body :not(.popup-box) > img[alt="Logo Ryuza Official"]{width:60px!important;height:60px!important;max-width:60px!important;border-radius:18px!important;margin-bottom:8px!important}}
-</style>
-
-
-<style id="ryuza-purple-lightning-download">
-/* Purple neon lightning burst on skin download */
-.ryuza-lightning-burst{position:absolute;inset:-18px;z-index:20;pointer-events:none;overflow:visible;isolation:isolate;animation:ryuza-burst-fade .85s ease-out forwards}
-.ryuza-lightning-burst .rl-bolt{position:absolute;width:30px;height:58px;left:var(--x);top:var(--y);background:linear-gradient(180deg,#fff 0%,#e9d5ff 18%,#c084fc 48%,#7c3aed 100%);clip-path:polygon(56% 0,18% 48%,43% 48%,25% 100%,82% 39%,55% 39%);filter:drop-shadow(0 0 4px #fff) drop-shadow(0 0 9px #a855f7) drop-shadow(0 0 17px #7c3aed);opacity:0;transform:rotate(var(--rot)) scale(.25);animation:ryuza-bolt-pop .62s cubic-bezier(.15,.8,.25,1) var(--delay) forwards}
-.ryuza-lightning-burst .rl-flash{position:absolute;inset:0;border-radius:inherit;background:radial-gradient(ellipse at center,rgba(192,132,252,.38),rgba(124,58,237,.12) 42%,transparent 72%);box-shadow:inset 0 0 18px #a855f780,0 0 25px #9333ea70;animation:ryuza-flash .65s ease-out forwards}
-.card.skin.ryuza-zap-active,.recal-index-card.ryuza-zap-active{animation:ryuza-card-zap .62s ease-out}
-.card.skin .replace-download:active,.recal-index-card .replace-download:active{box-shadow:0 0 12px #a855f7,0 0 24px #7c3aed!important}
-@keyframes ryuza-bolt-pop{0%{opacity:0;transform:rotate(var(--rot)) scale(.2) translateY(8px)}18%{opacity:1}65%{opacity:1;transform:rotate(var(--rot)) scale(1.08)}100%{opacity:0;transform:rotate(var(--rot)) scale(.65) translateY(-12px)}}
-@keyframes ryuza-burst-fade{0%{opacity:1}100%{opacity:0}}
-@keyframes ryuza-flash{0%{opacity:0}18%{opacity:1}100%{opacity:0}}
-@keyframes ryuza-card-zap{0%,100%{filter:none}18%{filter:brightness(1.25) drop-shadow(0 0 9px #a855f7)}45%{filter:brightness(1.08) drop-shadow(0 0 15px #7c3aed)}70%{filter:brightness(1.15) drop-shadow(0 0 7px #c084fc)}}
-@media(prefers-reduced-motion:reduce){.ryuza-lightning-burst,.ryuza-lightning-burst *,.ryuza-zap-active{animation-duration:.01ms!important;animation-iteration-count:1!important}}
-</style>
-<script id="ryuza-purple-lightning-download-script">
-(function(){
- if(window.__ryuzaPurpleLightningBound)return;window.__ryuzaPurpleLightningBound=true;
- function zap(btn){
-  var card=btn.closest('.recal-index-card,.skin-card,.skin-item,.script-card,.card,[class*=\"card\"]');if(!card){card=btn;for(var i=0;i<6&&card.parentElement;i++){card=card.parentElement;if(card.querySelector('.hero-title,.hero-title-text,.skin-title'))break}}if(!card)return;
-  var old=card.querySelector(':scope > .ryuza-lightning-burst');if(old)old.remove();
-  var cs=getComputedStyle(card);if(cs.position==='static')card.style.position='relative';
-  var burst=document.createElement('span');burst.className='ryuza-lightning-burst';burst.setAttribute('aria-hidden','true');
-  var flash=document.createElement('span');flash.className='rl-flash';burst.appendChild(flash);
-  var spots=[['8%','12%','-24deg','0s'],['76%','4%','18deg','.04s'],['88%','52%','35deg','.08s'],['16%','62%','-38deg','.02s'],['48%','-8%','8deg','.1s'],['61%','68%','-12deg','.06s']];
-  spots.forEach(function(a){var bolt=document.createElement('span');bolt.className='rl-bolt';bolt.style.setProperty('--x',a[0]);bolt.style.setProperty('--y',a[1]);bolt.style.setProperty('--rot',a[2]);bolt.style.setProperty('--delay',a[3]);burst.appendChild(bolt)});
-  card.appendChild(burst);card.classList.remove('ryuza-zap-active');void card.offsetWidth;card.classList.add('ryuza-zap-active');
-  setTimeout(function(){burst.remove();card.classList.remove('ryuza-zap-active')},950);
- }
- document.addEventListener('click',function(e){var btn=e.target.closest('.replace-download');if(!btn)return;zap(btn)},true);
- // Fallback for buttons rendered after page load and alternate download controls.
- document.addEventListener('pointerdown',function(e){var btn=e.target.closest('.replace-download');if(btn)zap(btn)},true);
+<script id="ryuza-show-all-skins-script">
+(()=>{
+ const showAll=()=>{
+  document.querySelectorAll('#ryMainPager,#ryRecalPager,.ry-pagination').forEach(el=>el.remove());
+  ['list','recalList'].forEach(id=>{const list=document.getElementById(id);if(!list)return;
+   list.querySelectorAll(':scope > .card, :scope > .skin, :scope > .card.skin').forEach(card=>{
+    card.classList.remove('ry-page-hidden');card.removeAttribute('aria-hidden');
+    if(card.style.getPropertyValue('display')==='none')card.style.removeProperty('display');
+   });
+  });
+ };
+ showAll();
+ const mo=new MutationObserver(showAll);
+ ['list','recalList'].forEach(id=>{const el=document.getElementById(id);if(el)mo.observe(el,{childList:true,subtree:false});});
+ let tries=0;const timer=setInterval(()=>{showAll();if(++tries>=30)clearInterval(timer)},500);
 })();
 </script>
-
-<style id="ryuza-lightning-visibility-fix">
-.ryuza-lightning-burst{z-index:999!important;overflow:visible!important;pointer-events:none!important}.ryuza-lightning-burst .rl-bolt{filter:drop-shadow(0 0 5px #c084fc) drop-shadow(0 0 12px #a855f7)!important}.ryuza-zap-active{outline:2px solid #c084fc!important;box-shadow:0 0 18px #a855f7,0 0 38px #7c3aed!important}
-</style>
-
-
-
-<style id="ryuza-preserve-page-neon-v3">
-/* Tambahan visual saja: seluruh isi halaman, tab, pencarian, pagination, dan fungsi lama tetap dipertahankan. */
-@keyframes ryuzaCardNeonPulse{0%,100%{box-shadow:0 0 0 1px rgba(168,85,247,.52),0 0 10px rgba(168,85,247,.25),0 0 22px rgba(124,58,237,.12)}50%{box-shadow:0 0 0 1px rgba(216,180,254,.95),0 0 17px rgba(168,85,247,.62),0 0 34px rgba(124,58,237,.34)}}
-@keyframes ryuzaCardNeonSweep{0%{transform:translateX(-140%) skewX(-18deg);opacity:0}15%{opacity:.45}55%{opacity:.18}100%{transform:translateX(240%) skewX(-18deg);opacity:0}}
-#list .card.skin,#recalList .card.skin,.card.skin{position:relative!important;isolation:isolate;overflow:hidden!important;border:1px solid rgba(192,132,252,.65)!important;animation:ryuzaCardNeonPulse 2.8s ease-in-out infinite;transition:transform .25s ease,border-color .25s ease!important}
-#list .card.skin::after,#recalList .card.skin::after,.card.skin::after{content:"";position:absolute;inset:0;z-index:2;pointer-events:none;background:linear-gradient(110deg,transparent 20%,rgba(216,180,254,.04) 37%,rgba(192,132,252,.28) 49%,rgba(255,255,255,.12) 52%,transparent 66%);transform:translateX(-140%) skewX(-18deg);animation:ryuzaCardNeonSweep 4.8s ease-in-out infinite}
-#list .card.skin:hover,#recalList .card.skin:hover,.card.skin:hover{border-color:#e9d5ff!important;transform:translateY(-3px);box-shadow:0 0 18px rgba(168,85,247,.72),0 0 38px rgba(124,58,237,.38)!important}
-@media(prefers-reduced-motion:reduce){#list .card.skin,#recalList .card.skin,.card.skin{animation:none}#list .card.skin::after,#recalList .card.skin::after,.card.skin::after{animation:none}}
-</style>
+</body></html>
