@@ -3978,8 +3978,39 @@ body{background:radial-gradient(ellipse at 50% 0%,rgba(168,85,247,.18),transpare
   function copyLink(url,name){function fallback(){var ta=document.createElement('textarea');ta.value=url;ta.style.position='fixed';ta.style.opacity='0';document.body.appendChild(ta);ta.select();try{document.execCommand('copy');showMessage('Link skin berhasil disalin.');}catch(e){window.prompt('Salin link skin ini:',url);}ta.remove();}if(navigator.clipboard&&navigator.clipboard.writeText)navigator.clipboard.writeText(url).then(function(){showMessage('Link skin berhasil disalin.');closeSheet();}).catch(fallback);else fallback();}
   function showMessage(message){var toast=document.getElementById('ryuzaShareToast');if(!toast){toast=document.createElement('div');toast.id='ryuzaShareToast';toast.style.cssText='position:fixed;left:50%;bottom:24px;transform:translateX(-50%);z-index:100002;max-width:calc(100vw - 28px);padding:12px 16px;border:1px solid #53cfff66;border-radius:14px;background:#102235;color:#e9faff;box-shadow:0 10px 28px #0008;font:700 13px/1.4 system-ui,sans-serif;text-align:center';document.body.appendChild(toast);}toast.textContent=message;toast.style.display='block';clearTimeout(window.__ryuzaShareToastTimer);window.__ryuzaShareToastTimer=setTimeout(function(){toast.style.display='none';},2600);}
   var targetId=null,targetName=null,finished=false,attempts=0;
-  function findSharedSkin(){if(!targetId&&!targetName||finished)return;attempts++;var cards=allCards(),targetSlug=slug(targetId||targetName),nameSlug=slug(targetName||'');var card=cards.find(function(c){return getCardId(c)===targetId||slug(getCardId(c))===targetSlug;});if(!card&&targetName)card=cards.find(function(c){var n=slug(getCardName(c));return n===nameSlug||n.includes(nameSlug)||nameSlug.includes(n);});if(card){finished=true;var parent=card;while(parent&&parent!==document.body){if(parent.hidden)parent.hidden=false;if(getComputedStyle(parent).display==='none'&&(parent.id==='recalList'||parent.id==='list'))parent.style.display='';parent=parent.parentElement;}card.scrollIntoView({behavior:'smooth',block:'center'});card.style.outline='3px solid #35bfff';card.style.outlineOffset='3px';card.style.boxShadow='0 0 28px #168cff88';setTimeout(function(){card.style.outline='';card.style.outlineOffset='';card.style.boxShadow='';},6500);return;}if(targetName){var search=document.querySelector('#searchInput, #search, input[type="search"], .search input, input[placeholder*="Cari"], input[placeholder*="cari"]');if(search&&search.value!==targetName){search.value=targetName;search.dispatchEvent(new Event('input',{bubbles:true}));search.dispatchEvent(new Event('change',{bubbles:true}));}}if(attempts<80)setTimeout(findSharedSkin,250);}
-  function init(){addShareButtons();var params=new URLSearchParams(location.search);targetId=params.get('ryuza_skin');targetName=params.get('ryuza_skin_name');if(targetId||targetName)setTimeout(findSharedSkin,150);}
+  function findSharedSkin(){
+    if((!targetId&&!targetName)||finished)return;
+    attempts++;
+    var cards=allCards(),targetSlug=slug(targetId||targetName),nameSlug=slug(targetName||'');
+    var card=cards.find(function(c){return (targetId&&(getCardId(c)===targetId||slug(getCardId(c))===targetSlug));});
+    if(!card&&targetName)card=cards.find(function(c){var n=slug(getCardName(c));return n===nameSlug||n.includes(nameSlug)||nameSlug.includes(n);});
+    if(card){
+      /* Jangan berhenti di card yang disembunyikan pagination. Paksa card target terlihat,
+         termasuk saat berada di halaman 2+ atau di daftar Recal yang sedang tersembunyi. */
+      var list=card.closest('#list, #recalList');
+      var hiddenByPager=card.classList.contains('ry-page-hidden')||getComputedStyle(card).display==='none';
+      if(hiddenByPager){card.classList.remove('ry-page-hidden');card.removeAttribute('hidden');card.setAttribute('aria-hidden','false');card.style.setProperty('display','block','important');}
+      var parent=card;
+      while(parent&&parent!==document.body){
+        if(parent.hidden)parent.hidden=false;
+        if(getComputedStyle(parent).display==='none'){
+          if(parent===list){parent.style.setProperty('display','grid','important');}
+          else if(parent===card.parentElement||parent.classList.contains('tab-content')||parent.classList.contains('tab-pane')||parent.getAttribute('role')==='tabpanel')parent.style.setProperty('display','block','important');
+        }
+        parent=parent.parentElement;
+      }
+      /* Jika pencarian/pagination masih menyembunyikan kartu, beri satu frame untuk layout lalu scroll. */
+      requestAnimationFrame(function(){
+        card.scrollIntoView({behavior:'smooth',block:'center'});
+        card.style.setProperty('outline','3px solid #c084fc','important');card.style.setProperty('outline-offset','4px','important');card.style.setProperty('box-shadow','0 0 28px #a855f7cc,0 0 55px #7c3aed66','important');
+        setTimeout(function(){card.style.removeProperty('outline');card.style.removeProperty('outline-offset');card.style.removeProperty('box-shadow');},7000);
+      });
+      finished=true;return;
+    }
+    if(targetName){var search=document.querySelector('#q, #searchInput, #search, input[type="search"], .search input, input[placeholder*="Cari"], input[placeholder*="cari"]');if(search&&search.value!==targetName){search.value=targetName;search.dispatchEvent(new Event('input',{bubbles:true}));search.dispatchEvent(new Event('change',{bubbles:true}));}}
+    if(attempts<100)setTimeout(findSharedSkin,250);
+  }
+  function init(){addShareButtons();var params=new URLSearchParams(location.search);targetId=params.get('ryuza_skin');targetName=params.get('ryuza_skin_name');if(targetId||targetName){setTimeout(findSharedSkin,150);setTimeout(findSharedSkin,700);setTimeout(findSharedSkin,1600);}}
   if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init);else init();var observer=new MutationObserver(function(){addShareButtons();if(targetId||targetName)findSharedSkin();});observer.observe(document.documentElement,{childList:true,subtree:true});setTimeout(function(){observer.disconnect();},30000);
 })();
 </script>
