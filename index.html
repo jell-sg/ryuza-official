@@ -4022,4 +4022,60 @@ body{background:radial-gradient(ellipse at 50% 0%,rgba(168,85,247,.18),transpare
  let tries=0;const timer=setInterval(()=>{showAll();if(++tries>=30)clearInterval(timer)},500);
 })();
 </script>
+<script id="ryuza-share-direct-final-fix">
+(function(){
+ 'use strict';
+ function clean(s){return String(s||'').replace(/\s+/g,' ').trim().toLowerCase();}
+ function slug(s){return clean(s).normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'');}
+ function norm(s){return slug(s).replace(/-/g,'');}
+ function params(){try{return new URLSearchParams(window.location.search)}catch(e){return new URLSearchParams('')}}
+ var p=params(),wantedId=p.get('ryuza_skin')||'',wantedName=p.get('ryuza_skin_name')||'',wantedPath=p.get('ryuza_skin_path')||'main';
+ if(!wantedId&&!wantedName)return;
+ var start=Date.now(),lastCard=null,tries=0,doneCount=0;
+ function getId(c){return c.getAttribute('data-rtdb-id')||c.getAttribute('data-skin-id')||c.getAttribute('data-id')||c.id||''}
+ function getName(c){var n=c.querySelector('.hero-title-text,[data-title],h2,h3,.title');return clean(n?n.textContent:c.innerText||c.textContent)}
+ function find(){
+  var cards=Array.from(document.querySelectorAll('#list .card.skin, #recalList .card, #recalList .recal-index-card, .card.skin[data-rtdb-id]'));
+  var id=slug(wantedId),name=slug(wantedName),hit=null;
+  if(wantedId)hit=cards.find(c=>getId(c)===wantedId||slug(getId(c))===id)||null;
+  if(!hit&&wantedName)hit=cards.find(c=>slug(getName(c))===name)||null;
+  if(!hit&&wantedName){var nn=norm(wantedName);hit=cards.find(c=>{var title=norm(getName(c)),ds=norm(c.getAttribute('data-search')||'');return (title&&nn&&(title===nn||title.includes(nn)||nn.includes(title)))||(ds&&nn&&ds.includes(nn))})||null}
+  if(!hit&&wantedId){var ii=norm(wantedId);hit=cards.find(c=>{var ds=norm(c.getAttribute('data-search')||'');return ds&&ii&&ds.includes(ii)})||null}
+  if(!hit)return false;
+  lastCard=hit;
+  // Force the target card and its containers to be visible, regardless of filters/tabs.
+  hit.hidden=false;hit.removeAttribute('hidden');hit.classList.remove('ry-page-hidden','d-none','hidden','filtered-out','is-hidden','hide');
+  hit.style.setProperty('display','block','important');hit.style.setProperty('visibility','visible','important');hit.style.setProperty('opacity','1','important');
+  var parent=hit.parentElement;
+  while(parent&&parent!==document.body){parent.hidden=false;parent.removeAttribute('hidden');parent.classList.remove('d-none','hidden','is-hidden','hide');
+   if(getComputedStyle(parent).display==='none'){
+    if(parent.id==='list'||parent.id==='recalList')parent.style.setProperty('display','grid','important');
+    else parent.style.setProperty('display','block','important');
+   }
+   parent=parent.parentElement;
+  }
+  // Clear active search, if any, then re-apply visibility after the app's listeners run.
+  var search=document.querySelector('#q,#searchInput,#search,input[type="search"],.search input,input[placeholder*="Cari"],input[placeholder*="cari"]');
+  if(search&&search.value){search.value='';search.dispatchEvent(new Event('input',{bubbles:true}));search.dispatchEvent(new Event('change',{bubbles:true}));}
+  requestAnimationFrame(function(){requestAnimationFrame(function(){
+   if(!document.documentElement.contains(hit))return;
+   hit.hidden=false;hit.classList.remove('ry-page-hidden','d-none','hidden','filtered-out','is-hidden','hide');
+   hit.style.setProperty('display','block','important');hit.style.setProperty('visibility','visible','important');
+   var y=hit.getBoundingClientRect().top+(window.pageYOffset||document.documentElement.scrollTop)-105;
+   window.scrollTo({top:Math.max(0,y),behavior:'auto'});
+   hit.style.setProperty('outline','3px solid #b76cff','important');hit.style.setProperty('outline-offset','4px','important');hit.style.setProperty('box-shadow','0 0 26px #a855f7cc,0 0 48px #7c3aed66','important');
+   hit.setAttribute('data-ryuza-share-target','true');
+   doneCount++;
+   if(doneCount>=3){setTimeout(function(){if(hit&&hit.isConnected){hit.style.removeProperty('outline');hit.style.removeProperty('outline-offset');hit.style.removeProperty('box-shadow');hit.removeAttribute('data-ryuza-share-target')}},9000)}
+  })});
+  return true;
+ }
+ function tick(){tries++;var found=find();if(Date.now()-start<25000&&(!found||doneCount<3)){setTimeout(tick,found?700:350)}}
+ if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',tick,{once:true});else tick();
+ window.addEventListener('load',function(){setTimeout(tick,350)});
+ var mo=new MutationObserver(function(){if(Date.now()-start<25000)find()});
+ mo.observe(document.documentElement,{childList:true,subtree:true});setTimeout(function(){mo.disconnect()},26000);
+})();
+</script>
+
 </body></html>
