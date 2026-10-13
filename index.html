@@ -3927,49 +3927,76 @@ body{background:radial-gradient(ellipse at 50% 0%,rgba(168,85,247,.18),transpare
   }
   function openSheet(name,url){ensureSheet();activeShare={name:name,url:url,data:{title:name+' — Ryuza Official',text:'Buka langsung skin '+name+' di Ryuza Official:',url:url}};document.getElementById('rzShareSkinName').textContent=name;var sheet=document.getElementById('ryuzaShareSheet');sheet.classList.add('is-open');document.body.style.overflow='hidden';}
   function closeSheet(){var sheet=document.getElementById('ryuzaShareSheet');if(sheet)sheet.classList.remove('is-open');document.body.style.overflow='';}
-  function addShareButtons(){allCards().forEach(function(card){if(card.querySelector(':scope > .card-share-btn'))return;var btn=document.createElement('button');btn.type='button';btn.className='card-share-btn';btn.setAttribute('aria-label','Bagikan '+getCardName(card));btn.innerHTML=iconShare()+'<span>Bagikan</span>';btn.addEventListener('click',function(e){e.preventDefault();e.stopPropagation();var name=getCardName(card),id=getCardId(card),url=new URL(location.pathname,location.origin);url.searchParams.set('ryuza_skin',id);url.searchParams.set('ryuza_skin_name',name);url.hash='';openSheet(name,url.href);});card.insertBefore(btn,card.firstChild);});}
+  function addShareButtons(){allCards().forEach(function(card){if(card.querySelector(':scope > .card-share-btn'))return;var btn=document.createElement('button');btn.type='button';btn.className='card-share-btn';btn.setAttribute('aria-label','Bagikan '+getCardName(card));btn.innerHTML=iconShare()+'<span>Bagikan</span>';btn.addEventListener('click',function(e){e.preventDefault();e.stopPropagation();var name=getCardName(card),id=getCardId(card),url=new URL(location.href);url.search='';url.hash='';url.searchParams.set('ryuza_skin',id);url.searchParams.set('ryuza_skin_name',name);url.searchParams.set('ryuza_skin_path',card.closest('#recalList')?'recal':'main');openSheet(name,url.href);});card.insertBefore(btn,card.firstChild);});}
   function copyLink(url,name){function fallback(){var ta=document.createElement('textarea');ta.value=url;ta.style.position='fixed';ta.style.opacity='0';document.body.appendChild(ta);ta.select();try{document.execCommand('copy');showMessage('Link skin berhasil disalin.');}catch(e){window.prompt('Salin link skin ini:',url);}ta.remove();}if(navigator.clipboard&&navigator.clipboard.writeText)navigator.clipboard.writeText(url).then(function(){showMessage('Link skin berhasil disalin.');closeSheet();}).catch(fallback);else fallback();}
   function showMessage(message){var toast=document.getElementById('ryuzaShareToast');if(!toast){toast=document.createElement('div');toast.id='ryuzaShareToast';toast.style.cssText='position:fixed;left:50%;bottom:24px;transform:translateX(-50%);z-index:100002;max-width:calc(100vw - 28px);padding:12px 16px;border:1px solid #53cfff66;border-radius:14px;background:#102235;color:#e9faff;box-shadow:0 10px 28px #0008;font:700 13px/1.4 system-ui,sans-serif;text-align:center';document.body.appendChild(toast);}toast.textContent=message;toast.style.display='block';clearTimeout(window.__ryuzaShareToastTimer);window.__ryuzaShareToastTimer=setTimeout(function(){toast.style.display='none';},2600);}
-  var targetId=null,targetName=null,finished=false,attempts=0;
+  var targetId=null,targetName=null,finished=false,attempts=0,searchApplied=false;
+  function norm(v){return slug(v).replace(/-/g,'');}
+  function cardRawId(c){return c.getAttribute('data-rtdb-id')||c.getAttribute('data-skin-id')||c.getAttribute('data-id')||c.id||'';}
+  function makeVisible(el){
+    var list=el.closest('#list, #recalList');
+    /* Reset filter/search states that may hide the requested card. */
+    var search=document.querySelector('#q, #searchInput, #search, input[type="search"], .search input, input[placeholder*="Cari"], input[placeholder*="cari"]');
+    if(search&&search.value){search.value='';search.dispatchEvent(new Event('input',{bubbles:true}));search.dispatchEvent(new Event('change',{bubbles:true}));}
+    el.classList.remove('ry-page-hidden','d-none','hidden','filtered-out','is-hidden','hide');
+    el.removeAttribute('hidden');el.setAttribute('aria-hidden','false');
+    el.style.removeProperty('display');el.style.removeProperty('visibility');el.style.removeProperty('opacity');
+    var p=el.parentElement;
+    while(p&&p!==document.body){
+      if(p.hidden)p.hidden=false;
+      p.classList.remove('d-none','hidden','is-hidden','hide');
+      if(getComputedStyle(p).display==='none'){
+        if(p===list)p.style.setProperty('display','grid','important');
+        else if(p.matches('.tab-pane,.tab-content,[role="tabpanel"]')){p.classList.add('active','show');p.style.setProperty('display','block','important');}
+        else p.style.setProperty('display','block','important');
+      }
+      p=p.parentElement;
+    }
+    if(list){list.querySelectorAll('.ry-page-hidden,[hidden],.d-none,.filtered-out,.is-hidden').forEach(function(x){x.classList.remove('ry-page-hidden','d-none','hidden','filtered-out','is-hidden');x.removeAttribute('hidden');x.style.removeProperty('display');});}
+    return list;
+  }
   function findSharedSkin(){
     if((!targetId&&!targetName)||finished)return;
     attempts++;
-    var cards=allCards(),targetSlug=slug(targetId||targetName),nameSlug=slug(targetName||'');
-    /* Cari berdasarkan ID stabil terlebih dahulu, lalu nama lengkap, kemudian kata kunci data-search. */
-    var card=cards.find(function(c){var cid=c.getAttribute('data-rtdb-id')||c.getAttribute('data-skin-id')||c.getAttribute('data-id')||c.id||'';return !!targetId&&(cid===targetId||slug(cid)===targetSlug||slug(getCardId(c))===targetSlug);});
-    if(!card&&targetName)card=cards.find(function(c){var n=slug(getCardName(c));return n===nameSlug;});
-    if(!card&&targetName)card=cards.find(function(c){var n=slug(getCardName(c));return n&&nameSlug&&(n.includes(nameSlug)||nameSlug.includes(n));});
-    if(!card&&targetName)card=cards.find(function(c){var ds=slug(c.getAttribute('data-search')||'');return ds&&nameSlug&&ds.includes(nameSlug);});
+    var cards=allCards(),idSlug=slug(targetId||''),nameSlug=slug(targetName||''),idNorm=norm(targetId||''),nameNorm=norm(targetName||'');
+    var card=null;
+    if(targetId) card=cards.find(function(c){var cid=cardRawId(c);return cid===targetId||slug(cid)===idSlug||slug(getCardId(c))===idSlug;})||null;
+    if(!card&&targetName) card=cards.find(function(c){return slug(getCardName(c))===nameSlug;})||null;
+    if(!card&&targetName) card=cards.find(function(c){var title=norm(getCardName(c)),ds=norm(c.getAttribute('data-search')||'');return (title&&nameNorm&&(title===nameNorm||title.includes(nameNorm)||nameNorm.includes(title)))||(ds&&nameNorm&&ds.includes(nameNorm));})||null;
+    /* Last-resort match: some Firebase-rendered cards use a different runtime ID. */
+    if(!card&&targetId) card=cards.find(function(c){var ds=slug(c.getAttribute('data-search')||'');return ds&&idSlug&&ds.includes(idSlug);})||null;
     if(card){
-      /* Jangan berhenti di card yang disembunyikan pagination. Paksa card target terlihat,
-         termasuk saat berada di halaman 2+ atau di daftar Recal yang sedang tersembunyi. */
-      var list=card.closest('#list, #recalList');
-      var hiddenByPager=card.classList.contains('ry-page-hidden')||getComputedStyle(card).display==='none';
-      if(hiddenByPager){card.classList.remove('ry-page-hidden','d-none','hidden','filtered-out','is-hidden');card.removeAttribute('hidden');card.setAttribute('aria-hidden','false');card.style.setProperty('display','block','important');card.style.setProperty('visibility','visible','important');card.style.setProperty('opacity','1','important');}
-      var parent=card;
-      while(parent&&parent!==document.body){
-        if(parent.hidden)parent.hidden=false;
-        if(getComputedStyle(parent).display==='none'){
-          if(parent===list){parent.style.setProperty('display','grid','important');}
-          else if(parent===card.parentElement||parent.classList.contains('tab-content')||parent.classList.contains('tab-pane')||parent.getAttribute('role')==='tabpanel')parent.style.setProperty('display','block','important');
-        }
-        parent=parent.parentElement;
-      }
-      /* Jika pencarian/pagination masih menyembunyikan kartu, beri satu frame untuk layout lalu scroll. */
-      requestAnimationFrame(function(){
-        /* Paksa layout ulang agar posisi tepat walau daftar baru selesai dirender. */
-        card.getBoundingClientRect();
-        card.scrollIntoView({behavior:'smooth',block:'center'});
-        card.style.setProperty('outline','3px solid #c084fc','important');card.style.setProperty('outline-offset','4px','important');card.style.setProperty('box-shadow','0 0 28px #a855f7cc,0 0 55px #7c3aed66','important');
-        setTimeout(function(){card.style.removeProperty('outline');card.style.removeProperty('outline-offset');card.style.removeProperty('box-shadow');},7000);
-      });
+      var list=makeVisible(card);
+      /* Wait for filtering/layout to settle before scrolling. */
+      requestAnimationFrame(function(){requestAnimationFrame(function(){
+        if(!document.documentElement.contains(card))return;
+        card.scrollIntoView({behavior:'auto',block:'center',inline:'nearest'});
+        card.style.setProperty('outline','3px solid #c084fc','important');
+        card.style.setProperty('outline-offset','4px','important');
+        card.style.setProperty('box-shadow','0 0 28px #a855f7cc,0 0 55px #7c3aed66','important');
+        try{history.replaceState(null,'',location.pathname+location.search+'#skin-'+encodeURIComponent(targetId||slug(targetName)));}catch(e){}
+        setTimeout(function(){card.style.removeProperty('outline');card.style.removeProperty('outline-offset');card.style.removeProperty('box-shadow');},9000);
+      });});
       finished=true;return;
     }
-    if(targetName){var search=document.querySelector('#q, #searchInput, #search, input[type="search"], .search input, input[placeholder*="Cari"], input[placeholder*="cari"]');if(search&&search.value!==targetName){search.value=targetName;search.dispatchEvent(new Event('input',{bubbles:true}));search.dispatchEvent(new Event('change',{bubbles:true}));}}
-    if(attempts<180)setTimeout(findSharedSkin,250);
+    /* Search only once; continue waiting for async Firebase cards to render. */
+    if(!searchApplied&&targetName){var search=document.querySelector('#q, #searchInput, #search, input[type="search"], .search input, input[placeholder*="Cari"], input[placeholder*="cari"]');if(search){search.value=targetName;search.dispatchEvent(new Event('input',{bubbles:true}));search.dispatchEvent(new Event('change',{bubbles:true}));searchApplied=true;}}
+    if(attempts<240)setTimeout(findSharedSkin,250);
   }
-  function init(){addShareButtons();var params=new URLSearchParams(location.search);targetId=params.get('ryuza_skin');targetName=params.get('ryuza_skin_name');if(targetId||targetName){setTimeout(findSharedSkin,150);setTimeout(findSharedSkin,700);setTimeout(findSharedSkin,1600);}}
-  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init);else init();var observer=new MutationObserver(function(){addShareButtons();if(targetId||targetName)findSharedSkin();});observer.observe(document.documentElement,{childList:true,subtree:true});setTimeout(function(){observer.disconnect();},30000);
+  function init(){
+    addShareButtons();
+    var params=new URLSearchParams(location.search);
+    targetId=params.get('ryuza_skin');targetName=params.get('ryuza_skin_name');
+    if(targetId||targetName){
+      /* Disable any leftover pagination before resolving the shared card. */
+      document.querySelectorAll('#ryMainPager,#ryRecalPager,.ry-pagination').forEach(function(el){el.remove();});
+      setTimeout(findSharedSkin,100);setTimeout(findSharedSkin,500);setTimeout(findSharedSkin,1200);setTimeout(findSharedSkin,2500);
+    }
+  }
+  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init);else init();
+  var observer=new MutationObserver(function(){addShareButtons();if(targetId||targetName)findSharedSkin();});
+  observer.observe(document.documentElement,{childList:true,subtree:true});
+  setTimeout(function(){observer.disconnect();},65000);
 })();
 </script>
 
