@@ -3943,80 +3943,44 @@ body{background:radial-gradient(ellipse at 50% 0%,rgba(168,85,247,.18),transpare
 
 
 <style id="ryuza-card-share-style">
-.card-share-btn{display:flex;align-items:center;justify-content:center;gap:7px;width:100%;min-height:39px;margin:8px 0 2px;padding:9px 12px;border:1px solid rgba(64,190,255,.38);border-radius:11px;background:linear-gradient(120deg,#102b48,#12394a);color:#d8f5ff;font:800 12px/1.2 inherit;cursor:pointer;transition:background .2s,border-color .2s}
-.card-share-btn:hover{background:linear-gradient(120deg,#17416b,#145368);border-color:#48caff}
-.card-share-btn svg{width:16px;height:16px;flex:none}
-.card-share-btn:active{transform:scale(.99)}
-@media(prefers-reduced-motion:reduce){.card-share-btn{transition:none}}
+.card-share-btn{position:absolute;top:12px;right:12px;z-index:8;display:inline-flex;align-items:center;justify-content:center;gap:7px;min-height:34px;padding:8px 11px;border:1px solid rgba(133,220,255,.36);border-radius:999px;background:rgba(7,17,31,.78);color:#e8f8ff;font:700 11px/1 Arial,sans-serif;letter-spacing:.15px;cursor:pointer;backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);box-shadow:0 5px 18px rgba(0,0,0,.2);transition:transform .2s ease,border-color .2s ease,background .2s ease}
+.card-share-btn:hover{transform:translateY(-1px);border-color:#73ddff;background:rgba(15,49,72,.94)}.card-share-btn:active{transform:scale(.96)}.card-share-btn svg{width:15px;height:15px;flex:none;color:#79e1ff}
+.card:has(>.card-share-btn),#list .card.skin:has(.card-share-btn),#recalList .card:has(.card-share-btn){position:relative}
+#ryuzaShareSheet{position:fixed;inset:0;z-index:100001;display:none;align-items:flex-end;justify-content:center;padding:18px;background:rgba(2,8,18,.68);backdrop-filter:blur(9px);-webkit-backdrop-filter:blur(9px)}#ryuzaShareSheet.is-open{display:flex;animation:rzShareFade .18s ease-out}
+#ryuzaSharePanel{position:relative;width:min(100%,420px);padding:22px 19px 19px;border:1px solid rgba(135,214,255,.2);border-radius:27px;background:linear-gradient(155deg,#14263b 0%,#091321 70%,#0a1928 100%);color:#f2f8ff;box-shadow:0 24px 90px #0009;animation:rzShareRise .24s cubic-bezier(.2,.8,.2,1)}
+#ryuzaSharePanel .rz-grabber{width:38px;height:4px;border-radius:9px;background:#7891a5;opacity:.65;margin:-10px auto 20px}#ryuzaSharePanel .rz-share-head{display:flex;align-items:center;gap:13px;margin-bottom:18px}#ryuzaSharePanel .rz-share-logo{display:grid;place-items:center;width:48px;height:48px;flex:none;border-radius:16px;background:linear-gradient(145deg,#123c5c,#176b83);border:1px solid #4bd3ff55;color:#8deaff;box-shadow:inset 0 0 18px #42cfff18}#ryuzaSharePanel .rz-share-logo svg{width:24px;height:24px}#ryuzaSharePanel .rz-share-title{font:800 17px/1.2 system-ui,sans-serif;letter-spacing:-.3px}#ryuzaSharePanel .rz-share-subtitle{margin-top:5px;color:#9db4c8;font:500 12px/1.4 system-ui,sans-serif}#ryuzaSharePanel .rz-share-skin{display:flex;align-items:center;gap:10px;padding:12px 13px;margin-bottom:16px;border:1px solid #9edfff20;border-radius:16px;background:rgba(255,255,255,.045)}#ryuzaSharePanel .rz-share-skin-icon{display:grid;place-items:center;width:36px;height:36px;flex:none;border-radius:12px;background:#45caff18;color:#80e4ff}#ryuzaSharePanel .rz-share-skin-icon svg{width:19px;height:19px}#ryuzaSharePanel .rz-share-skin-name{min-width:0;overflow-wrap:anywhere;font:750 13px/1.35 system-ui,sans-serif}#ryuzaSharePanel .rz-share-skin-label{margin-top:3px;color:#90a8bc;font:500 10px/1.3 system-ui,sans-serif;letter-spacing:.6px;text-transform:uppercase}#ryuzaSharePanel .rz-share-actions{display:grid;grid-template-columns:1fr 1fr;gap:10px}#ryuzaSharePanel .rz-share-action{display:flex;align-items:center;justify-content:center;gap:8px;min-height:47px;padding:11px;border-radius:14px;font:750 12px/1 system-ui,sans-serif;cursor:pointer;transition:transform .15s ease,filter .15s ease}#ryuzaSharePanel .rz-share-action:active{transform:scale(.97)}#ryuzaSharePanel .rz-share-action svg{width:17px;height:17px}#ryuzaSharePanel .rz-share-primary{border:1px solid #5de0ff55;background:linear-gradient(120deg,#127da6,#1765a4);color:#fff;box-shadow:0 7px 20px #087eb633}#ryuzaSharePanel .rz-share-secondary{border:1px solid #b6d9f126;background:#ffffff09;color:#dcecf8}#ryuzaSharePanel .rz-share-close{display:block;width:100%;margin-top:11px;padding:12px;border:0;background:transparent;color:#8fa8bc;font:650 12px system-ui,sans-serif;cursor:pointer}
+@keyframes rzShareFade{from{opacity:0}to{opacity:1}}@keyframes rzShareRise{from{opacity:0;transform:translateY(22px) scale(.98)}to{opacity:1;transform:translateY(0) scale(1)}}@media(min-width:600px){#ryuzaShareSheet{align-items:center}#ryuzaSharePanel{border-radius:25px}}@media(prefers-reduced-motion:reduce){.card-share-btn,#ryuzaShareSheet,#ryuzaSharePanel{animation:none;transition:none}}
 </style>
 <script id="ryuza-per-card-share">
 (function(){
   'use strict';
-  function getCardName(card){
-    var el=card.querySelector('.hero-title-text')||card.querySelector('.title');
-    return (el?el.textContent:'Skin Ryuza Official').replace(/\\s+/g,' ').trim();
+  function clean(v){return (v||'').replace(/\s+/g,' ').trim();}
+  function slug(v){return clean(v).toLocaleLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'');}
+  function getCardName(card){var el=card.querySelector('.hero-title-text, .title, h2, h3, [data-title]');if(el&&clean(el.textContent))return clean(el.textContent);var txt=clean(card.innerText||card.textContent);return(txt.split('\n').map(clean).find(function(x){return x&&x.length<100;})||'Skin Ryuza Official');}
+  function getCardId(card){return card.getAttribute('data-rtdb-id')||card.getAttribute('data-skin-id')||card.getAttribute('data-id')||card.id||slug(getCardName(card));}
+  function allCards(){return Array.from(document.querySelectorAll('#list .card.skin, #recalList .card, #recalList .recal-index-card'));}
+  var activeShare=null;
+  function iconShare(){return '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="18" cy="5" r="3"></circle><circle cx="6" cy="12" r="3"></circle><circle cx="18" cy="19" r="3"></circle><path d="m8.7 10.7 6.6-4.4M8.7 13.3l6.6 4.4"></path></svg>';}
+  function ensureSheet(){
+    if(document.getElementById('ryuzaShareSheet'))return;
+    var sheet=document.createElement('div');sheet.id='ryuzaShareSheet';sheet.setAttribute('role','dialog');sheet.setAttribute('aria-modal','true');sheet.setAttribute('aria-label','Bagikan skin');
+    sheet.innerHTML='<div id="ryuzaSharePanel"><div class="rz-grabber"></div><div class="rz-share-head"><div class="rz-share-logo">'+iconShare()+'</div><div><div class="rz-share-title">Bagikan skin</div><div class="rz-share-subtitle">Biar temanmu langsung menemukan skin ini.</div></div></div><div class="rz-share-skin"><div class="rz-share-skin-icon">'+iconShare()+'</div><div style="min-width:0"><div class="rz-share-skin-name" id="rzShareSkinName">Skin Ryuza Official</div><div class="rz-share-skin-label">RYUZA OFFICIAL · SKIN LINK</div></div></div><div class="rz-share-actions"><button class="rz-share-action rz-share-primary" id="rzShareNative">'+iconShare()+'<span>Bagikan</span></button><button class="rz-share-action rz-share-secondary" id="rzShareCopy"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="8" y="8" width="12" height="12" rx="2"></rect><path d="M16 8V5a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h3"></path></svg><span>Salin link</span></button></div><button class="rz-share-close" id="rzShareClose">Batal</button></div>';
+    document.body.appendChild(sheet);
+    sheet.addEventListener('click',function(e){if(e.target===sheet)closeSheet();});
+    sheet.querySelector('#rzShareClose').addEventListener('click',closeSheet);
+    document.addEventListener('keydown',function(e){if(e.key==='Escape')closeSheet();});
+    sheet.querySelector('#rzShareNative').addEventListener('click',function(){if(!activeShare)return;if(navigator.share){navigator.share(activeShare.data).then(closeSheet).catch(function(err){if(err&&err.name!=='AbortError')copyLink(activeShare.url,activeShare.name);});}else copyLink(activeShare.url,activeShare.name);});
+    sheet.querySelector('#rzShareCopy').addEventListener('click',function(){if(activeShare)copyLink(activeShare.url,activeShare.name);});
   }
-  function getCardId(card){
-    return card.getAttribute('data-rtdb-id') || card.getAttribute('data-skin-id') ||
-      card.id || getCardName(card).toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'');
-  }
-  function addShareButtons(){
-    document.querySelectorAll('#list .card.skin, #recalList .card, #recalList .recal-index-card').forEach(function(card){
-      if(card.querySelector(':scope > .card-share-btn')) return;
-      var btn=document.createElement('button');
-      btn.type='button'; btn.className='card-share-btn';
-      btn.setAttribute('aria-label','Bagikan '+getCardName(card));
-      btn.innerHTML='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="18" cy="5" r="3"></circle><circle cx="6" cy="12" r="3"></circle><circle cx="18" cy="19" r="3"></circle><path d="m8.7 10.7 6.6-4.4M8.7 13.3l6.6 4.4"></path></svg><span>Bagikan Skin</span>';
-      btn.addEventListener('click',function(){
-        var name=getCardName(card), id=getCardId(card);
-        var url=new URL(location.href);
-        url.searchParams.set('ryuza_skin',id);
-        url.hash='';
-        var shareData={title:name+' — Ryuza Official',text:'Lihat skin '+name+' di Ryuza Official. Buka link ini untuk langsung menemukannya:',url:url.href};
-        if(navigator.share){
-          navigator.share(shareData).catch(function(err){if(err&&err.name!=='AbortError')copyLink(url.href,name);});
-        }else{copyLink(url.href,name);}
-      });
-      var title=card.querySelector('.title');
-      if(title) title.insertAdjacentElement('afterend',btn); else card.appendChild(btn);
-    });
-  }
-  function copyLink(url,name){
-    function fallback(){
-      var ta=document.createElement('textarea');ta.value=url;ta.style.position='fixed';ta.style.opacity='0';
-      document.body.appendChild(ta);ta.select();
-      try{document.execCommand('copy');showMessage('Link '+name+' berhasil disalin. Kirim ke teman!');}
-      catch(e){window.prompt('Salin link skin ini:',url);}
-      ta.remove();
-    }
-    if(navigator.clipboard&&navigator.clipboard.writeText){
-      navigator.clipboard.writeText(url).then(function(){showMessage('Link '+name+' berhasil disalin. Kirim ke teman!');}).catch(fallback);
-    }else fallback();
-  }
-  function showMessage(message){
-    var toast=document.getElementById('ryuzaShareToast');
-    if(!toast){toast=document.createElement('div');toast.id='ryuzaShareToast';toast.style.cssText='position:fixed;left:50%;bottom:22px;transform:translateX(-50%);z-index:100000;max-width:calc(100vw - 28px);padding:12px 16px;border:1px solid #2e9bca;border-radius:13px;background:#101d2d;color:#e9faff;box-shadow:0 10px 28px #0008;font:700 13px/1.4 Arial,sans-serif;text-align:center';document.body.appendChild(toast);}
-    toast.textContent=message;toast.style.display='block';
-    clearTimeout(window.__ryuzaShareToastTimer);window.__ryuzaShareToastTimer=setTimeout(function(){toast.style.display='none';},3000);
-  }
-  function openSharedSkin(){
-    var params=new URLSearchParams(location.search), target=params.get('ryuza_skin');
-    if(!target)return;
-    var find=function(){
-      var cards=Array.from(document.querySelectorAll('#list .card.skin, #recalList .card, #recalList .recal-index-card'));
-      var card=cards.find(function(c){return getCardId(c)===target;});
-      if(card){card.scrollIntoView({behavior:'smooth',block:'center'});card.style.outline='2px solid #35bfff';card.style.boxShadow='0 0 24px #168cff55';setTimeout(function(){card.style.outline='';},4500);return true;}
-      var search=document.querySelector('#searchInput, #search, input[type="search"], .search input, input[placeholder*="Cari"], input[placeholder*="cari"]');
-      if(search){search.value=target.replace(/-/g,' ');search.dispatchEvent(new Event('input',{bubbles:true}));}
-      return false;
-    };
-    setTimeout(find,500);setTimeout(find,1500);setTimeout(find,3000);
-  }
-  function init(){addShareButtons();openSharedSkin();}
-  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init);else init();
-  var observer=new MutationObserver(function(){addShareButtons();});
-  observer.observe(document.documentElement,{childList:true,subtree:true});
-  setTimeout(function(){observer.disconnect();},30000);
+  function openSheet(name,url){ensureSheet();activeShare={name:name,url:url,data:{title:name+' — Ryuza Official',text:'Buka langsung skin '+name+' di Ryuza Official:',url:url}};document.getElementById('rzShareSkinName').textContent=name;var sheet=document.getElementById('ryuzaShareSheet');sheet.classList.add('is-open');document.body.style.overflow='hidden';}
+  function closeSheet(){var sheet=document.getElementById('ryuzaShareSheet');if(sheet)sheet.classList.remove('is-open');document.body.style.overflow='';}
+  function addShareButtons(){allCards().forEach(function(card){if(card.querySelector(':scope > .card-share-btn'))return;var btn=document.createElement('button');btn.type='button';btn.className='card-share-btn';btn.setAttribute('aria-label','Bagikan '+getCardName(card));btn.innerHTML=iconShare()+'<span>Bagikan</span>';btn.addEventListener('click',function(e){e.preventDefault();e.stopPropagation();var name=getCardName(card),id=getCardId(card),url=new URL(location.href);url.hash='';url.search='';url.searchParams.set('ryuza_skin',id);url.searchParams.set('ryuza_skin_name',name);openSheet(name,url.href);});card.insertBefore(btn,card.firstChild);});}
+  function copyLink(url,name){function fallback(){var ta=document.createElement('textarea');ta.value=url;ta.style.position='fixed';ta.style.opacity='0';document.body.appendChild(ta);ta.select();try{document.execCommand('copy');showMessage('Link skin berhasil disalin.');}catch(e){window.prompt('Salin link skin ini:',url);}ta.remove();}if(navigator.clipboard&&navigator.clipboard.writeText)navigator.clipboard.writeText(url).then(function(){showMessage('Link skin berhasil disalin.');closeSheet();}).catch(fallback);else fallback();}
+  function showMessage(message){var toast=document.getElementById('ryuzaShareToast');if(!toast){toast=document.createElement('div');toast.id='ryuzaShareToast';toast.style.cssText='position:fixed;left:50%;bottom:24px;transform:translateX(-50%);z-index:100002;max-width:calc(100vw - 28px);padding:12px 16px;border:1px solid #53cfff66;border-radius:14px;background:#102235;color:#e9faff;box-shadow:0 10px 28px #0008;font:700 13px/1.4 system-ui,sans-serif;text-align:center';document.body.appendChild(toast);}toast.textContent=message;toast.style.display='block';clearTimeout(window.__ryuzaShareToastTimer);window.__ryuzaShareToastTimer=setTimeout(function(){toast.style.display='none';},2600);}
+  var targetId=null,targetName=null,finished=false,attempts=0;
+  function findSharedSkin(){if(!targetId&&!targetName||finished)return;attempts++;var cards=allCards(),targetSlug=slug(targetId||targetName),nameSlug=slug(targetName||'');var card=cards.find(function(c){return getCardId(c)===targetId||slug(getCardId(c))===targetSlug;});if(!card&&targetName)card=cards.find(function(c){var n=slug(getCardName(c));return n===nameSlug||n.includes(nameSlug)||nameSlug.includes(n);});if(card){finished=true;var parent=card;while(parent&&parent!==document.body){if(parent.hidden)parent.hidden=false;if(getComputedStyle(parent).display==='none'&&(parent.id==='recalList'||parent.id==='list'))parent.style.display='';parent=parent.parentElement;}card.scrollIntoView({behavior:'smooth',block:'center'});card.style.outline='3px solid #35bfff';card.style.outlineOffset='3px';card.style.boxShadow='0 0 28px #168cff88';setTimeout(function(){card.style.outline='';card.style.outlineOffset='';card.style.boxShadow='';},6500);return;}if(targetName){var search=document.querySelector('#searchInput, #search, input[type="search"], .search input, input[placeholder*="Cari"], input[placeholder*="cari"]');if(search&&search.value!==targetName){search.value=targetName;search.dispatchEvent(new Event('input',{bubbles:true}));search.dispatchEvent(new Event('change',{bubbles:true}));}}if(attempts<80)setTimeout(findSharedSkin,250);}
+  function init(){addShareButtons();var params=new URLSearchParams(location.search);targetId=params.get('ryuza_skin');targetName=params.get('ryuza_skin_name');if(targetId||targetName)setTimeout(findSharedSkin,150);}
+  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init);else init();var observer=new MutationObserver(function(){addShareButtons();if(targetId||targetName)findSharedSkin();});observer.observe(document.documentElement,{childList:true,subtree:true});setTimeout(function(){observer.disconnect();},30000);
 })();
 </script>
 
