@@ -3941,6 +3941,85 @@ body{background:radial-gradient(ellipse at 50% 0%,rgba(168,85,247,.18),transpare
 })();
 </script>
 
+
+<style id="ryuza-card-share-style">
+.card-share-btn{display:flex;align-items:center;justify-content:center;gap:7px;width:100%;min-height:39px;margin:8px 0 2px;padding:9px 12px;border:1px solid rgba(64,190,255,.38);border-radius:11px;background:linear-gradient(120deg,#102b48,#12394a);color:#d8f5ff;font:800 12px/1.2 inherit;cursor:pointer;transition:background .2s,border-color .2s}
+.card-share-btn:hover{background:linear-gradient(120deg,#17416b,#145368);border-color:#48caff}
+.card-share-btn svg{width:16px;height:16px;flex:none}
+.card-share-btn:active{transform:scale(.99)}
+@media(prefers-reduced-motion:reduce){.card-share-btn{transition:none}}
+</style>
+<script id="ryuza-per-card-share">
+(function(){
+  'use strict';
+  function getCardName(card){
+    var el=card.querySelector('.hero-title-text')||card.querySelector('.title');
+    return (el?el.textContent:'Skin Ryuza Official').replace(/\\s+/g,' ').trim();
+  }
+  function getCardId(card){
+    return card.getAttribute('data-rtdb-id') || card.getAttribute('data-skin-id') ||
+      card.id || getCardName(card).toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'');
+  }
+  function addShareButtons(){
+    document.querySelectorAll('#list .card.skin, #recalList .card, #recalList .recal-index-card').forEach(function(card){
+      if(card.querySelector(':scope > .card-share-btn')) return;
+      var btn=document.createElement('button');
+      btn.type='button'; btn.className='card-share-btn';
+      btn.setAttribute('aria-label','Bagikan '+getCardName(card));
+      btn.innerHTML='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="18" cy="5" r="3"></circle><circle cx="6" cy="12" r="3"></circle><circle cx="18" cy="19" r="3"></circle><path d="m8.7 10.7 6.6-4.4M8.7 13.3l6.6 4.4"></path></svg><span>Bagikan Skin</span>';
+      btn.addEventListener('click',function(){
+        var name=getCardName(card), id=getCardId(card);
+        var url=new URL(location.href);
+        url.searchParams.set('ryuza_skin',id);
+        url.hash='';
+        var shareData={title:name+' — Ryuza Official',text:'Lihat skin '+name+' di Ryuza Official. Buka link ini untuk langsung menemukannya:',url:url.href};
+        if(navigator.share){
+          navigator.share(shareData).catch(function(err){if(err&&err.name!=='AbortError')copyLink(url.href,name);});
+        }else{copyLink(url.href,name);}
+      });
+      var title=card.querySelector('.title');
+      if(title) title.insertAdjacentElement('afterend',btn); else card.appendChild(btn);
+    });
+  }
+  function copyLink(url,name){
+    function fallback(){
+      var ta=document.createElement('textarea');ta.value=url;ta.style.position='fixed';ta.style.opacity='0';
+      document.body.appendChild(ta);ta.select();
+      try{document.execCommand('copy');showMessage('Link '+name+' berhasil disalin. Kirim ke teman!');}
+      catch(e){window.prompt('Salin link skin ini:',url);}
+      ta.remove();
+    }
+    if(navigator.clipboard&&navigator.clipboard.writeText){
+      navigator.clipboard.writeText(url).then(function(){showMessage('Link '+name+' berhasil disalin. Kirim ke teman!');}).catch(fallback);
+    }else fallback();
+  }
+  function showMessage(message){
+    var toast=document.getElementById('ryuzaShareToast');
+    if(!toast){toast=document.createElement('div');toast.id='ryuzaShareToast';toast.style.cssText='position:fixed;left:50%;bottom:22px;transform:translateX(-50%);z-index:100000;max-width:calc(100vw - 28px);padding:12px 16px;border:1px solid #2e9bca;border-radius:13px;background:#101d2d;color:#e9faff;box-shadow:0 10px 28px #0008;font:700 13px/1.4 Arial,sans-serif;text-align:center';document.body.appendChild(toast);}
+    toast.textContent=message;toast.style.display='block';
+    clearTimeout(window.__ryuzaShareToastTimer);window.__ryuzaShareToastTimer=setTimeout(function(){toast.style.display='none';},3000);
+  }
+  function openSharedSkin(){
+    var params=new URLSearchParams(location.search), target=params.get('ryuza_skin');
+    if(!target)return;
+    var find=function(){
+      var cards=Array.from(document.querySelectorAll('#list .card.skin, #recalList .card, #recalList .recal-index-card'));
+      var card=cards.find(function(c){return getCardId(c)===target;});
+      if(card){card.scrollIntoView({behavior:'smooth',block:'center'});card.style.outline='2px solid #35bfff';card.style.boxShadow='0 0 24px #168cff55';setTimeout(function(){card.style.outline='';},4500);return true;}
+      var search=document.querySelector('#searchInput, #search, input[type="search"], .search input, input[placeholder*="Cari"], input[placeholder*="cari"]');
+      if(search){search.value=target.replace(/-/g,' ');search.dispatchEvent(new Event('input',{bubbles:true}));}
+      return false;
+    };
+    setTimeout(find,500);setTimeout(find,1500);setTimeout(find,3000);
+  }
+  function init(){addShareButtons();openSharedSkin();}
+  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init);else init();
+  var observer=new MutationObserver(function(){addShareButtons();});
+  observer.observe(document.documentElement,{childList:true,subtree:true});
+  setTimeout(function(){observer.disconnect();},30000);
+})();
+</script>
+
 </body></html>
 
 <style id="ryuza-purple-neon-page-theme-final">
