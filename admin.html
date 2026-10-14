@@ -483,7 +483,62 @@ async function moveSkinToEdge(id,edge){
  catch(e){toast('Gagal mengubah urutan: '+e.message)}
 }
 let skinSearchTimer=0;$('search').oninput=()=>{clearTimeout(skinSearchTimer);skinSearchTimer=setTimeout(()=>{skinPage=1;render()},120)};
-$('addBtn').onclick=()=>{const id='skin-'+Date.now();items[id]={id,title:'Skin Baru',iconText:'S',options:[{label:'Default',url:'',selected:true}],order:0};promoteSkinLocal(id);render();document.querySelector(`.skin[data-id="${id}"]`)?.scrollIntoView({behavior:'smooth',block:'center'});document.querySelector(`.skin[data-id="${id}"] .titleInput`)?.focus();toast('Skin baru dibuat. Isi data lalu klik Simpan.')};
+function addSkinManual(categoryId=''){
+ openCategorySkinPicker(String(categoryId||''));
+}
+function openCategorySkinPicker(categoryId){
+ const modal=$('categorySkinPickerModal');if(!modal){toast('Popup pemilih skin tidak tersedia');return;}
+ const cat=categories[categoryId]||{};
+ $('categorySkinPickerTitle').textContent='Pilih Skin untuk '+(cat.name||categoryId||'Kategori');
+ $('categorySkinPickerSearch').value='';
+ modal.dataset.categoryId=categoryId;
+ const selected=new Set();
+ modal.querySelectorAll('[data-picker-skin]').forEach(x=>x.checked=false);
+ renderCategorySkinPicker();
+ modal.style.display='flex';document.body.style.overflow='hidden';
+ setTimeout(()=>$('categorySkinPickerSearch')?.focus(),50);
+}
+function closeCategorySkinPicker(){const modal=$('categorySkinPickerModal');if(modal)modal.style.display='none';document.body.style.overflow='';}
+function categorySearchNorm(value){
+ return String(value??'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLocaleLowerCase('id').replace(/[_-]+/g,' ').replace(/\s+/g,' ').trim();
+}
+function renderCategorySkinPicker(){
+ const modal=$('categorySkinPickerModal');if(!modal)return;
+ const searchEl=$('categorySkinPickerSearch');
+ const q=categorySearchNorm(searchEl?.value||'');
+ const catId=modal.dataset.categoryId||'';
+ const previouslyChecked=new Set([...modal.querySelectorAll('[data-picker-skin]:checked')].map(x=>x.dataset.pickerSkin));
+ const arr=Object.entries(items||{}).filter(([id,x])=>x&&typeof x==='object').sort((a,b)=>Number(a[1]?.order??999999)-Number(b[1]?.order??999999));
+ const filtered=arr.filter(([id,x])=>{
+  const options=Array.isArray(x.options)?x.options:[];
+  const haystack=categorySearchNorm([id,x.title,x.name,x.iconText,x.category,x.imageUrl,x.backgroundImage,x.cardBackground,x.backgroundUrl,x.bannerImage,...options.flatMap(o=>[o?.label,o?.url,o?.name])].filter(Boolean).join(' '));
+  return !q||haystack.includes(q);
+ });
+ const countEl=$('categorySkinPickerCount');if(countEl)countEl.textContent=q?`${filtered.length} hasil untuk “${String(searchEl?.value||'').trim()}” · ${arr.length} total skin`:`${arr.length} skin tersedia`;
+ const list=$('categorySkinPickerList');if(!list)return;
+ list.innerHTML=filtered.map(([id,x])=>{
+  const title=cleanTitle(x.title||x.name||id),cur=String(x.category||''),assigned=cur===catId||cur===String(categories[catId]?.name||'');
+  const img=x.imageUrl||x.backgroundImage||x.cardBackground||x.backgroundUrl||x.bannerImage||'';
+  const safeId=esc(id);
+  return `<label class="category-picker-item"><input type="checkbox" data-picker-skin="${safeId}" ${(assigned||previouslyChecked.has(id))?'checked':''}><span class="category-picker-thumb" style="${img?`background-image:url(&quot;${esc(img)}&quot;)`:''}">${img?'':esc(x.iconText||initials(title))}</span><span class="category-picker-info"><b>${esc(title||id)}</b><small>${esc((Array.isArray(x.options)?x.options:[]).length+' pilihan Replace · '+id)}</small></span><span class="category-picker-current">${assigned?'Sudah di kategori':''}</span></label>`;
+ }).join('')||`<div class="hint" style="padding:20px;text-align:center">${q?'Tidak ditemukan. Coba kata kunci lain.':'Belum ada skin tersimpan.'}</div>`;
+}
+async function applyCategorySkinSelection(){
+ const modal=$('categorySkinPickerModal'),categoryId=modal?.dataset.categoryId||'';if(!categoryId){toast('Kategori tidak ditemukan');return}
+ const chosen=[...modal.querySelectorAll('[data-picker-skin]:checked')].map(x=>x.dataset.pickerSkin);
+ if(!chosen.length){toast('Pilih minimal satu skin');return}
+ const btn=$('categorySkinPickerApply'),old=btn.textContent;btn.disabled=true;btn.textContent='Menyimpan…';
+ try{const updates={};chosen.forEach(id=>{updates[id+'/category']=categoryId;if(items[id])items[id].category=categoryId});await db.ref('siteConfig/skins').update(updates);renderCategories();render();closeCategorySkinPicker();toast(chosen.length+' skin dimasukkan ke kategori '+(categories[categoryId]?.name||categoryId));document.dispatchEvent(new CustomEvent('ryuza-admin-data-changed'))}
+ catch(e){toast('Gagal menyimpan kategori skin: '+(e.message||e))}
+ finally{btn.disabled=false;btn.textContent=old}
+}
+if($('categorySkinPickerSearch'))$('categorySkinPickerSearch').oninput=()=>renderCategorySkinPicker();
+$('categorySkinPickerClose')?.addEventListener('click',e=>{e.preventDefault();e.stopPropagation();closeCategorySkinPicker()});
+$('categorySkinPickerCancel')?.addEventListener('click',e=>{e.preventDefault();e.stopPropagation();closeCategorySkinPicker()});
+$('categorySkinPickerApply')?.addEventListener('click',e=>{e.preventDefault();e.stopPropagation();applyCategorySkinSelection()});
+$('categorySkinPickerModal')?.addEventListener('click',e=>{if(e.target.id==='categorySkinPickerModal')closeCategorySkinPicker()});
+document.addEventListener('keydown',e=>{if(e.key==='Escape')closeCategorySkinPicker()});
+$('addBtn').onclick=()=>addSkinManual('');
 $('quickAdd').onclick=()=>{$('.tab[data-tab="skins"]').click();$('addBtn').click()};
 function switchTab(name){document.querySelectorAll('.tab').forEach(b=>b.classList.toggle('active',b.dataset.tab===name));document.querySelectorAll('.panel').forEach(p=>p.classList.toggle('active',p.id===name));location.hash=name}
 document.querySelectorAll('.tab').forEach(b=>b.onclick=()=>switchTab(b.dataset.tab));if(location.hash&&document.getElementById(location.hash.slice(1))?.classList.contains('panel'))switchTab(location.hash.slice(1));
@@ -509,8 +564,9 @@ let featuredSearchTimer=0;$('featuredPickerSearch').oninput=()=>{clearTimeout(fe
 function categorySlug(v){return String(v||'').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'').slice(0,70)||('kategori-'+Date.now())}
 function renderCategories(){
  const el=$('categoryList');if(!el)return;const arr=Object.entries(categories||{}).sort((a,b)=>Number(a[1]?.order||0)-Number(b[1]?.order||0));
- el.innerHTML=arr.map(([id,c])=>`<div class="card" style="margin:0;padding:12px;display:flex;align-items:center;justify-content:space-between;gap:10px"><div><b>${esc(c.icon||'✦')} ${esc(c.name||id)}</b><div class="hint">ID: ${esc(id)}</div></div><button class="danger" data-delete-category="${esc(id)}" type="button">Hapus</button></div>`).join('')||'<div class="empty">Belum ada kategori. Tambahkan kategori di atas.</div>';
- el.querySelectorAll('[data-delete-category]').forEach(b=>b.onclick=async()=>{const id=b.dataset.deleteCategory;if(!confirm('Hapus kategori ini? Skin yang sudah memakai kategori ini tetap ada, tetapi tidak lagi masuk tab kategori.'))return;try{await db.ref('siteConfig/categories/'+id).remove();delete categories[id];window.__RYUZA_ADMIN_CATEGORIES__=categories;renderCategories();render();toast('Kategori dihapus. Publish Index untuk memperbarui tab.')}catch(e){toast('Gagal menghapus kategori: '+e.message)}});
+ el.innerHTML=arr.map(([id,c])=>{const count=Object.values(items||{}).filter(x=>String(x.category||'')===String(id)||String(x.category||'')===String(c.name||'')).length;return `<div class="card" style="margin:0;padding:12px;display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap"><div style="min-width:130px;flex:1"><b>${esc(c.icon||'✦')} ${esc(c.name||id)}</b><div class="hint">ID: ${esc(id)} · ${count} skin</div></div><div class="actions" style="margin:0"><button class="primary" data-add-skin-category="${esc(id)}" type="button">＋ Tambah Skin</button><button class="danger" data-delete-category="${esc(id)}" type="button">Hapus</button></div></div>`}).join('')||'<div class="empty">Belum ada kategori. Tambahkan kategori di atas.</div>';
+ el.querySelectorAll('[data-add-skin-category]').forEach(b=>{b.type='button';b.onclick=(ev)=>{ev.preventDefault();ev.stopPropagation();addSkinManual(b.dataset.addSkinCategory)}});
+ el.querySelectorAll('[data-delete-category]').forEach(b=>{b.type='button';b.onclick=async(ev)=>{ev.preventDefault();ev.stopPropagation();const id=b.dataset.deleteCategory;if(!confirm('Hapus kategori ini? Skin yang sudah memakai kategori ini tetap ada, tetapi tidak lagi masuk tab kategori.'))return;try{await db.ref('siteConfig/categories/'+id).remove();delete categories[id];window.__RYUZA_ADMIN_CATEGORIES__=categories;renderCategories();render();toast('Kategori dihapus. Publish Index untuk memperbarui tab.')}catch(e){toast('Gagal menghapus kategori: '+e.message)}}});
  const st=$('categoryStatus');if(st){st.textContent='● '+arr.length+' kategori';st.className='badge ok'}
 }
 $('addCategoryBtn')?.addEventListener('click',async()=>{const name=String($('categoryName')?.value||'').trim(),icon=String($('categoryIcon')?.value||'✦').trim()||'✦';if(!name){toast('Isi nama kategori dulu');$('categoryName')?.focus();return}const id=categorySlug(name);if(categories[id]){toast('Kategori sudah ada');return}const obj={name,icon,order:Object.keys(categories).length,createdAt:Date.now()};try{await db.ref('siteConfig/categories/'+id).set(obj);categories[id]=obj;window.__RYUZA_ADMIN_CATEGORIES__=categories;$('categoryName').value='';renderCategories();render();toast('Kategori ditambahkan. Klik Publish Index agar tampil di website.')}catch(e){toast('Gagal menambah kategori: '+e.message)}});
@@ -1548,6 +1604,36 @@ $('quickImport').onclick=()=>{$('.tab[data-tab="skins"]').click();$('seedBtn').c
 <script id="ryuza-admin-image-live-preview-fix">
 (function(){document.addEventListener('input',function(e){const input=e.target;if(!input||!input.classList||!input.classList.contains('imageUrlInput'))return;const card=input.closest('.skin');if(!card)return;let preview=card.querySelector('.skin-image-preview');if(!preview){preview=document.createElement('div');preview.className='skin-image-preview';preview.style.cssText='margin-top:8px;height:88px;border:1px solid #29445e;border-radius:10px;background:#101c2d center/cover no-repeat';input.insertAdjacentElement('afterend',preview)}const url=String(input.value||'').trim();preview.style.display=url?'block':'none';preview.style.backgroundImage=url&&/^https?:\/\//i.test(url)?'url("'+url.replace(/["\\]/g,'')+'")':'none';});})();
 </script>
+
+<style id="category-skin-picker-style">
+#categorySkinPickerModal{position:fixed;inset:0;z-index:2147483000;pointer-events:auto;background:rgba(2,8,18,.78);backdrop-filter:blur(8px);display:none;align-items:center;justify-content:center;padding:16px}
+#categorySkinPickerModal .category-picker-dialog{position:relative;z-index:1;pointer-events:auto;width:min(720px,100%);max-height:min(84vh,850px);display:flex;flex-direction:column;background:#0d1726;border:1px solid #2c4966;border-radius:20px;box-shadow:0 24px 80px #0009;color:#edf6ff;overflow:hidden}
+#categorySkinPickerModal .category-picker-head{padding:18px 20px;border-bottom:1px solid #ffffff16;display:flex;align-items:center;justify-content:space-between;gap:12px}
+#categorySkinPickerModal .category-picker-head h2{font-size:18px;margin:0}
+#categorySkinPickerModal .category-picker-tools{padding:14px 18px;display:grid;gap:8px;border-bottom:1px solid #ffffff12}
+#categorySkinPickerModal input[type=search]{width:100%;box-sizing:border-box;background:#080f1a;color:#f8fafc;border:1px solid #334155;border-radius:12px;padding:12px 14px;font:inherit;outline:none}
+#categorySkinPickerModal input[type=search]:focus{border-color:#60a5fa;box-shadow:0 0 0 3px #3b82f633}
+#categorySkinPickerModal #categorySkinPickerList{padding:12px 16px;overflow:auto;display:grid;gap:8px;min-height:100px}
+#categorySkinPickerModal .category-picker-item{display:flex;align-items:center;gap:12px;padding:10px;border:1px solid #263b52;background:#111f31;border-radius:12px;cursor:pointer;min-width:0}
+#categorySkinPickerModal .category-picker-item:hover{border-color:#60a5fa;background:#152940}
+#categorySkinPickerModal .category-picker-item input{width:18px;height:18px;flex:0 0 auto;accent-color:#60a5fa}
+#categorySkinPickerModal .category-picker-thumb{width:54px;height:54px;flex:0 0 54px;border-radius:10px;display:grid;place-items:center;background:#1e3550 center/cover no-repeat;color:#bfdbfe;font-weight:800;border:1px solid #ffffff16}
+#categorySkinPickerModal .category-picker-info{min-width:0;flex:1;display:grid;gap:4px}
+#categorySkinPickerModal .category-picker-info b{overflow-wrap:anywhere;font-size:14px}
+#categorySkinPickerModal .category-picker-info small{font-size:11px;color:#91a8c1;overflow-wrap:anywhere}
+#categorySkinPickerModal .category-picker-current{font-size:11px;color:#86efac;white-space:nowrap}
+#categorySkinPickerModal .category-picker-footer{padding:14px 18px;border-top:1px solid #ffffff16;display:flex;justify-content:flex-end;gap:8px;flex-wrap:wrap;background:#0a1320}
+@media(max-width:520px){#categorySkinPickerModal{padding:8px}#categorySkinPickerModal .category-picker-dialog{max-height:90vh;border-radius:15px}#categorySkinPickerModal .category-picker-head{padding:14px}#categorySkinPickerModal #categorySkinPickerList{padding:10px}#categorySkinPickerModal .category-picker-item{gap:8px;padding:8px}#categorySkinPickerModal .category-picker-thumb{width:44px;height:44px;flex-basis:44px}#categorySkinPickerModal .category-picker-current{display:none}}
+</style>
+<div id="categorySkinPickerModal" role="dialog" aria-modal="true" aria-labelledby="categorySkinPickerTitle" style="display:none">
+ <div class="category-picker-dialog">
+  <div class="category-picker-head"><h2 id="categorySkinPickerTitle">Pilih Skin untuk Kategori</h2><button type="button" class="ghost" id="categorySkinPickerClose" aria-label="Tutup">✕</button></div>
+  <div class="category-picker-tools"><input id="categorySkinPickerSearch" type="search" placeholder="🔎 Cari nama skin, ID, atau nama Replace…"><div id="categorySkinPickerCount" class="hint">Memuat daftar skin…</div></div>
+  <div id="categorySkinPickerList"></div>
+  <div class="category-picker-footer"><button type="button" class="secondary" id="categorySkinPickerCancel">Batal</button><button type="button" class="primary" id="categorySkinPickerApply">✓ Masukkan ke Kategori</button></div>
+ </div>
+</div>
+
 </body>
 </html>
 
