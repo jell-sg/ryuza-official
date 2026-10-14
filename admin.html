@@ -524,12 +524,25 @@ function renderCategorySkinPicker(){
 }
 async function applyCategorySkinSelection(){
  const modal=$('categorySkinPickerModal'),categoryId=modal?.dataset.categoryId||'';if(!categoryId){toast('Kategori tidak ditemukan');return}
- const chosen=[...(modal._selectedSkinIds||new Set([...modal.querySelectorAll('[data-picker-skin]:checked')].map(x=>x.dataset.pickerSkin)))];
- if(!chosen.length){toast('Pilih minimal satu skin');return}
+ const chosen=new Set([...(modal._selectedSkinIds||new Set([...modal.querySelectorAll('[data-picker-skin]:checked')].map(x=>x.dataset.pickerSkin)))].map(String));
+ const categoryName=String(categories[categoryId]?.name||categoryId);
  const btn=$('categorySkinPickerApply'),old=btn.textContent;btn.disabled=true;btn.textContent='Menyimpan…';
- try{const updates={};chosen.filter(id=>Object.prototype.hasOwnProperty.call(items,id)).forEach(id=>{updates[id+'/category']=categoryId;if(items[id])items[id].category=categoryId});
- if(!Object.keys(updates).length){toast('Skin yang dipilih tidak ditemukan');return}await db.ref('siteConfig/skins').update(updates);renderCategories();render();closeCategorySkinPicker();toast(chosen.length+' skin dimasukkan ke kategori '+(categories[categoryId]?.name||categoryId));document.dispatchEvent(new CustomEvent('ryuza-admin-data-changed'))}
- catch(e){toast('Gagal menyimpan kategori skin: '+(e.message||e))}
+ try{
+  const updates={},changedAdd=[],changedRemove=[];
+  // Sinkronkan seluruh skin: yang dicentang masuk kategori, yang sebelumnya di kategori
+  // tetapi kini tidak dicentang dikeluarkan dari kategori tanpa menghapus data skin-nya.
+  Object.entries(items||{}).forEach(([id,skin])=>{
+   const current=String(skin?.category||''),wasAssigned=current===String(categoryId)||current===categoryName,isChosen=chosen.has(String(id));
+   if(isChosen){updates[id+'/category']=categoryId;changedAdd.push(id)}
+   else if(wasAssigned){updates[id+'/category']=null;changedRemove.push(id)}
+  });
+  if(!Object.keys(updates).length){toast('Tidak ada perubahan kategori');return}
+  await db.ref('siteConfig/skins').update(updates);
+  Object.entries(updates).forEach(([path,value])=>{const id=path.split('/')[0];if(items[id]){if(value===null)delete items[id].category;else items[id].category=value}});
+  renderCategories();render();closeCategorySkinPicker();
+  toast(`${changedAdd.length} skin dimasukkan · ${changedRemove.length} skin dikeluarkan dari ${categoryName}`);
+  document.dispatchEvent(new CustomEvent('ryuza-admin-data-changed'))
+ }catch(e){toast('Gagal menyimpan perubahan kategori: '+(e.message||e))}
  finally{btn.disabled=false;btn.textContent=old}
 }
 // Delegated handlers: modal markup is placed after the main script, so bind on document.
