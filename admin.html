@@ -492,8 +492,7 @@ function openCategorySkinPicker(categoryId){
  $('categorySkinPickerTitle').textContent='Pilih Skin untuk '+(cat.name||categoryId||'Kategori');
  $('categorySkinPickerSearch').value='';
  modal.dataset.categoryId=categoryId;
- const selected=new Set();
- modal.querySelectorAll('[data-picker-skin]').forEach(x=>x.checked=false);
+ modal._selectedSkinIds=new Set(Object.entries(items||{}).filter(([id,x])=>String(x?.category||'')===String(categoryId)||String(x?.category||'')===String(cat.name||'')).map(([id])=>id));
  renderCategorySkinPicker();
  modal.style.display='flex';document.body.style.overflow='hidden';
  setTimeout(()=>$('categorySkinPickerSearch')?.focus(),50);
@@ -507,7 +506,8 @@ function renderCategorySkinPicker(){
  const searchEl=$('categorySkinPickerSearch');
  const q=categorySearchNorm(searchEl?.value||'');
  const catId=modal.dataset.categoryId||'';
- const previouslyChecked=new Set([...modal.querySelectorAll('[data-picker-skin]:checked')].map(x=>x.dataset.pickerSkin));
+ const previouslyChecked=new Set(modal._selectedSkinIds||[]);
+ modal.querySelectorAll('[data-picker-skin]').forEach(input=>{input.onchange=()=>{if(!modal._selectedSkinIds)modal._selectedSkinIds=new Set();if(input.checked)modal._selectedSkinIds.add(input.dataset.pickerSkin);else modal._selectedSkinIds.delete(input.dataset.pickerSkin)}});
  const arr=Object.entries(items||{}).filter(([id,x])=>x&&typeof x==='object').sort((a,b)=>Number(a[1]?.order??999999)-Number(b[1]?.order??999999));
  const filtered=arr.filter(([id,x])=>{
   const options=Array.isArray(x.options)?x.options:[];
@@ -525,18 +525,20 @@ function renderCategorySkinPicker(){
 }
 async function applyCategorySkinSelection(){
  const modal=$('categorySkinPickerModal'),categoryId=modal?.dataset.categoryId||'';if(!categoryId){toast('Kategori tidak ditemukan');return}
- const chosen=[...modal.querySelectorAll('[data-picker-skin]:checked')].map(x=>x.dataset.pickerSkin);
+ const chosen=[...(modal._selectedSkinIds||new Set([...modal.querySelectorAll('[data-picker-skin]:checked')].map(x=>x.dataset.pickerSkin)))];
  if(!chosen.length){toast('Pilih minimal satu skin');return}
  const btn=$('categorySkinPickerApply'),old=btn.textContent;btn.disabled=true;btn.textContent='Menyimpan…';
  try{const updates={};chosen.forEach(id=>{updates[id+'/category']=categoryId;if(items[id])items[id].category=categoryId});await db.ref('siteConfig/skins').update(updates);renderCategories();render();closeCategorySkinPicker();toast(chosen.length+' skin dimasukkan ke kategori '+(categories[categoryId]?.name||categoryId));document.dispatchEvent(new CustomEvent('ryuza-admin-data-changed'))}
  catch(e){toast('Gagal menyimpan kategori skin: '+(e.message||e))}
  finally{btn.disabled=false;btn.textContent=old}
 }
-if($('categorySkinPickerSearch'))$('categorySkinPickerSearch').oninput=()=>renderCategorySkinPicker();
-$('categorySkinPickerClose')?.addEventListener('click',e=>{e.preventDefault();e.stopPropagation();closeCategorySkinPicker()});
-$('categorySkinPickerCancel')?.addEventListener('click',e=>{e.preventDefault();e.stopPropagation();closeCategorySkinPicker()});
-$('categorySkinPickerApply')?.addEventListener('click',e=>{e.preventDefault();e.stopPropagation();applyCategorySkinSelection()});
-$('categorySkinPickerModal')?.addEventListener('click',e=>{if(e.target.id==='categorySkinPickerModal')closeCategorySkinPicker()});
+// Delegated handlers: modal markup is placed after the main script, so bind on document.
+document.addEventListener('input',e=>{if(e.target&&e.target.id==='categorySkinPickerSearch')renderCategorySkinPicker()});
+document.addEventListener('click',e=>{
+ const target=e.target?.closest?.('#categorySkinPickerClose,#categorySkinPickerCancel,#categorySkinPickerApply');
+ if(target){e.preventDefault();e.stopPropagation();if(target.id==='categorySkinPickerClose'||target.id==='categorySkinPickerCancel')closeCategorySkinPicker();else applyCategorySkinSelection();return;}
+ if(e.target?.id==='categorySkinPickerModal')closeCategorySkinPicker();
+});
 document.addEventListener('keydown',e=>{if(e.key==='Escape')closeCategorySkinPicker()});
 $('addBtn').onclick=()=>addSkinManual('');
 $('quickAdd').onclick=()=>{$('.tab[data-tab="skins"]').click();$('addBtn').click()};
