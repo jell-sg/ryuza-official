@@ -4570,4 +4570,59 @@ body{background:radial-gradient(ellipse at 50% 0%,rgba(168,85,247,.18),transpare
   #ryuzaSmartbar .ryuza-filter{min-height:42px!important;}
 }
 </style>
+
+<style id="ryuza-clean-stats-search-layout">
+/* Statistik angka tidak ditampilkan lagi di halaman index. */
+.site-stats{display:none!important}
+/* Pencarian dirapatkan ke tab kategori, baik desktop maupun mobile. */
+#ryuzaSearchMoved{display:block!important;width:100%;max-width:1180px;margin:6px auto 10px!important;padding:0!important}
+#ryuzaSearchMoved .search{position:relative!important;top:auto!important;left:auto!important;right:auto!important;width:100%;max-width:none!important;margin:0!important;padding:0!important;border-radius:12px!important;box-shadow:none!important}
+#ryuzaSearchMoved .search .wrap{display:flex;align-items:center;gap:7px;padding:8px!important;min-height:46px}
+#ryuzaSearchMoved .search input{width:100%;min-width:0;min-height:40px;padding:9px 11px!important;font-size:14px!important;border-radius:9px!important}
+#ryuzaSearchMoved .search .icon{flex:0 0 auto}
+#ryuzaSearchMoved .search .clear{flex:0 0 auto;min-width:34px;min-height:34px}
+#ryuzaSearchMoved .count{margin:3px 4px 0!important;font-size:11px!important}
+#ryuzaSuper{margin-top:8px!important}
+#ryuzaSmartbar{margin:5px 0 4px!important;gap:6px!important;padding:6px!important}
+.ryuza-tab-note{margin:3px 2px 5px!important}
+@media(max-width:600px){
+ body{padding-left:8px!important;padding-right:8px!important}
+ #ryuzaSearchMoved{margin:4px auto 8px!important}
+ #ryuzaSearchMoved .search .wrap{padding:6px!important;min-height:42px}
+ #ryuzaSearchMoved .search input{min-height:38px;font-size:13px!important}
+ #ryuzaSmartbar{gap:5px!important;padding:5px!important;border-radius:12px!important}
+ .ryuza-filter{padding:7px 9px!important}
+}
+</style>
+<script id="ryuza-clean-stats-search-layout-js">
+(function(){
+  function placeSearch(){
+    var search=document.querySelector('body > .search, .search:has(#q)');
+    var bar=document.getElementById('ryuzaSmartbar');
+    if(!search||!bar)return false;
+    var superBox=document.getElementById('ryuzaSuper');
+    if(!superBox)return false;
+    var note=document.getElementById('ryuzaTabNote');
+    var host=document.getElementById('ryuzaSearchMoved');
+    if(!host){host=document.createElement('div');host.id='ryuzaSearchMoved';}
+    if(host.parentElement!==superBox){
+      if(note&&note.parentElement===superBox)note.insertAdjacentElement('afterend',host);
+      else bar.insertAdjacentElement('afterend',host);
+    }
+    if(search.parentElement!==host)host.appendChild(search);
+    return true;
+  }
+  function init(){
+    placeSearch();
+    var bar=document.getElementById('ryuzaSmartbar');
+    if(bar&&window.MutationObserver&&!bar.__ryuzaSearchObserver){
+      bar.__ryuzaSearchObserver=true;
+      new MutationObserver(function(){placeSearch()}).observe(bar,{childList:true,subtree:true});
+    }
+    var tries=0;var timer=setInterval(function(){tries++;if(placeSearch()||tries>30)clearInterval(timer)},250);
+  }
+  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init,{once:true});else init();
+})();
+</script>
+
 </body></html>
