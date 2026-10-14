@@ -135,7 +135,8 @@ input:focus,select:focus,textarea:focus{border-color:#7ba7ff!important;box-shado
 @media(prefers-reduced-motion:reduce){*,*::before,*::after{scroll-behavior:auto!important;animation-duration:.01ms!important;transition-duration:.01ms!important}}
 
 </style>
-<style>.orderBtns{display:flex;gap:5px;align-items:center}.toTop,.toBottom{font-size:11px;padding:7px 9px!important}.actions{align-items:center}</style>\n
+<style>.orderBtns{display:flex;gap:5px;align-items:center}.toTop,.toBottom{font-size:11px;padding:7px 9px!important}.actions{align-items:center}</style>
+
 <style id="paste-skin-import-style">.paste-skin-import{margin-top:14px;padding:13px;border:1px solid #2a4a65;border-radius:13px;background:#081522}.paste-skin-import summary{font-weight:800;cursor:pointer;color:#a9d8ff}.paste-skin-import textarea{min-height:150px;margin-top:10px}.paste-skin-import .toolbar{align-items:center}.paste-skin-preview-list{display:flex;gap:6px;flex-wrap:wrap;margin-top:7px}.paste-skin-preview-list span{font-size:11px;padding:5px 8px;border-radius:8px;background:#10263a;border:1px solid #294761;color:#cde7ff}</style>
 
 
@@ -157,7 +158,60 @@ input:focus,select:focus,textarea:focus{border-color:#7ba7ff!important;box-shado
 @media(max-width:700px){#fileManager>.card{padding:14px;border-radius:15px}#fileManager .github-grid{grid-template-columns:1fr!important}#fileManager .github-grid input[style*="grid-column"]{grid-column:auto!important}#fileManager .toolbar button,#fileManager .actions button{flex:1 1 100%}#fileManager .badge{white-space:normal}}
 </style>
 
-</head>
+
+<style id="ryuza-admin-final-polish">
+/* Final admin pass: simplify monitoring display and improve responsive controls */
+html{scroll-padding-top:100px}
+body{overflow-x:hidden}
+.wrap{width:min(100%,1360px)!important}
+.nav-modern{position:sticky;top:6px;z-index:40;backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px)}
+#dashboard .ranking-grid{display:none!important}
+#dashboard>.cards{grid-template-columns:repeat(3,minmax(0,1fr))!important}
+#dashboard>.cards>.stat:nth-child(3){display:none!important}
+#dashboard .stat,#visitors .stat{min-width:0}
+#skins .toolbar{align-items:stretch}
+#skins #search{min-width:0}
+#skins .skin{min-width:0}
+#skins .skin .titleInput{min-width:0}
+#skins .row input{min-width:0}
+#skins .actions button{min-height:39px}
+#settings .field input,#settings .field textarea{min-width:0}
+#visitors .visitor-toolbar{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+#visitors .visitor-toolbar input{min-width:0;flex:1 1 220px}
+#visitors .visitor-toolbar button{min-height:40px}
+#requests .request-item{overflow-wrap:anywhere}
+button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-visible{outline:2px solid #8ab4ff!important;outline-offset:2px}
+@media(max-width:700px){
+ .wrap{padding:10px!important}
+ .top{align-items:flex-start}
+ .brand{min-width:0}
+ .brand h1{font-size:18px!important}
+ #dashboard>.cards{grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:8px!important}
+ #dashboard .stat{padding:12px!important}
+ #dashboard .stat .v{font-size:21px!important}
+ .nav-modern{position:static}
+ .nav-items{grid-template-columns:repeat(2,minmax(0,1fr))!important}
+ .nav-modern .tab{min-width:0;overflow-wrap:anywhere}
+ .featured-picker{grid-template-columns:1fr!important}
+ .toolbar input{min-width:0!important}
+ #skins .row{grid-template-columns:minmax(0,1fr) 38px!important}
+ #skins .row .label,#skins .row .url{grid-column:1!important;min-width:0}
+ #skins .row button{grid-column:2!important;grid-row:1/3!important}
+ #settings .settings{grid-template-columns:minmax(0,1fr)!important}
+ #visitors .visitor-toolbar>*{flex:1 1 100%}
+ #visitors .visitor-toolbar input{flex-basis:100%}
+}
+@media(max-width:360px){#dashboard>.cards{grid-template-columns:1fr!important}}
+@media(prefers-reduced-motion:reduce){*,*::before,*::after{scroll-behavior:auto!important;animation:none!important;transition:none!important}}
+</style>
+
+
+<style id="ryuza-final-admin-audit-fix">
+html,body{max-width:100%;overflow-x:hidden}img{max-width:100%;height:auto}input[type=url],input[type=text],input[type=search],textarea,select,button{max-width:100%;box-sizing:border-box}.panel,.card,.grid,.form-grid,.actions{min-width:0}
+@media(max-width:640px){.cards{grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:9px!important}.grid{grid-template-columns:minmax(0,1fr)!important}.actions{gap:8px!important;flex-wrap:wrap!important}.actions button{flex:1 1 145px}.panel{padding:12px!important}table{display:block;max-width:100%;overflow-x:auto}}
+@media(prefers-reduced-motion:reduce){*,*::before,*::after{animation:none!important;transition:none!important;scroll-behavior:auto!important}}
+</style>
+
 </head>
 <body>
 <div class="wrap">
@@ -204,7 +258,7 @@ input:focus,select:focus,textarea:focus{border-color:#7ba7ff!important;box-shado
   <div class="stat"><div class="l">TOTAL KLIK</div><div class="v" id="statClicks">0</div></div>
   <div class="stat"><div class="l">ONLINE</div><div class="v" id="statOnline">0</div></div>
  </div>
- <div class="card"><h3 style="margin:0 0 7px">⚡ Kontrol cepat</h3><div class="actions"><button class="primary" id="quickAdd">＋ Tambah Skin</button><button class="secondary" id="quickImport">🚀 Publish ke index.html</button><button class="secondary" id="quickBackup">💾 Backup Database</button></div><div class="hint">Perubahan skin disimpan ke Firebase Realtime Database dan dipantau secara realtime.</div></div>
+ <div class="card"><h3 style="margin:0 0 7px">⚡ Kontrol cepat</h3><div class="actions"><button class="primary" id="quickAdd">＋ Tambah Skin</button><button class="secondary" id="quickImport">🚀 Publish ke index.html</button><button class="secondary" id="quickBackup">💾 Backup Database</button><button class="danger" id="resetDownloadStatsButton" type="button">↻ Reset Total Download</button><span id="resetDownloadStatsStatus" class="badge">Hanya statistik download</span></div><div class="hint">Perubahan skin disimpan ke Firebase Realtime Database dan dipantau secara realtime.</div></div>
  <div class="card github-publish-panel"><h3 style="margin:0 0 7px">🚀 Publish langsung ke index.html</h3><div class="hint">Atur GitHub sekali. Setelah itu perubahan Admin dapat dipublish langsung ke <b>index.html</b>, tanpa perlu sinkron/ambil ulang dari index. Token hanya disimpan di browser ini.</div><div class="github-grid" style="display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin-top:12px"><input id="ghOwner" placeholder="GitHub Owner, contoh: jell-sg"><input id="ghRepo" placeholder="Repository, contoh: ryuza-official"><input id="ghBranch" placeholder="Branch, contoh: main" value="main"><input id="ghPath" placeholder="Path file, contoh: index.html" value="index.html"><input id="ghToken" type="password" placeholder="Fine-grained Token — Contents: Read and Write" style="grid-column:1/-1"><label style="display:flex;align-items:center;gap:8px;grid-column:1/-1"><input id="ghAuto" type="checkbox"> Publish otomatis setelah perubahan disimpan</label></div><div class="actions" style="margin-top:10px"><button class="secondary" id="ghSaveConfig">Simpan Konfigurasi</button><button class="primary" id="ghPublish">Publish Sekarang</button><span id="ghStatus" class="badge">● Belum dikonfigurasi</span></div></div>
  <div class="card"><h3 style="margin:0 0 8px">📡 Status Sistem</h3><div id="systemInfo" class="notice">Menunggu koneksi Firebase...</div></div>
  <div class="ranking-grid" style="grid-template-columns:repeat(3,minmax(0,1fr))"><div class="card"><h3 style="margin:0 0 8px">🔎 Pencarian Terbanyak</h3><ol id="topSearches" class="rank-list"><li class="muted">Memuat...</li></ol></div><div class="card"><h3 style="margin:0 0 8px">⬇️ Download Terbanyak</h3><ol id="topDownloads" class="rank-list"><li class="muted">Memuat...</li></ol></div><div class="card"><h3 style="margin:0 0 8px">👆 Peringkat Klik</h3><ol id="topClicks" class="rank-list"><li class="muted">Memuat...</li></ol></div></div>
@@ -1467,6 +1521,36 @@ $('quickImport').onclick=()=>{$('.tab[data-tab="skins"]').click();$('seedBtn').c
 <script id="ryuza-admin-image-live-preview-fix">
 (function(){document.addEventListener('input',function(e){const input=e.target;if(!input||!input.classList||!input.classList.contains('imageUrlInput'))return;const card=input.closest('.skin');if(!card)return;let preview=card.querySelector('.skin-image-preview');if(!preview){preview=document.createElement('div');preview.className='skin-image-preview';preview.style.cssText='margin-top:8px;height:88px;border:1px solid #29445e;border-radius:10px;background:#101c2d center/cover no-repeat';input.insertAdjacentElement('afterend',preview)}const url=String(input.value||'').trim();preview.style.display=url?'block':'none';preview.style.backgroundImage=url&&/^https?:\/\//i.test(url)?'url("'+url.replace(/["\\]/g,'')+'")':'none';});})();
 </script>
+
+<script id="ryuza-reset-download-count-only">
+(function(){
+  const btn=document.getElementById('resetDownloadStatsButton');
+  const status=document.getElementById('resetDownloadStatsStatus');
+  if(!btn)return;
+  btn.addEventListener('click',async function(){
+    const ok=window.confirm('Reset jumlah download menjadi 0? Data skin, member, nama pengunjung, request, dan riwayat lain tidak akan dihapus.');
+    if(!ok)return;
+    btn.disabled=true;
+    if(status)status.textContent='Memproses...';
+    try{
+      if(!window.db||typeof window.db.ref!=='function')throw new Error('Firebase belum siap. Coba lagi setelah status koneksi aktif.');
+      await Promise.all([
+        window.db.ref('downloadStats').remove(),
+        window.db.ref('downloadStatsByOption').remove()
+      ]);
+      if(status)status.textContent='Download direset • data lain aman';
+      if(typeof window.toast==='function')window.toast('Jumlah download berhasil direset. Data member, pengunjung, request, dan skin tetap dipertahankan.');
+      else alert('Jumlah download berhasil direset. Data lain tetap dipertahankan.');
+    }catch(e){
+      console.error('[Ryuza] Reset download gagal:',e);
+      if(status)status.textContent='Gagal reset';
+      if(typeof window.toast==='function')window.toast('Gagal reset download: '+(e.message||e));
+      else alert('Gagal reset download: '+(e.message||e));
+    }finally{btn.disabled=false}
+  });
+})();
+</script>
+
 </body>
 </html>
 
