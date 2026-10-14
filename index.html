@@ -2065,19 +2065,8 @@ html.ryuza-chrome-block #ryuzaChromeGate{display:flex!important}
 </style>
 <div id="ryuzaSuper" class="ryuza-super">
   <div id="ryuzaAnnouncement" class="ryuza-announce"><b>📢</b><span></span></div>
-  <div class="ryuza-smartbar" id="ryuzaSmartbar" aria-label="Filter role hero">
+  <div class="ryuza-smartbar" id="ryuzaSmartbar" aria-label="Filter kategori skin">
     <button class="ryuza-filter active" data-mode="ALL">✦ Semua Skin</button>
-    <button class="ryuza-filter" data-mode="TANK">🛡️ Tank</button>
-    <button class="ryuza-filter" data-mode="FIGHTER">⚔️ Fighter</button>
-    <button class="ryuza-filter" data-mode="ASSASSIN">🗡️ Assassin</button>
-    <button class="ryuza-filter" data-mode="MAGE">🔮 Mage</button>
-    <button class="ryuza-filter" data-mode="MARKSMAN">🏹 Marksman</button>
-    <button class="ryuza-filter" data-mode="MID">🔮 Mid Lane</button>
-    <button class="ryuza-filter" data-mode="GOLD">🪙 Gold Lane</button>
-    <button class="ryuza-filter" data-mode="SUPPORT">💠 Support</button>
-    <button class="ryuza-filter" data-mode="JUNGLE">🌿 Jungle</button>
-    <button class="ryuza-filter" data-mode="ROAM">🧭 Roam</button>
-    <button class="ryuza-filter" data-mode="EXP">⚡ EXP Lane</button>
     <button class="ryuza-filter" data-mode="RECAL">✧ Recal</button>
   </div>
   <div class="ryuza-tab-note" id="ryuzaTabNote">Semua skin</div>
@@ -2103,13 +2092,23 @@ html.ryuza-chrome-block #ryuzaChromeGate{display:flex!important}
   const STATIC_CFG=window.__RYUZA_STATIC_CONFIG__||{};
   const hasStaticSkins=!!(STATIC_CFG.skins&&Object.keys(STATIC_CFG.skins).length);
   const hasStaticPlaylists=!!(STATIC_CFG.playlists&&Object.keys(STATIC_CFG.playlists).length);
-  let db=null, skinData=hasStaticSkins?STATIC_CFG.skins:{}, playlistData=hasStaticPlaylists?STATIC_CFG.playlists:{}, mode='ALL', ready=false, applyTimer=0, featureCfg={featured:true,newest:true,recent:true,favorite:true,bottomNav:true,sectionLimit:8,...(STATIC_CFG.indexFeatures||STATIC_CFG.settings?.indexFeatures||{})};
+  let db=null, skinData=hasStaticSkins?STATIC_CFG.skins:{}, playlistData=hasStaticPlaylists?STATIC_CFG.playlists:{}, categoryData=STATIC_CFG.categories||{}, mode='ALL', ready=false, applyTimer=0, featureCfg={featured:true,newest:true,recent:true,favorite:true,bottomNav:true,sectionLimit:8,...(STATIC_CFG.indexFeatures||STATIC_CFG.settings?.indexFeatures||{})};
   const ids={list:'list',q:'q'};
   function wait(){if(window.firebase&&firebase.database){start()}else setTimeout(wait,500)}
+  function categoryId(v){return String(v||'').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'')}
+  function renderCategoryTabs(){
+    const bar=document.getElementById('ryuzaSmartbar');if(!bar)return;
+    const all=bar.querySelector('[data-mode="ALL"]'),recal=bar.querySelector('[data-mode="RECAL"]');bar.innerHTML='';
+    if(all)bar.appendChild(all);else{const b=document.createElement('button');b.className='ryuza-filter active';b.dataset.mode='ALL';b.textContent='✦ Semua Skin';bar.appendChild(b)}
+    Object.entries(categoryData||{}).sort((a,b)=>Number(a[1]?.order||0)-Number(b[1]?.order||0)).forEach(([id,c])=>{const b=document.createElement('button');b.className='ryuza-filter';b.dataset.mode='CAT:'+id;b.textContent=clean(c?.icon||'✦')+' '+clean(c?.name||id);bar.appendChild(b)});
+    if(recal)bar.appendChild(recal);else{const b=document.createElement('button');b.className='ryuza-filter';b.dataset.mode='RECAL';b.textContent='✧ Recal';bar.appendChild(b)}
+  }
   function start(){
     try{let app;try{app=firebase.app('ryuza-super-features')}catch(e){app=firebase.initializeApp(CFG,'ryuza-super-features')}db=app.database();
+      renderCategoryTabs();
       if(!hasStaticSkins) db.ref('siteConfig/skins').on('value',s=>{skinData=s.val()||{};scheduleApply()});
       if(!hasStaticPlaylists) db.ref('siteConfig/playlists').on('value',s=>{playlistData=s.val()||{};scheduleApply()});
+      if(!Object.keys(categoryData||{}).length) db.ref('siteConfig/categories').on('value',s=>{categoryData=s.val()||{};renderCategoryTabs();scheduleApply()});
       if(!(STATIC_CFG.settings&&Object.keys(STATIC_CFG.settings).length)) db.ref('siteConfig/settings').on('value',s=>{const st=s.val()||{};const a=document.getElementById('ryuzaAnnouncement');if(a){a.querySelector('span').textContent=clean(st.announcement||'');a.classList.toggle('show',!!st.showAnnouncement&&!!clean(st.announcement));} if(st.maintenance){showMaintenance()} });
       if(!(STATIC_CFG.indexFeatures&&Object.keys(STATIC_CFG.indexFeatures).length) && !(STATIC_CFG.settings?.indexFeatures&&Object.keys(STATIC_CFG.settings.indexFeatures).length)) db.ref('siteConfig/indexFeatures').on('value',s=>{featureCfg={...featureCfg,...(s.val()||{})};const reset=Number(featureCfg.favoriteResetAt||0);if(reset){try{localStorage.removeItem('ryuzaFavorites')}catch(e){}}applyFeatureVisibility();scheduleApply();});
       if(STATIC_CFG.settings){const st=STATIC_CFG.settings;const a=document.getElementById('ryuzaAnnouncement');if(a){a.querySelector('span').textContent=clean(st.announcement||'');a.classList.toggle('show',!!st.showAnnouncement&&!!clean(st.announcement));}if(st.maintenance)showMaintenance();}
@@ -2153,8 +2152,7 @@ html.ryuza-chrome-block #ryuzaChromeGate{display:flex!important}
       if(mode==='NEW')ok=ok&&featureCfg.newest&&!!skinData[id]?.isNew;
       if(mode==='FEATURED')ok=ok&&featureCfg.featured&&!!skinData[id]?.featured;
       if(mode==='FAVORITE')ok=ok&&featureCfg.favorite&&fav.includes(id);
-      const roleMap={TANK:['tank'],FIGHTER:['fighter'],ASSASSIN:['assassin'],MAGE:['mage'],MARKSMAN:['marksman','mm'],SUPPORT:['support'],MID:['mid lane','midlane','mid'],GOLD:['gold lane','goldlane','gold'],JUNGLE:['jungle'],ROAM:['roam'],EXP:['exp lane','explane']};
-      if(roleMap[mode]){const roleText=normalizeSearch([c.dataset.search||'',c.textContent||'',skinData[id]?.role||skinData[id]?.roles||''].join(' '));ok=ok&&roleMap[mode].some(r=>new RegExp('(?:^|[^a-z])'+r.replace(/\s+/g,'\\s*')+'(?:$|[^a-z])','i').test(roleText));}
+      if(mode.startsWith('CAT:')){const wanted=mode.slice(4),raw=skinData[id]?.category??skinData[id]?.categoryId??skinData[id]?.playlist??skinData[id]?.categories??'';const vals=Array.isArray(raw)?raw:[raw];ok=ok&&vals.some(v=>String(v)===wanted||categoryId(v)===wanted||categoryId(categoryData?.[wanted]?.name)===categoryId(v));}
       c.hidden=!ok;c.setAttribute('aria-hidden',ok?'false':'true');c.style.display=ok?'':'none';
       if(ok){shown++;if(mode==='RECAL')recalVisible++;}
     });
@@ -2180,7 +2178,7 @@ html.ryuza-chrome-block #ryuzaChromeGate{display:flex!important}
     Object.entries(map).forEach(([m,id])=>{const el=document.getElementById(id);if(el)el.classList.toggle('active',mode===m)});
     if(lb)lb.classList.toggle('active',mode==='POPULAR');
     if(list)list.style.display=['POPULAR','FEATURED','NEW','RECENT','FAVORITE'].includes(mode)?'none':'';
-    const labels={ALL:'Semua skin',TANK:'Hero role Tank',FIGHTER:'Hero role Fighter',ASSASSIN:'Hero role Assassin',MAGE:'Hero role Mage',MARKSMAN:'Hero role Marksman',SUPPORT:'Hero role Support',MID:'Hero dengan tag Mid Lane',GOLD:'Hero dengan tag Gold Lane',JUNGLE:'Hero dengan tag Jungle',ROAM:'Hero dengan tag Roam',EXP:'Hero dengan tag EXP Lane',RECAL:'Koleksi Recal / Recall'};
+    const labels={ALL:'Semua skin',RECAL:'Koleksi Recal / Recall'};if(mode.startsWith('CAT:'))labels[mode]=(categoryData?.[mode.slice(4)]?.name||mode.slice(4));
     if(note)note.textContent=labels[mode]||'Semua skin';
   }
 
