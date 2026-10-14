@@ -186,7 +186,7 @@ input:focus,select:focus,textarea:focus{border-color:#7ba7ff!important;box-shado
   <div class="nav-group-title">MONITORING</div>
   <div class="nav-items">
    <button class="tab" data-tab="recalPlaylist"><span class="tab-icon">🔄</span><span>Playlist Recal</span></button>
-   <button class="tab" data-tab="indexFeatures"><span class="tab-icon">✣</span><span>Index Features</span></button>
+   <button class="tab" data-tab="indexFeatures"><span class="tab-icon">✣</span><span>Kategori Skin</span></button>
   </div>
  </div>
  <div class="nav-group nav-group-last">
@@ -378,6 +378,19 @@ Replace : Basic
 
 <section id="indexFeatures" class="panel">
  <div class="card">
+  <h3 style="margin-top:0">🗂️ Kelola Kategori Skin</h3>
+  <div class="notice">Buat kategori sendiri, lalu pilih kategorinya pada setiap card skin. Kategori yang dipublish akan menjadi tab di halaman Index. Tab role seperti Tank, Mage, Gold Lane, dan lainnya tidak digunakan lagi.</div>
+  <div class="toolbar" style="margin-top:12px">
+   <input id="categoryName" maxlength="50" placeholder="Nama kategori, contoh: Collector, Aspirant, Collaboration">
+   <input id="categoryIcon" maxlength="6" value="✦" placeholder="Ikon" style="max-width:100px">
+   <button class="primary" id="addCategoryBtn" type="button">＋ Tambah Kategori</button>
+  </div>
+  <div class="hint">Kategori disimpan di Firebase pada <b>siteConfig/categories</b>. Gunakan tab Skin &amp; Replace untuk menambahkan skin manual, lalu pilih kategori di card-nya.</div>
+  <div id="categoryStatus" class="badge" style="display:inline-block;margin-top:10px">● Memuat kategori...</div>
+  <div id="categoryList" class="grid" style="margin-top:12px"></div>
+ </div>
+ <div class="legacy-index-features" style="display:none!important">
+ <div class="card">
   <h3 style="margin-top:0">🎛️ Kontrol Fitur Index / Member</h3>
   <div class="notice">Semua kontrol di sini disimpan realtime ke <b>siteConfig/indexFeatures</b>. Index akan mengikuti pengaturan tanpa perlu edit HTML lagi.</div>
   <div class="settings" style="margin-top:14px">
@@ -416,6 +429,7 @@ Replace : Basic
   <div class="actions"><button class="secondary" id="refreshIndexStats">↻ Refresh Statistik</button><button class="danger" id="clearIndexFavorites">🗑️ Reset Favorit Pengunjung</button></div>
   <div class="hint">Favorit disimpan di browser masing-masing pengunjung. Tombol reset hanya mengubah pengaturan global untuk memaksa pembersihan pada perangkat saat kunjungan berikutnya.</div>
  </div>
+</div>
 </section>
 
 <section id="backup" class="panel">
@@ -429,7 +443,7 @@ Replace : Basic
 <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
 <script>
 const CFG={authDomain:'ryuza-official.firebaseapp.com',databaseURL:'https://ryuza-official-default-rtdb.firebaseio.com',projectId:'ryuza-official'};
-let app,db,items={},settings={}; window.__RYUZA_ADMIN_ITEMS__=items; window.__RYUZA_ADMIN_SETTINGS__=settings;
+let app,db,items={},settings={},categories={}; window.__RYUZA_ADMIN_CATEGORIES__=categories; window.__RYUZA_ADMIN_ITEMS__=items; window.__RYUZA_ADMIN_SETTINGS__=settings;
 const $=id=>document.getElementById(id);
 function esc(s){return String(s??'').replace(/[&<>\"]/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','\\':'&#92;','"':'&quot;'}[m]));}
 function cleanTitle(s){return String(s??'').replace(/^[\s📌•·—–:-]+/,'').replace(/\s+/g,' ').trim()}function initials(name){const t=cleanTitle(name).replace(/[^\p{L}\p{N}\s]/gu,' ').trim();if(!t)return 'R';const a=t.split(/\s+/).filter(Boolean);return (a.length===1?a[0].slice(0,2):a.slice(0,2).map(x=>x[0])).join('').toUpperCase().slice(0,3)}
@@ -439,7 +453,7 @@ let skinPage=1;const SKINS_PER_PAGE=20;
 function render(){const q=$('search').value.toLowerCase().trim();const allArr=normalizeOrders().filter(([id,x])=>{const hay=(cleanTitle(x.title||id)+' '+(x.options||[]).map(o=>o.label+' '+o.url).join(' ')).toLowerCase();return !q||hay.includes(q)});
 const totalPages=Math.max(1,Math.ceil(allArr.length/SKINS_PER_PAGE));if(skinPage>totalPages)skinPage=totalPages;
 const start=(skinPage-1)*SKINS_PER_PAGE;const arr=allArr.slice(start,start+SKINS_PER_PAGE);
-$('list').innerHTML=arr.map(([id,x],idx)=>{const title=cleanTitle(x.title||id);const order=x.order??idx;return `<div class="skin" data-id="${esc(id)}"><div class="skinhead"><span class="label">Skin #${String(order+1).padStart(3,'0')}</span><span class="muted small">${esc(id)}</span></div><div class="namebox"><span class="num">${String(order+1).padStart(2,'0')}</span><input class="titleInput" value="${esc(title)}" placeholder="Contoh: Natan Collector"></div><div class="preview">Tampilan: <b>${esc(title||'Nama Skin')}</b></div><div class="field" style="margin:0 0 10px"><label>Icon skin</label><div class="iconField"><div class="iconPreview">${esc(x.iconText||initials(title))}</div><input class="iconInput" maxlength="3" value="${esc(x.iconText||initials(title))}" placeholder="N"></div><div class="hint">Contoh: Natan → N, Natan Collector → NC</div></div><div class="field skin-image-field" style="margin:0 0 12px"><label>🖼️ Link gambar / background card</label><input class="imageUrlInput" type="url" value="${esc(x.imageUrl||x.backgroundImage||x.cardBackground||x.backgroundUrl||x.bannerImage||'')}" placeholder="https://contoh.com/gambar-skin.jpg"><div class="hint">Tempel URL gambar langsung (https://...). Setelah itu klik Simpan; Index akan menerima perubahan melalui Firebase.</div><div class="skin-image-preview" style="margin-top:8px;display:${(x.imageUrl||x.backgroundImage||x.cardBackground||x.backgroundUrl||x.bannerImage)?'block':'none'};height:88px;border:1px solid #29445e;border-radius:10px;background:#101c2d center/cover no-repeat url('${esc(x.imageUrl||x.backgroundImage||x.cardBackground||x.backgroundUrl||x.bannerImage||'')}')"></div></div><div class="skin-flags"><label><input class="featuredInput" type="checkbox" ${x.featured?'checked':''}> ⭐ Pilihan Admin</label><label><input class="newInput" type="checkbox" ${x.isNew?'checked':''}> 🆕 Tandai NEW</label></div><div class="replace-box"><div class="replace-top"><div><div class="replace-title">Replace</div><div class="replace-hint">Pilih Replace dari dropdown untuk mengubah link.</div></div><span class="replace-count">${(x.options||[]).length} pilihan</span></div><select class="replace-select-admin" aria-label="Pilih Replace">${(x.options||[]).map((o,i)=>`<option value="${i}">${esc(o.label||('Replace '+(i+1)))}</option>`).join('')}</select><div class="replace-editor">${(x.options||[]).map((o,i)=>`<div class="replace-row row" data-i="${i}" style="display:${i===0?'grid':'none'}"><input class="label" value="${esc(o.label||'')}" placeholder="Nama Replace"><input class="url" value="${esc(o.url||'')}" placeholder="https://..."><button class="delOpt danger" data-i="${i}" title="Hapus Replace">×</button></div>`).join('')}</div></div><div class="actions"><button class="addOpt secondary">＋ Replace</button><button class="save">💾 Simpan</button><div class="orderBtns"><button class="ghost up" title="Naik satu posisi">↑</button><button class="ghost down" title="Turun satu posisi">↓</button></div><button class="ghost toTop" title="Pindahkan ke urutan paling atas">⇈ Paling atas</button><button class="ghost toBottom" title="Pindahkan ke urutan paling bawah">⇊ Paling bawah</button><button class="delSkin danger">Hapus</button></div></div>`}).join('')||'<div class="card empty">Tidak ada skin yang cocok.</div>';
+$('list').innerHTML=arr.map(([id,x],idx)=>{const title=cleanTitle(x.title||id);const order=x.order??idx;return `<div class="skin" data-id="${esc(id)}"><div class="skinhead"><span class="label">Skin #${String(order+1).padStart(3,'0')}</span><span class="muted small">${esc(id)}</span></div><div class="namebox"><span class="num">${String(order+1).padStart(2,'0')}</span><input class="titleInput" value="${esc(title)}" placeholder="Contoh: Natan Collector"></div><div class="preview">Tampilan: <b>${esc(title||'Nama Skin')}</b></div><div class="field" style="margin:0 0 10px"><label>🗂️ Kategori Skin</label><select class="categoryInput"><option value="">Tanpa kategori</option>${Object.entries(categories||{}).map(([cid,cat])=>`<option value="${esc(cid)}" ${(String(x.category||'')===String(cid)||String(x.category||'')===String(cat.name||''))?'selected':''}>${esc((cat.icon||'✦')+' '+(cat.name||cid))}</option>`).join('')}</select><div class="hint">Kategori ini akan menjadi tab filter pada Index setelah Publish Index.</div></div><div class="field" style="margin:0 0 10px"><label>Icon skin</label><div class="iconField"><div class="iconPreview">${esc(x.iconText||initials(title))}</div><input class="iconInput" maxlength="3" value="${esc(x.iconText||initials(title))}" placeholder="N"></div><div class="hint">Contoh: Natan → N, Natan Collector → NC</div></div><div class="field skin-image-field" style="margin:0 0 12px"><label>🖼️ Link gambar / background card</label><input class="imageUrlInput" type="url" value="${esc(x.imageUrl||x.backgroundImage||x.cardBackground||x.backgroundUrl||x.bannerImage||'')}" placeholder="https://contoh.com/gambar-skin.jpg"><div class="hint">Tempel URL gambar langsung (https://...). Setelah itu klik Simpan; Index akan menerima perubahan melalui Firebase.</div><div class="skin-image-preview" style="margin-top:8px;display:${(x.imageUrl||x.backgroundImage||x.cardBackground||x.backgroundUrl||x.bannerImage)?'block':'none'};height:88px;border:1px solid #29445e;border-radius:10px;background:#101c2d center/cover no-repeat url('${esc(x.imageUrl||x.backgroundImage||x.cardBackground||x.backgroundUrl||x.bannerImage||'')}')"></div></div><div class="skin-flags"><label><input class="featuredInput" type="checkbox" ${x.featured?'checked':''}> ⭐ Pilihan Admin</label><label><input class="newInput" type="checkbox" ${x.isNew?'checked':''}> 🆕 Tandai NEW</label></div><div class="replace-box"><div class="replace-top"><div><div class="replace-title">Replace</div><div class="replace-hint">Pilih Replace dari dropdown untuk mengubah link.</div></div><span class="replace-count">${(x.options||[]).length} pilihan</span></div><select class="replace-select-admin" aria-label="Pilih Replace">${(x.options||[]).map((o,i)=>`<option value="${i}">${esc(o.label||('Replace '+(i+1)))}</option>`).join('')}</select><div class="replace-editor">${(x.options||[]).map((o,i)=>`<div class="replace-row row" data-i="${i}" style="display:${i===0?'grid':'none'}"><input class="label" value="${esc(o.label||'')}" placeholder="Nama Replace"><input class="url" value="${esc(o.url||'')}" placeholder="https://..."><button class="delOpt danger" data-i="${i}" title="Hapus Replace">×</button></div>`).join('')}</div></div><div class="actions"><button class="addOpt secondary">＋ Replace</button><button class="save">💾 Simpan</button><div class="orderBtns"><button class="ghost up" title="Naik satu posisi">↑</button><button class="ghost down" title="Turun satu posisi">↓</button></div><button class="ghost toTop" title="Pindahkan ke urutan paling atas">⇈ Paling atas</button><button class="ghost toBottom" title="Pindahkan ke urutan paling bawah">⇊ Paling bawah</button><button class="delSkin danger">Hapus</button></div></div>`}).join('')||'<div class="card empty">Tidak ada skin yang cocok.</div>';
 const pg=$('skinPagination');if(pg){if(totalPages<=1)pg.innerHTML='';else{let h='<button class="secondary" '+(skinPage===1?'disabled':'')+' data-page="prev">‹</button>';const from=Math.max(1,skinPage-2),to=Math.min(totalPages,skinPage+2);if(from>1)h+='<button class="secondary" data-page="1">1</button><span class="page-info">…</span>';for(let p=from;p<=to;p++)h+='<button class="'+(p===skinPage?'active':'secondary')+'" data-page="'+p+'">'+p+'</button>';if(to<totalPages)h+='<span class="page-info">…</span><button class="secondary" data-page="'+totalPages+'">'+totalPages+'</button>';h+='<button class="secondary" '+(skinPage===totalPages?'disabled':'')+' data-page="next">›</button><span class="page-info">'+(start+1)+'–'+Math.min(start+SKINS_PER_PAGE,allArr.length)+' dari '+allArr.length+'</span>';pg.innerHTML=h;pg.querySelectorAll('[data-page]').forEach(b=>b.onclick=()=>{const v=b.dataset.page;skinPage=v==='prev'?skinPage-1:v==='next'?skinPage+1:Number(v);render()})}}
 bind();updateStats();document.querySelectorAll('.titleInput').forEach(inp=>inp.addEventListener('input',()=>{const card=inp.closest('.skin');const p=card?.querySelector('.preview b');if(p)p.textContent=''+(cleanTitle(inp.value)||'Nama Skin');const icon=card?.querySelector('.iconInput'),prev=card?.querySelector('.iconPreview');if(icon&&prev&&!icon.value)prev.textContent=initials(inp.value)}));document.querySelectorAll('.iconInput').forEach(inp=>inp.addEventListener('input',()=>{inp.value=inp.value.toUpperCase().replace(/[^A-Z0-9]/g,'').slice(0,3);const p=inp.closest('.skin')?.querySelector('.iconPreview');if(p)p.textContent=inp.value||'R'}));}
 function updateStats(){const arr=Object.values(items);$('statSkins').textContent=arr.length;$('statReplace').textContent=arr.reduce((n,x)=>n+(x.options||[]).length,0)}
@@ -458,7 +472,7 @@ function promoteSkinLocal(id){
  ordered.forEach(([sid,x],i)=>{if(x) x.order=i});
  skinPage=1;
 }
-async function saveSkin(id,card){const btn=card.querySelector('.save');const old=items[id]||{};const x={...old,id,title:cleanTitle(card.querySelector('.titleInput').value)||'Skin Baru',iconText:(card.querySelector('.iconInput')?.value.trim()||initials(card.querySelector('.titleInput').value)).slice(0,3).toUpperCase(),options:[...card.querySelectorAll('.row')].map(r=>({label:r.querySelector('.label').value.trim(),url:r.querySelector('.url').value.trim(),selected:false})),order:Number(old.order??normalizeOrders().length),featured:!!card.querySelector('.featuredInput')?.checked,isNew:!!card.querySelector('.newInput')?.checked,imageUrl:String(card.querySelector('.imageUrlInput')?.value||'').trim(),createdAt:old.createdAt||Date.now(),updatedAt:Date.now()};if(x.options[0])x.options[0].selected=true;try{btn.disabled=true;btn.textContent='⏳ Menyimpan...';await db.ref('siteConfig/skins/'+id).set(x);items[id]=x;btn.textContent='✅ Tersimpan';toast('Skin berhasil disimpan ke Firebase');document.dispatchEvent(new CustomEvent('ryuza-admin-data-changed'));setTimeout(()=>{if(btn)btn.textContent='💾 Simpan'},1300)}catch(e){btn.textContent='❌ Gagal';toast('Gagal menyimpan: '+e.message);setTimeout(()=>{if(btn)btn.textContent='💾 Simpan'},1500)}finally{btn.disabled=false}}
+async function saveSkin(id,card){const btn=card.querySelector('.save');const old=items[id]||{};const x={...old,id,title:cleanTitle(card.querySelector('.titleInput').value)||'Skin Baru',iconText:(card.querySelector('.iconInput')?.value.trim()||initials(card.querySelector('.titleInput').value)).slice(0,3).toUpperCase(),options:[...card.querySelectorAll('.row')].map(r=>({label:r.querySelector('.label').value.trim(),url:r.querySelector('.url').value.trim(),selected:false})),order:Number(old.order??normalizeOrders().length),featured:!!card.querySelector('.featuredInput')?.checked,isNew:!!card.querySelector('.newInput')?.checked,imageUrl:String(card.querySelector('.imageUrlInput')?.value||'').trim(),category:String(card.querySelector('.categoryInput')?.value||''),createdAt:old.createdAt||Date.now(),updatedAt:Date.now()};if(x.options[0])x.options[0].selected=true;try{btn.disabled=true;btn.textContent='⏳ Menyimpan...';await db.ref('siteConfig/skins/'+id).set(x);items[id]=x;btn.textContent='✅ Tersimpan';toast('Skin berhasil disimpan ke Firebase');document.dispatchEvent(new CustomEvent('ryuza-admin-data-changed'));setTimeout(()=>{if(btn)btn.textContent='💾 Simpan'},1300)}catch(e){btn.textContent='❌ Gagal';toast('Gagal menyimpan: '+e.message);setTimeout(()=>{if(btn)btn.textContent='💾 Simpan'},1500)}finally{btn.disabled=false}}
 function bind(){document.querySelectorAll('.skin').forEach(card=>{const id=card.dataset.id;const picker=card.querySelector('.replace-select-admin');const rows=[...card.querySelectorAll('.replace-row')];if(picker){picker.onchange=()=>{const i=Number(picker.value)||0;rows.forEach((r,n)=>r.style.display=n===i?'grid':'none')};rows.forEach((r,i)=>r.querySelector('.label')?.addEventListener('input',()=>{const o=picker.options[i];if(o)o.textContent=r.querySelector('.label').value||('Replace '+(i+1))}))}card.querySelector('.addOpt').onclick=()=>{items[id].options=items[id].options||[];items[id].options.push({label:'',url:'',selected:false});promoteSkinLocal(id);render();document.querySelector(`.skin[data-id="${id}"] .replace-select-admin`)?.focus();toast('Replace baru ditambahkan. Nama dan link masih kosong.')};card.querySelectorAll('.delOpt').forEach(b=>b.onclick=()=>{items[id].options.splice(+b.dataset.i,1);render()});card.querySelector('.imageUrlInput')?.addEventListener('input',e=>{const box=card.querySelector('.skin-image-preview');const url=String(e.target.value||'').trim();if(box){box.style.display=url?'block':'none';box.style.backgroundImage=url?`url(\"${url.replace(/[\"\\]/g,'')}\")`:'none'}});card.querySelector('.save').onclick=()=>saveSkin(id,card);card.querySelector('.delSkin').onclick=async()=>{if(confirm('Hapus skin ini dari Firebase?')){await db.ref('siteConfig/skins/'+id).remove();toast('Skin dihapus');document.dispatchEvent(new CustomEvent('ryuza-admin-data-changed'))}};card.querySelector('.up').onclick=()=>moveSkin(id,-1);card.querySelector('.down').onclick=()=>moveSkin(id,1);card.querySelector('.toTop').onclick=()=>moveSkinToEdge(id,'top');card.querySelector('.toBottom').onclick=()=>moveSkinToEdge(id,'bottom')})}
 async function moveSkin(id,dir){const arr=normalizeOrders();const i=arr.findIndex(x=>x[0]===id),j=i+dir;if(i<0||j<0||j>=arr.length)return;const a=arr[i][1],b=arr[j][1],ao=a.order??i,bo=b.order??j;await db.ref('siteConfig/skins/'+arr[i][0]+'/order').set(bo);await db.ref('siteConfig/skins/'+arr[j][0]+'/order').set(ao);toast('Urutan diperbarui');document.dispatchEvent(new CustomEvent('ryuza-admin-data-changed'))}
 async function moveSkinToEdge(id,edge){
@@ -492,6 +506,14 @@ $('featuredSelectAll').onclick=()=>setAllFeatured(true);
 $('featuredClearAll').onclick=()=>setAllFeatured(false);
 let featuredSearchTimer=0;$('featuredPickerSearch').oninput=()=>{clearTimeout(featuredSearchTimer);featuredSearchTimer=setTimeout(renderFeaturedPicker,120)};
 
+function categorySlug(v){return String(v||'').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'').slice(0,70)||('kategori-'+Date.now())}
+function renderCategories(){
+ const el=$('categoryList');if(!el)return;const arr=Object.entries(categories||{}).sort((a,b)=>Number(a[1]?.order||0)-Number(b[1]?.order||0));
+ el.innerHTML=arr.map(([id,c])=>`<div class="card" style="margin:0;padding:12px;display:flex;align-items:center;justify-content:space-between;gap:10px"><div><b>${esc(c.icon||'✦')} ${esc(c.name||id)}</b><div class="hint">ID: ${esc(id)}</div></div><button class="danger" data-delete-category="${esc(id)}" type="button">Hapus</button></div>`).join('')||'<div class="empty">Belum ada kategori. Tambahkan kategori di atas.</div>';
+ el.querySelectorAll('[data-delete-category]').forEach(b=>b.onclick=async()=>{const id=b.dataset.deleteCategory;if(!confirm('Hapus kategori ini? Skin yang sudah memakai kategori ini tetap ada, tetapi tidak lagi masuk tab kategori.'))return;try{await db.ref('siteConfig/categories/'+id).remove();delete categories[id];window.__RYUZA_ADMIN_CATEGORIES__=categories;renderCategories();render();toast('Kategori dihapus. Publish Index untuk memperbarui tab.')}catch(e){toast('Gagal menghapus kategori: '+e.message)}});
+ const st=$('categoryStatus');if(st){st.textContent='● '+arr.length+' kategori';st.className='badge ok'}
+}
+$('addCategoryBtn')?.addEventListener('click',async()=>{const name=String($('categoryName')?.value||'').trim(),icon=String($('categoryIcon')?.value||'✦').trim()||'✦';if(!name){toast('Isi nama kategori dulu');$('categoryName')?.focus();return}const id=categorySlug(name);if(categories[id]){toast('Kategori sudah ada');return}const obj={name,icon,order:Object.keys(categories).length,createdAt:Date.now()};try{await db.ref('siteConfig/categories/'+id).set(obj);categories[id]=obj;window.__RYUZA_ADMIN_CATEGORIES__=categories;$('categoryName').value='';renderCategories();render();toast('Kategori ditambahkan. Klik Publish Index agar tampil di website.')}catch(e){toast('Gagal menambah kategori: '+e.message)}});
 function loadIndexFeatures(){
  const f=settings.indexFeatures||{};
  $('idxTrending').checked=f.trending!==false; $('idxFeatured').checked=f.featured!==false; $('idxNew').checked=f.newest!==false; $('idxRecent').checked=f.recent!==false; $('idxFavorite').checked=f.favorite!==false; $('idxStats').checked=f.stats!==false; $('idxBottom').checked=f.bottomNav!==false; $('idxTrendingLimit').value=Number(f.trendingLimit||8); $('idxSectionLimit').value=Number(f.sectionLimit||8);
@@ -503,6 +525,7 @@ async function saveIndexFeatures(){
 $('saveIndexFeatures').onclick=saveIndexFeatures; $('reloadIndexFeatures').onclick=loadIndexFeatures; $('refreshIndexStats').onclick=()=>{watchRankings();toast('↻ Statistik direfresh')}; $('clearIndexFavorites').onclick=async()=>{if(!confirm('Reset penanda favorit global pada perangkat pengunjung?'))return;try{await db.ref('siteConfig/indexFeatures/favoriteResetAt').set(Date.now());toast('✅ Perintah reset favorit dikirim realtime')}catch(e){toast('❌ Gagal: '+e.message)}};
 try{app=firebase.initializeApp(CFG,'ryuza-admin-'+Math.random().toString(36).slice(2));db=app.database(); window.db=db;
  db.ref('siteConfig/skins').on('value',s=>{items=s.val()||{};window.__RYUZA_ADMIN_ITEMS__=items;renderFeaturedPicker();$('status').textContent='● REALTIME AKTIF';$('status').className='badge ok';$('systemInfo').innerHTML='<b class="ok">Terhubung ke Firebase Realtime Database</b><br><span class="small">Path skin: siteConfig/skins • Perubahan dipantau realtime.</span>';render()},e=>{$('status').textContent='Firebase gagal: '+e.message;$('status').className='badge err';$('systemInfo').textContent='Firebase gagal: '+e.message});
+db.ref('siteConfig/categories').on('value',s=>{categories=s.val()||{};window.__RYUZA_ADMIN_CATEGORIES__=categories;renderCategories();render()});
  db.ref('siteConfig/settings').on('value',s=>{settings=s.val()||{};window.__RYUZA_ADMIN_SETTINGS__=settings;loadSettings();loadIndexFeatures()});
 db.ref('siteConfig/indexFeatures').on('value',s=>{settings.indexFeatures=s.val()||{};loadIndexFeatures()});
  db.ref('onlineUsers').on('value',s=>{$('statOnline').textContent=Object.keys(s.val()||{}).length});
@@ -865,7 +888,7 @@ $('quickImport').onclick=()=>{$('.tab[data-tab="skins"]').click();$('seedBtn').c
   function setStatus(t,kind){const e=$('ghStatus');if(!e)return;e.textContent='● '+t;e.className='badge '+(kind||'')}
   function headers(token){return {Accept:'application/vnd.github+json',Authorization:'Bearer '+token,'X-GitHub-Api-Version':'2022-11-28','Content-Type':'application/json'}}
   function b64decode(s){const bin=atob(s.replace(/\n/g,''));let out='';for(let i=0;i<bin.length;i+=8192)out+=String.fromCharCode(...Uint8Array.from(bin.slice(i,i+8192),c=>c.charCodeAt(0)));return decodeURIComponent(escape(out))}
-  function b64encode(s){return btoa(unescape(encodeURIComponent(s)))}
+  function b64encode(s){const bytes=new TextEncoder().encode(s);let bin='';for(let i=0;i<bytes.length;i+=0x8000)bin+=String.fromCharCode(...bytes.subarray(i,i+0x8000));return btoa(bin)}
   function safeJson(x){return JSON.stringify(x).replace(/</g,'\\u003c').replace(/\u2028/g,'\\u2028').replace(/\u2029/g,'\\u2029')}
   function getAdminState(){
     const source=window.__RYUZA_ADMIN_ITEMS__||{};
@@ -887,7 +910,7 @@ $('quickImport').onclick=()=>{$('.tab[data-tab="skins"]').click();$('seedBtn').c
     if(document.getElementById('setBannerEnabled'))settings.bannerEnabled=document.getElementById('setBannerEnabled').checked;
     const features=JSON.parse(JSON.stringify(window.__RYUZA_ADMIN_FEATURES||settings.indexFeatures||{}));
     ['trending','featured','newest','recent','favorite','stats','bottomNav'].forEach(k=>{const el=document.getElementById('idx'+k.charAt(0).toUpperCase()+k.slice(1));if(el)features[k]=el.checked});
-    return {version:1,updatedAt:Date.now(),skins,settings,indexFeatures:features};
+    return {version:1,updatedAt:Date.now(),skins,categories:JSON.parse(JSON.stringify(window.__RYUZA_ADMIN_CATEGORIES__||categories||{})),settings,indexFeatures:features};
   }
   async function publish(){
     const c=cfgFromUI();
@@ -895,16 +918,30 @@ $('quickImport').onclick=()=>{$('.tab[data-tab="skins"]').click();$('seedBtn').c
     setCfg(c);setStatus('Mengambil index.html...','');
     const api='https://api.github.com/repos/'+encodeURIComponent(c.owner)+'/'+encodeURIComponent(c.repo)+'/contents/'+c.path.split('/').map(encodeURIComponent).join('/')+'?ref='+encodeURIComponent(c.branch);
     try{
+      // Ambil metadata (termasuk SHA) lewat Contents API. File index Ryuza berukuran >1 MB,
+      // sehingga GitHub dapat mengembalikan field content kosong pada respons JSON standar.
       const get=await fetch(api,{headers:headers(c.token)});const gd=await get.json();if(!get.ok)throw Error(gd.message||('GitHub GET '+get.status));
-      const old=b64decode(gd.content||'');
+      let old='';
+      if(typeof gd.content==='string'&&gd.content.trim()){
+        try{old=b64decode(gd.content)}catch(decodeErr){old=''}
+      }
+      if(!old||old.length<1000){
+        const rawHeaders={Accept:'application/vnd.github.raw+json',Authorization:'Bearer '+c.token,'X-GitHub-Api-Version':'2022-11-28'};
+        const raw=await fetch(api,{headers:rawHeaders});
+        if(!raw.ok)throw Error('GitHub gagal membaca isi index.html ('+raw.status+'). Pastikan token memiliki izin Contents: Read and write.');
+        old=await raw.text();
+      }
+      if(!old||old.length<1000)throw Error('Isi index.html dari GitHub kosong atau tidak terbaca. Publish dibatalkan agar file tidak tertimpa kosong.');
       // Ambil snapshot terbaru dari Firebase agar perubahan Skin & Replace yang baru disimpan ikut ter-publish.
       if(!db)throw Error('Koneksi Firebase belum siap');
-      const snaps=await Promise.all([db.ref('siteConfig/skins').once('value'),db.ref('siteConfig/settings').once('value'),db.ref('siteConfig/indexFeatures').once('value'),db.ref('siteConfig/playlists').once('value'),db.ref('siteConfig/recalSkins').once('value')]);
+      const snaps=await Promise.all([db.ref('siteConfig/skins').once('value'),db.ref('siteConfig/settings').once('value'),db.ref('siteConfig/indexFeatures').once('value'),db.ref('siteConfig/playlists').once('value'),db.ref('siteConfig/recalSkins').once('value'),db.ref('siteConfig/categories').once('value')]);
       window.__RYUZA_ADMIN_ITEMS__=snaps[0].val()||{};
       window.__RYUZA_ADMIN_SETTINGS__={...(snaps[1].val()||{}),indexFeatures:snaps[2].val()||{}};
       window.__RYUZA_ADMIN_FEATURES__=snaps[2].val()||{};
       const staticPlaylists=snaps[3].val()||{};
       const staticRecalSkins=snaps[4].val()||{};
+      const staticCategories=snaps[5].val()||{};
+      categories=staticCategories;window.__RYUZA_ADMIN_CATEGORIES__=categories;
       items=window.__RYUZA_ADMIN_ITEMS__;settings=window.__RYUZA_ADMIN_SETTINGS__;
       const state=getAdminState();
       state.skins=window.__RYUZA_ADMIN_ITEMS__;
@@ -912,9 +949,20 @@ $('quickImport').onclick=()=>{$('.tab[data-tab="skins"]').click();$('seedBtn').c
       state.indexFeatures={...window.__RYUZA_ADMIN_FEATURES__,...(state.indexFeatures||{})};
       state.playlists=staticPlaylists;
       state.recalSkins=staticRecalSkins;
+      state.categories=staticCategories;
       const block='<!-- RYUZA_STATIC_CONFIG_START -->\n<script id="ryuza-static-config">window.__RYUZA_STATIC_CONFIG__='+safeJson(state)+';<\/script>\n<!-- RYUZA_STATIC_CONFIG_END -->';
       const re=/<!-- RYUZA_STATIC_CONFIG_START -->.*?<!-- RYUZA_STATIC_CONFIG_END -->/s;
-      const updated=re.test(old)?old.replace(re,block):old.replace('<script id="ryuza-super-features-js">',block+'\n<script id="ryuza-super-features-js">');
+      let updated='';
+      if(re.test(old)) updated=old.replace(re,block);
+      else if(/<head\b[^>]*>/i.test(old)) {
+        // Kompatibel dengan index lama: pasang konfigurasi statis di awal <head>
+        // agar tersedia sebelum script halaman dijalankan. Jangan gagalkan publish hanya
+        // karena index belum memiliki penanda versi baru.
+        updated=old.replace(/<head\b[^>]*>/i,match=>match+'\n'+block+'\n');
+      } else if(/<!doctype\s+html[^>]*>/i.test(old)) {
+        updated=old.replace(/<!doctype\s+html[^>]*>/i,match=>match+'\n'+block+'\n');
+      } else throw Error('Struktur index.html tidak dikenali (tag <head> tidak ditemukan). Publish dibatalkan agar file tidak rusak.');
+      if(updated.length<1000)throw Error('Hasil Index kosong; publish dibatalkan.');
       const put=await fetch(api,{method:'PUT',headers:headers(c.token),body:JSON.stringify({message:'Admin: update index settings & skins',content:b64encode(updated),sha:gd.sha,branch:c.branch})});
       const pd=await put.json();if(!put.ok)throw Error(pd.message||('GitHub PUT '+put.status));
       setStatus('Berhasil dipublish ke index.html','ok');toast?.('Index berhasil diperbarui dari Admin');return true;
