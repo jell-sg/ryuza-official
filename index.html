@@ -4505,4 +4505,58 @@ body{background:radial-gradient(ellipse at 50% 0%,rgba(168,85,247,.18),transpare
 #ryuzaCategoryPopup .rzcp-card .replace-dropdown{margin-top:8px!important;}
 @media(max-width:560px){#ryuzaCategoryPopup{padding:5px!important;}#ryuzaCategoryPopup .rzcp-panel{width:100%!important;height:94vh!important;height:94dvh!important;max-height:94vh!important;max-height:94dvh!important;border-radius:14px!important;}#ryuzaCategoryPopup .rzcp-grid{grid-template-columns:minmax(0,1fr)!important;gap:8px!important;padding:0 8px 28px!important;}}
 </style>
+
+<style id="ryuza-mobile-category-usability-fix">
+/* Mobile: kategori dibuat mudah disentuh dan digeser mendatar */
+@media (max-width: 700px) {
+  #ryuzaSmartbar {
+    width: calc(100% - 16px) !important;
+    max-width: none !important;
+    margin: 10px 8px 12px !important;
+    padding: 9px !important;
+    display: flex !important;
+    flex-wrap: nowrap !important;
+    justify-content: flex-start !important;
+    align-items: center !important;
+    gap: 8px !important;
+    overflow-x: auto !important;
+    overflow-y: hidden !important;
+    white-space: nowrap !important;
+    -webkit-overflow-scrolling: touch !important;
+    overscroll-behavior-x: contain !important;
+    touch-action: pan-x pan-y !important;
+    scrollbar-width: thin !important;
+    scroll-snap-type: x proximity !important;
+  }
+  #ryuzaSmartbar .ryuza-filter {
+    flex: 0 0 auto !important;
+    min-height: 44px !important;
+    padding: 11px 15px !important;
+    font-size: 14px !important;
+    line-height: 1.2 !important;
+    white-space: nowrap !important;
+    scroll-snap-align: start !important;
+    touch-action: manipulation !important;
+    -webkit-tap-highlight-color: transparent !important;
+  }
+  #ryuzaSmartbar .ryuza-filter:hover { transform: none !important; }
+  #ryuzaCategoryPopup .rzcp-head { gap: 8px !important; padding: 12px !important; }
+  #ryuzaCategoryPopup .rzcp-title { font-size: 16px !important; line-height: 1.25 !important; }
+  #ryuzaCategoryPopup .rzcp-close { flex: 0 0 44px !important; width: 44px !important; height: 44px !important; }
+  #ryuzaCategoryPopup .rzcp-search { min-height: 44px !important; margin: 10px 12px !important; padding: 11px 12px !important; font-size: 16px !important; }
+  #ryuzaCategoryPopup .rzcp-count { padding: 0 12px 9px !important; }
+}
+</style>
+<script id="ryuza-mobile-category-active-scroll">
+(function(){
+  const bar=document.getElementById('ryuzaSmartbar'); if(!bar)return;
+  bar.addEventListener('click',function(e){
+    const b=e.target.closest('.ryuza-filter');
+    if(b && window.matchMedia('(max-width: 700px)').matches){
+      requestAnimationFrame(()=>{ try{ b.scrollIntoView({behavior:'smooth',block:'nearest',inline:'nearest'}); }catch(_){} });
+    }
+  },{passive:true});
+})();
+</script>
+
 </body></html>
