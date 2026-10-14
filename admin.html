@@ -157,6 +157,29 @@ input:focus,select:focus,textarea:focus{border-color:#7ba7ff!important;box-shado
 @media(max-width:700px){#fileManager>.card{padding:14px;border-radius:15px}#fileManager .github-grid{grid-template-columns:1fr!important}#fileManager .github-grid input[style*="grid-column"]{grid-column:auto!important}#fileManager .toolbar button,#fileManager .actions button{flex:1 1 100%}#fileManager .badge{white-space:normal}}
 </style>
 
+
+<style id="ryuza-desktop-mode-style">
+#ryuzaDesktopModeToggle{position:fixed;right:12px;bottom:72px;z-index:100001;display:flex;align-items:center;gap:8px;padding:12px 14px;border:1px solid #48baff;border-radius:999px;background:linear-gradient(135deg,#087cff,#00b7ff);color:#fff;font-weight:800;font-size:12px;box-shadow:0 8px 24px #0008;cursor:pointer;max-width:calc(100vw - 24px)}
+#ryuzaDesktopModeToggle .mode-icon{font-size:16px}
+body.ryuza-desktop-mode{overflow-x:auto}
+body.ryuza-desktop-mode .wrap{width:1180px;max-width:none;margin:0;padding:18px}
+body.ryuza-desktop-mode .top{min-width:1140px;flex-wrap:nowrap}
+body.ryuza-desktop-mode .nav-modern{width:1140px;flex-wrap:nowrap;overflow:visible;align-items:stretch}
+body.ryuza-desktop-mode .nav-group{flex:0 0 auto;min-width:max-content;border-right:1px solid #19344d;border-bottom:0}
+body.ryuza-desktop-mode .nav-items{flex-wrap:nowrap}
+body.ryuza-desktop-mode .nav-modern .tab{white-space:nowrap}
+body.ryuza-desktop-mode .cards{grid-template-columns:repeat(4,minmax(0,1fr))}
+body.ryuza-desktop-mode .settings{grid-template-columns:1fr 1fr}
+body.ryuza-desktop-mode .grid{grid-template-columns:repeat(auto-fit,minmax(330px,1fr))}
+body.ryuza-desktop-mode .ranking-grid{grid-template-columns:1fr 1fr!important}
+body.ryuza-desktop-mode .analytics-grid{grid-template-columns:1fr 1fr}
+body.ryuza-desktop-mode .detail-stats{grid-template-columns:repeat(4,1fr)}
+body.ryuza-desktop-mode .bannerGrid{grid-template-columns:1fr 1fr}
+body.ryuza-desktop-mode .visitor-list{grid-template-columns:repeat(auto-fit,minmax(280px,1fr))}
+body.ryuza-desktop-mode .activity-item{grid-template-columns:150px 1fr auto}
+body.ryuza-desktop-mode #ryuzaDesktopModeToggle{bottom:18px}
+@media(max-width:700px){body.ryuza-desktop-mode .wrap{padding:12px}}
+</style>
 </head>
 </head>
 <body>
@@ -164,6 +187,7 @@ input:focus,select:focus,textarea:focus{border-color:#7ba7ff!important;box-shado
 <header class="top">
  <div class="brand"><div class="logo">⚡</div><div><h1>Ryuza Admin Panel</h1><div class="muted">Skin Manager • Realtime Control Center</div></div></div>
  <div id="status" class="badge">Menghubungkan...</div>
+ <button type="button" id="ryuzaDesktopModeToggle" aria-pressed="false"><span class="mode-icon">▣</span><span id="ryuzaDesktopModeLabel">Ubah ke Tampilan Desktop</span></button>
 </header>
 <nav class="nav-modern" aria-label="Navigasi Admin">
  <div class="nav-group">
@@ -1659,6 +1683,19 @@ $('quickImport').onclick=()=>{$('.tab[data-tab="skins"]').click();$('seedBtn').c
  </div>
 </div>
 
+
+<script id="ryuza-desktop-mode-script">
+(function(){
+ const btn=document.getElementById('ryuzaDesktopModeToggle');
+ const label=document.getElementById('ryuzaDesktopModeLabel');
+ if(!btn||!label)return;
+ let desktop=false;
+ try{desktop=localStorage.getItem('ryuzaAdminDesktopMode')==='1'}catch(e){}
+ function apply(){document.body.classList.toggle('ryuza-desktop-mode',desktop);btn.setAttribute('aria-pressed',desktop?'true':'false');label.textContent=desktop?'Kembali ke Tampilan Mobile':'Ubah ke Tampilan Desktop';btn.querySelector('.mode-icon').textContent=desktop?'▱':'▣';}
+ btn.addEventListener('click',function(){desktop=!desktop;try{localStorage.setItem('ryuzaAdminDesktopMode',desktop?'1':'0')}catch(e){}apply();if(desktop)window.scrollTo({left:0,top:0,behavior:'smooth'});});
+ apply();
+})();
+</script>
 </body>
 </html>
 
