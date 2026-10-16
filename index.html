@@ -4989,14 +4989,23 @@ input,textarea,select{background:#0e0b10!important;color:#fff2f5!important;borde
  <div class="rz-tutorial-panel">
   <div class="rz-tutorial-head"><h2 id="rzTutorialTitle">▶ Tutorial Ryuza Official</h2><button class="rz-tutorial-close" id="closeRyuzaTutorial" type="button" aria-label="Tutup tutorial">×</button></div>
   <div class="rz-tutorial-video"><iframe id="ryuzaTutorialFrame" src="https://www.youtube.com/embed/5BQRtwDUb0Y?rel=0&origin=https%3A%2F%2Fjell-sg.github.io" title="Tutorial Ryuza Official" loading="lazy" referrerpolicy="origin" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe></div>
-  <p class="rz-tutorial-desc">Video tutorial online — tekan tombol putar untuk menonton. Kalau video tidak dapat diputar di dalam popup, buka langsung melalui YouTube.</p>
-  <a class="rz-tutorial-open" href="https://youtube.com/watch?v=5BQRtwDUb0Y" target="_blank" rel="noopener noreferrer">Buka di YouTube ↗</a>
+  <p class="rz-tutorial-desc" id="rzTutorialDescription">Video tutorial online — tekan tombol putar untuk menonton. Kalau video tidak dapat diputar di dalam popup, buka langsung melalui YouTube.</p>
+  <a class="rz-tutorial-open" id="rzTutorialOpenYoutube" href="https://youtube.com/watch?v=5BQRtwDUb0Y" target="_blank" rel="noopener noreferrer">Buka di YouTube ↗</a>
  </div>
 </div>
 <script id="ryuza-tutorial-script">
 (()=>{const modal=document.getElementById('ryuzaTutorialPopup');const openBtn=document.getElementById('openRyuzaTutorial');const closeBtn=document.getElementById('closeRyuzaTutorial');if(!modal||!openBtn||!closeBtn||window.__ryuzaTutorialReady)return;window.__ryuzaTutorialReady=true;let previousFocus=null;function open(){previousFocus=document.activeElement;modal.classList.add('open');modal.setAttribute('aria-hidden','false');document.body.style.overflow='hidden';closeBtn.focus()}function close(){modal.classList.remove('open');modal.setAttribute('aria-hidden','true');document.body.style.overflow='';if(previousFocus&&previousFocus.focus)previousFocus.focus()}openBtn.addEventListener('click',open);closeBtn.addEventListener('click',close);modal.addEventListener('click',e=>{if(e.target===modal)close()});document.addEventListener('keydown',e=>{if(e.key==='Escape'&&modal.classList.contains('open'))close()})})();
 </script>
 <!-- ===== END RYUZA ONLINE VIDEO TUTORIAL ===== -->
+<!-- Sinkronisasi Tutorial dari Admin melalui Firebase Realtime Database -->
+<script id="ryuza-tutorial-firebase-sync">
+(()=>{const fallback={title:'Tutorial Ryuza Official',url:'https://youtube.com/watch?v=5BQRtwDUb0Y',description:'Video tutorial online — tekan tombol putar untuk menonton. Kalau video tidak dapat diputar di dalam popup, buka langsung melalui YouTube.'};
+function getId(raw){try{const u=new URL(String(raw||''));if(u.hostname==='youtu.be')return u.pathname.split('/').filter(Boolean)[0]||'';if(/youtube\.com$|youtube-nocookie\.com$/.test(u.hostname)){if(u.pathname==='/watch')return u.searchParams.get('v')||'';const m=u.pathname.match(/\/(?:embed|shorts|live)\/([^/?]+)/);return m?m[1]:''}}catch(e){}return ''}
+function apply(x){x={...fallback,...(x||{})};const id=getId(x.url);if(!id)return;const title=document.getElementById('rzTutorialTitle'),desc=document.getElementById('rzTutorialDescription'),frame=document.getElementById('ryuzaTutorialFrame'),open=document.getElementById('rzTutorialOpenYoutube');if(title)title.textContent='▶ '+x.title;if(desc)desc.textContent=x.description;if(frame){const next='https://www.youtube.com/embed/'+encodeURIComponent(id)+'?rel=0&origin='+encodeURIComponent(location.origin);if(frame.src!==next)frame.src=next}if(open)open.href='https://www.youtube.com/watch?v='+encodeURIComponent(id)}
+function start(){if(!window.firebase||!firebase.database)return setTimeout(start,500);try{let app;try{app=firebase.app('ryuza-tutorial-sync')}catch(e){app=firebase.initializeApp({authDomain:'ryuza-official.firebaseapp.com',databaseURL:'https://ryuza-official-default-rtdb.firebaseio.com',projectId:'ryuza-official'},'ryuza-tutorial-sync')}app.database().ref('siteConfig/tutorial').on('value',s=>apply(s.val()||fallback),e=>console.warn('[Ryuza Tutorial] gagal membaca pengaturan:',e))}catch(e){console.warn('[Ryuza Tutorial] init gagal:',e)}}
+apply(fallback);if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',start);else start();})();
+</script>
+
 
 </body></html>
 
