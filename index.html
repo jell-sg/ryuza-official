@@ -1894,6 +1894,20 @@ html{scroll-behavior:auto!important}
 @media(prefers-reduced-motion:reduce){*,*::before,*::after{animation:none!important;transition:none!important;scroll-behavior:auto!important}}
 </style>
 
+
+<style id="ryuza-youtube-subscriber-style">
+.ryuza-youtube-subs{display:flex;align-items:center;justify-content:space-between;gap:14px;width:100%;max-width:1240px;margin:10px auto 16px;padding:15px 17px;border:1px solid #3a2630;border-radius:16px;background:linear-gradient(110deg,#21121a,#111827 70%);box-shadow:0 8px 24px rgba(0,0,0,.2)}
+.ryuza-youtube-left{display:flex;align-items:center;gap:12px;min-width:0}
+.ryuza-youtube-icon{width:44px;height:44px;flex:0 0 44px;display:grid;place-items:center;border-radius:13px;background:#ff0033;color:#fff;font-size:23px;box-shadow:0 5px 18px rgba(255,0,51,.2)}
+.ryuza-youtube-label{font-size:10px;font-weight:900;letter-spacing:1px;color:#ff879b}
+.ryuza-youtube-name{font-size:14px;font-weight:900;color:#f4f7ff;margin-top:3px}
+.ryuza-youtube-status{font-size:10px;color:#9ca9ba;margin-top:4px}
+.ryuza-youtube-count{font-size:clamp(19px,4vw,27px);font-weight:950;line-height:1.1;text-align:right;color:#fff;font-variant-numeric:tabular-nums;overflow-wrap:anywhere}
+.ryuza-youtube-count small{display:block;font-size:9px;font-weight:700;color:#aeb7c5;margin-top:4px}
+.ryuza-youtube-visit{flex:0 0 auto;display:inline-flex;align-items:center;justify-content:center;padding:10px 12px;border-radius:10px;background:#ff0033;color:white;text-decoration:none;font-size:11px;font-weight:900}
+@media(max-width:480px){.ryuza-youtube-subs{padding:12px;gap:8px}.ryuza-youtube-icon{width:37px;height:37px;flex-basis:37px;font-size:19px}.ryuza-youtube-name{font-size:12px}.ryuza-youtube-status{max-width:170px;line-height:1.35}.ryuza-youtube-visit{padding:9px;font-size:10px}.ryuza-youtube-count{font-size:19px}}
+</style>
+
 </head><body>
 <style id="ryuza-chrome-gate-style">
 #ryuzaChromeGate{
@@ -2111,6 +2125,7 @@ html.ryuza-chrome-block #ryuzaChromeGate{display:flex!important}
  <a class="request" href="https://forms.gle/8ArZgMqNSGLtoruv7" target="_blank" rel="noopener">♙ Saran / Request Script</a>
  <button class="report" type="button" id="kaijiOpenReport">⚑ Lapor Bug / Error</button>
  <button class="skip-link-nav" type="button" id="openSkipLinkGuide">🔗 Cara Melewati Link</button>
+ <button class="rz-tutorial-nav" type="button" id="openRyuzaTutorial">▶ Tutorial</button>
 </nav>
 <script id="ryuza-kaijich-nav-actions">
 (()=>{const t=document.getElementById('kaijiCommunityToggle'),w=t?.closest('.kaiji-community');t?.addEventListener('click',()=>{const open=w.classList.toggle('open');t.setAttribute('aria-expanded',String(open))});document.addEventListener('click',e=>{if(w&&!w.contains(e.target)){w.classList.remove('open');t.setAttribute('aria-expanded','false')}});document.getElementById('kaijiOpenReport')?.addEventListener('click',()=>{const p=document.getElementById('reportPopup');if(p){p.style.display='flex';p.setAttribute('aria-hidden','false')}})})();
@@ -2185,6 +2200,22 @@ html.ryuza-chrome-block #ryuzaChromeGate{display:flex!important}
 <div class="stat-card"><div class="stat-icon">⬇️</div><div><div class="stat-label">TOTAL DOWNLOAD</div><div class="stat-value" id="totalDownloads">7.483.217</div><div class="stat-sub">download tercatat</div></div></div>
 <div class="stat-card"><div class="stat-icon">👥</div><div><div class="stat-label">TOTAL PENGUNJUNG</div><div class="stat-value" id="totalVisitors">5.000.000</div><div class="stat-sub">yang mengunjungi situs</div></div></div>
 </div>
+
+<section class="ryuza-youtube-subs" id="ryuzaYoutubeSubs" aria-label="Subscriber YouTube Ryuza Official">
+  <div class="ryuza-youtube-left">
+    <div class="ryuza-youtube-icon" aria-hidden="true">▶</div>
+    <div>
+      <div class="ryuza-youtube-label">YOUTUBE CHANNEL</div>
+      <div class="ryuza-youtube-name">Ryuza Official</div>
+      <div class="ryuza-youtube-status" id="ryuzaYoutubeStatus">Memuat jumlah subscriber…</div>
+    </div>
+  </div>
+  <div>
+    <div class="ryuza-youtube-count" id="ryuzaYoutubeCount">—<small>SUBSCRIBERS</small></div>
+  </div>
+  <a class="ryuza-youtube-visit" href="https://youtube.com/@ryuzaofficialr-x5r" target="_blank" rel="noopener noreferrer">SUBSCRIBE ↗</a>
+</section>
+
 <style id="ryuza-recal-tab-style">
 .ryuza-filter[data-mode="RECAL"]{color:#d7c8ff;border-color:#604b8f;background:linear-gradient(135deg,#211936,#33245a)}
 .ryuza-filter[data-mode="RECAL"].active{color:#fff;background:linear-gradient(135deg,#7046c6,#9b63f6);border-color:#b999ff;box-shadow:0 5px 16px rgba(139,92,246,.25)}
@@ -2970,8 +3001,21 @@ document.querySelectorAll('.replace-dropdown').forEach(function(box){
     console.log('[Ryuza RTDB] Skin tersinkron:',changed);
   }
   if(USE_STATIC){apply(STATIC_SKINS);console.log('[Ryuza RTDB] Skin/Replace dimuat langsung dari index.html:',Object.keys(STATIC_SKINS).length)}
-  else ref.on('value',snap=>apply(snap.val()),err=>console.error('[Ryuza RTDB] gagal membaca siteConfig/skins:',err));
+  else ref.on('value',snap=>{apply(snap.val());const wrap=skinWrap();if(wrap){wrap.dataset.ryuzaLiveReady='1';wrap.classList.add('ryuza-live-skins-ready');}},err=>{console.error('[Ryuza RTDB] gagal membaca siteConfig/skins:',err);const wrap=skinWrap();if(wrap){wrap.dataset.ryuzaLiveError='1';}});
 })();
+</script>
+
+
+<style id="ryuza-no-stale-skins">
+/* Jangan tampilkan card bawaan HTML (mis. Badang Saint Seiya) sebelum data terbaru Firebase siap. */
+#list{visibility:hidden!important;opacity:0!important;transition:none!important}
+#list.ryuza-live-skins-ready{visibility:visible!important;opacity:1!important}
+#list.ryuza-live-skins-ready:empty{display:none!important}
+#ryuzaSkinSyncWait{display:flex;align-items:center;justify-content:center;gap:9px;min-height:70px;margin:12px 0;padding:14px;border:1px solid rgba(255,55,115,.22);border-radius:14px;background:rgba(12,15,26,.9);color:#c7ccda;font:600 13px/1.4 system-ui,sans-serif}
+#ryuzaSkinSyncWait[hidden]{display:none!important}
+</style>
+<script id="ryuza-no-stale-skins-init">
+(()=>{const list=document.getElementById('list');if(!list)return;const wait=document.createElement('div');wait.id='ryuzaSkinSyncWait';wait.setAttribute('role','status');wait.innerHTML='<span aria-hidden="true">⏳</span><span>Memuat skin terbaru…</span>';list.parentNode.insertBefore(wait,list);const done=()=>{if(list.classList.contains('ryuza-live-skins-ready'))wait.hidden=true};new MutationObserver(done).observe(list,{attributes:true,attributeFilter:['class']});})();
 </script>
 
 <style id="ryuza-live-settings-first">
@@ -2982,10 +3026,9 @@ document.querySelectorAll('.replace-dropdown').forEach(function(box){
 <script id="ryuza-site-settings">
 (function(){
   const CFG={authDomain:'ryuza-official.firebaseapp.com',databaseURL:'https://ryuza-official-default-rtdb.firebaseio.com',projectId:'ryuza-official'};
-  const STATIC_SETTINGS=window.__RYUZA_STATIC_CONFIG__?.settings||{};
-  const USE_STATIC=Object.keys(STATIC_SETTINGS).length>0;
+  /* Gunakan Firebase sebagai satu-satunya sumber pengaturan agar nilai lama yang tertanam di HTML tidak muncul sesaat. */
   let db=null;
-  if(!USE_STATIC){if(!window.firebase)return;let app;try{app=firebase.app('ryuza-site-settings');}catch(e){try{app=firebase.initializeApp(CFG,'ryuza-site-settings')}catch(err){console.error('[Ryuza Settings] init gagal',err);return;}}db=app.database();}
+  if(!window.firebase)return;let app;try{app=firebase.app('ryuza-site-settings');}catch(e){try{app=firebase.initializeApp(CFG,'ryuza-site-settings')}catch(err){console.error('[Ryuza Settings] init gagal',err);return;}}db=app.database();
   const clean=s=>String(s||'').replace(/^[\s📌•·—–:-]+/,'').replace(/\s+/g,' ').trim();
   const initials=name=>{const t=clean(name).replace(/[^\p{L}\p{N}\s]/gu,' ').trim();if(!t)return 'R';const a=t.split(/\s+/).filter(Boolean);return (a.length===1?a[0].slice(0,2):a.slice(0,2).map(x=>x[0])).join('').toUpperCase().slice(0,2)};
   const esc=s=>String(s??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
@@ -3032,8 +3075,7 @@ document.querySelectorAll('.replace-dropdown').forEach(function(box){
     if(sub1)sub1.href=y1.includes('sub_confirmation=')?y1:(y1+(y1.includes('?')?'&':'?')+'sub_confirmation=1');
     if(sub2)sub2.href=y2.includes('sub_confirmation=')?y2:(y2+(y2.includes('?')?'&':'?')+'sub_confirmation=1');
   };
-  if(USE_STATIC) applySettings(STATIC_SETTINGS);
-  else db.ref('siteConfig/settings').on('value',snap=>applySettings(snap.val()||{}),err=>console.warn('[Ryuza Settings] gagal membaca:',err));
+  db.ref('siteConfig/settings').on('value',snap=>applySettings(snap.val()||{}),err=>console.warn('[Ryuza Settings] gagal membaca:',err));
   /* Skin icon mode ikut diterapkan oleh skin manager; tidak perlu listener skins kedua. */
 })();
 </script>
@@ -4882,4 +4924,85 @@ input,textarea,select{background:#0e0b10!important;color:#fff2f5!important;borde
 })();
 </script>
 
+
+<script id="ryuza-youtube-subscriber-script">
+(function(){
+  'use strict';
+  /* API key diperlukan oleh YouTube Data API.
+     Buat key di Google Cloud Console, aktifkan YouTube Data API v3,
+     lalu ganti teks di bawah dengan API key milikmu. */
+  const YOUTUBE_API_KEY = 'AIzaSyCZbwvumv6lJoUGRGyRZdYiYsxsEiX6cKM';
+  const HANDLE = '@ryuzaofficialr-x5r';
+  const countEl = document.getElementById('ryuzaYoutubeCount');
+  const statusEl = document.getElementById('ryuzaYoutubeStatus');
+  if (!countEl || !statusEl) return;
+  function status(message){ statusEl.textContent = message; }
+  function formatCount(value){ return Number(value).toLocaleString('id-ID'); }
+  async function loadSubscribers(){
+    if (!YOUTUBE_API_KEY || YOUTUBE_API_KEY === 'MASUKKAN_API_KEY_YOUTUBE_DI_SINI') {
+      status('Siapkan API key YouTube agar angka tampil otomatis');
+      return;
+    }
+    try {
+      const url = 'https://www.googleapis.com/youtube/v3/channels?part=statistics&forHandle=' + encodeURIComponent(HANDLE) + '&key=' + encodeURIComponent(YOUTUBE_API_KEY);
+      const response = await fetch(url, {cache:'no-store'});
+      if (!response.ok) throw new Error('YouTube API HTTP ' + response.status);
+      const data = await response.json();
+      const channel = data.items && data.items[0];
+      if (!channel || !channel.statistics) throw new Error('Data channel tidak ditemukan');
+      const stats = channel.statistics;
+      if (stats.hiddenSubscriberCount) {
+        countEl.innerHTML = 'Disembunyikan<small>SUBSCRIBERS</small>';
+        status('Channel menyembunyikan jumlah subscriber');
+      } else {
+        countEl.innerHTML = formatCount(stats.subscriberCount) + '<small>SUBSCRIBERS</small>';
+        status('Data YouTube • diperbarui otomatis');
+      }
+    } catch (error) {
+      status('Jumlah subscriber belum dapat dimuat • cek API key');
+      console.warn('[Ryuza YouTube Subscribers]', error);
+    }
+  }
+  loadSubscribers();
+  window.addEventListener('online', loadSubscribers);
+})();
+</script>
+
+
+<!-- ===== RYUZA ONLINE VIDEO TUTORIAL (TEST) ===== -->
+<style id="ryuza-tutorial-style">
+.rz-tutorial-nav{appearance:none;border:1px solid #37506d;border-radius:12px;padding:10px 14px;background:linear-gradient(135deg,#172b46,#142039);color:#dff7ff;font:800 12px/1.2 inherit;cursor:pointer;white-space:nowrap}
+.rz-tutorial-nav:hover{border-color:#42c9ff;background:linear-gradient(135deg,#183e5d,#25204b)}
+#ryuzaTutorialPopup{position:fixed;inset:0;z-index:2147483646;display:none;align-items:center;justify-content:center;padding:14px;background:rgba(3,7,15,.82);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px)}
+#ryuzaTutorialPopup.open{display:flex}
+#ryuzaTutorialPopup .rz-tutorial-panel{width:min(760px,100%);max-height:92dvh;overflow:auto;background:linear-gradient(145deg,#111d30,#0b101b);border:1px solid #344967;border-radius:22px;box-shadow:0 25px 80px #0009;color:#eef5ff;padding:16px}
+#ryuzaTutorialPopup .rz-tutorial-head{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:12px}
+#ryuzaTutorialPopup h2{margin:0;font-size:18px;font-weight:900}
+#ryuzaTutorialPopup .rz-tutorial-close{width:38px;height:38px;flex:0 0 38px;border:1px solid #40536b;border-radius:12px;background:#1a2638;color:white;font-size:24px;cursor:pointer}
+#ryuzaTutorialPopup .rz-tutorial-video{width:100%;aspect-ratio:16/9;background:#000;border-radius:15px;overflow:hidden;border:1px solid #293e58}
+#ryuzaTutorialPopup iframe{width:100%;height:100%;border:0;display:block}
+#ryuzaTutorialPopup .rz-tutorial-desc{margin:12px 2px 4px;color:#aebdd1;font-size:13px;line-height:1.6}
+#ryuzaTutorialPopup .rz-tutorial-open{display:inline-flex;margin-top:10px;align-items:center;justify-content:center;padding:10px 14px;border-radius:11px;background:linear-gradient(120deg,#1587dc,#673bdf);color:white;text-decoration:none;font-size:12px;font-weight:850}
+@media(max-width:560px){.rz-tutorial-nav{padding:8px 10px;font-size:11px}#ryuzaTutorialPopup{padding:8px;align-items:center}#ryuzaTutorialPopup .rz-tutorial-panel{padding:12px;border-radius:18px;max-height:94dvh}#ryuzaTutorialPopup h2{font-size:16px}}
+</style>
+<div id="ryuzaTutorialPopup" aria-hidden="true" role="dialog" aria-modal="true" aria-labelledby="rzTutorialTitle">
+ <div class="rz-tutorial-panel">
+  <div class="rz-tutorial-head"><h2 id="rzTutorialTitle">▶ Tutorial Ryuza Official</h2><button class="rz-tutorial-close" id="closeRyuzaTutorial" type="button" aria-label="Tutup tutorial">×</button></div>
+  <div class="rz-tutorial-video"><iframe id="ryuzaTutorialFrame" src="https://www.youtube.com/embed/5BQRtwDUb0Y?rel=0&origin=https%3A%2F%2Fjell-sg.github.io" title="Tutorial Ryuza Official" loading="lazy" referrerpolicy="origin" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe></div>
+  <p class="rz-tutorial-desc">Video tutorial online — tekan tombol putar untuk menonton. Kalau video tidak dapat diputar di dalam popup, buka langsung melalui YouTube.</p>
+  <a class="rz-tutorial-open" href="https://youtube.com/watch?v=5BQRtwDUb0Y" target="_blank" rel="noopener noreferrer">Buka di YouTube ↗</a>
+ </div>
+</div>
+<script id="ryuza-tutorial-script">
+(()=>{const modal=document.getElementById('ryuzaTutorialPopup');const openBtn=document.getElementById('openRyuzaTutorial');const closeBtn=document.getElementById('closeRyuzaTutorial');if(!modal||!openBtn||!closeBtn||window.__ryuzaTutorialReady)return;window.__ryuzaTutorialReady=true;let previousFocus=null;function open(){previousFocus=document.activeElement;modal.classList.add('open');modal.setAttribute('aria-hidden','false');document.body.style.overflow='hidden';closeBtn.focus()}function close(){modal.classList.remove('open');modal.setAttribute('aria-hidden','true');document.body.style.overflow='';if(previousFocus&&previousFocus.focus)previousFocus.focus()}openBtn.addEventListener('click',open);closeBtn.addEventListener('click',close);modal.addEventListener('click',e=>{if(e.target===modal)close()});document.addEventListener('keydown',e=>{if(e.key==='Escape'&&modal.classList.contains('open'))close()})})();
+</script>
+<!-- ===== END RYUZA ONLINE VIDEO TUTORIAL ===== -->
+
 </body></html>
+
+<style id="ryuza-banner-smaller-final">
+/* Banner lebih ringkas tanpa mengubah isi/fitur banner. */
+.ryuza-banner{aspect-ratio:16/4.2!important;min-height:125px!important;max-height:260px!important;margin:8px auto 12px!important;border-radius:15px!important}
+@media(max-width:900px){.ryuza-banner{aspect-ratio:16/5.2!important;min-height:115px!important;max-height:210px!important}}
+@media(max-width:600px){.ryuza-banner{aspect-ratio:16/6.2!important;min-height:95px!important;max-height:155px!important;margin:6px auto 10px!important;border-radius:12px!important}.ryuza-slide-caption{left:12px!important;bottom:18px!important;max-width:78%!important}.ryuza-slide-caption h2{font-size:clamp(15px,4.5vw,23px)!important;margin-top:4px!important}.ryuza-slide-caption span{font-size:8px!important;letter-spacing:1px!important}.ryuza-arrow{width:27px!important;height:27px!important;font-size:19px!important}.ryuza-dots{bottom:7px!important;right:9px!important;gap:5px!important}.ryuza-dot{width:6px!important;height:6px!important}.ryuza-dot.active{width:15px!important}}
+</style>
