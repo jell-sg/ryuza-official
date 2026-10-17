@@ -37,6 +37,10 @@ input:focus,textarea:focus,select:focus{outline:none;border-color:#4a9eff!import
 @media(max-width:600px){.recal-replace-row{grid-template-columns:1fr}.recal-replace-row .danger{width:100%}.recal-skin-card{padding:11px}}
 .skin-image-preview{background-size:cover;background-position:center}.skin-image-field input{margin-top:2px}
 </style>
+<style id="ryuza-admin-smooth-lists">
+#visitorList,#activityList,#categoryList,#recalSkinList{content-visibility:auto;contain-intrinsic-size:1px 500px}
+#skins .skin{contain:layout style}
+</style>
 <style>.activity-list{display:flex;flex-direction:column;gap:8px;max-height:620px;overflow:auto}.activity-item{display:grid;grid-template-columns:150px 1fr auto;gap:12px;align-items:center;padding:12px 14px;border:1px solid #20364c;border-radius:12px;background:#091522}.activity-time{font-size:11px;color:#7f98ae}.activity-main{min-width:0}.activity-name{font-weight:800;color:#fff}.activity-detail{font-size:12px;color:#91a8bc;margin-top:4px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.activity-badge{font-size:11px;font-weight:800;padding:5px 8px;border-radius:999px;background:#10283b;color:#75d1ff}@media(max-width:700px){.activity-item{grid-template-columns:1fr}}.analytics-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}.bar-chart{height:210px;display:flex;align-items:flex-end;gap:5px;padding:15px 5px 25px;border-bottom:1px solid #29445e}.bar-col{flex:1;min-width:8px;height:100%;display:flex;flex-direction:column;justify-content:flex-end;align-items:center;gap:5px}.bar-fill{width:100%;max-width:28px;border-radius:6px 6px 2px 2px;background:linear-gradient(180deg,#19b9ff,#1768d5);min-height:2px}.bar-label{font-size:9px;color:#718ba3}.bar-val{font-size:9px;color:#b9d4ea}.trend-list,.notification-list{display:flex;flex-direction:column;gap:7px;max-height:380px;overflow:auto}.trend-item,.notification-item{display:flex;align-items:center;gap:10px;padding:10px;border:1px solid #20364c;border-radius:10px;background:#091522}.trend-rank{font-weight:900;color:#65c9ff;width:25px}.trend-name{font-weight:700;flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.trend-count{font-weight:900}.notification-item{font-size:12px}.notification-item b{color:#fff}.notification-time{color:#718ba3;font-size:10px;margin-left:auto;white-space:nowrap}.detail-box{margin-top:12px;padding:14px;border:1px solid #29445e;border-radius:12px;background:#091522;min-height:80px}.detail-stats{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}.detail-stat{padding:10px;border-radius:10px;background:#102033;text-align:center}.detail-stat b{display:block;font-size:20px}.skin-flags{display:flex;gap:14px;flex-wrap:wrap;margin:5px 0 12px}.skin-flags label{font-size:12px;color:#a9bad0;display:flex;align-items:center;gap:6px}.skin-flags input{width:auto}@media(max-width:700px){.analytics-grid{grid-template-columns:1fr}.detail-stats{grid-template-columns:1fr 1fr}}</style><style id="ryuza-replace-dropdown-ui">.replace-box{margin-top:12px;padding:12px;border:1px solid #243f59;border-radius:13px;background:linear-gradient(145deg,#0b1827,#09131f)}.replace-top{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:9px}.replace-title{font-weight:800;font-size:13px;color:#dcecff}.replace-hint{font-size:11px;color:#718ba3;margin-top:3px}.replace-count{font-size:11px;font-weight:800;color:#76cfff;background:#102b43;border:1px solid #285476;padding:5px 8px;border-radius:999px;white-space:nowrap}.replace-select-admin{width:100%;height:42px;border-radius:10px;border:1px solid #2e5270;background:#0a1b2b;color:#fff;font-weight:700;padding:0 12px;cursor:pointer}.replace-select-admin option{background:#0a1b2b;color:#fff}.replace-editor{margin-top:8px}.replace-row{margin:0!important}.replace-row .label{font-weight:700}.replace-row .url{color:#a9d8ff}.replace-box .row{grid-template-columns:145px 1fr 38px}.replace-box .delOpt{height:38px;padding:0;font-size:18px}.replace-box:focus-within{border-color:#287db6;box-shadow:0 0 0 3px #168cff12}@media(max-width:560px){.replace-box .row{grid-template-columns:1fr 38px}.replace-box .row .label{grid-column:1/2}.replace-box .row .url{grid-column:1/2}.replace-box .row .delOpt{grid-column:2;grid-row:1/3;height:100%}}</style>
 <style id="ryuza-admin-performance">
 #skins .grid{content-visibility:auto;contain:layout paint style}
@@ -664,10 +668,9 @@ $('saveIndexFeatures').onclick=saveIndexFeatures; $('reloadIndexFeatures').oncli
 try{app=firebase.initializeApp(CFG,'ryuza-admin-'+Math.random().toString(36).slice(2));db=app.database(); window.db=db;
  db.ref('siteConfig/skins').on('value',s=>{items=s.val()||{};window.__RYUZA_ADMIN_ITEMS__=items;renderFeaturedPicker();$('status').textContent='● REALTIME AKTIF';$('status').className='badge ok';$('systemInfo').innerHTML='<b class="ok">Terhubung ke Firebase Realtime Database</b><br><span class="small">Path skin: siteConfig/skins • Perubahan dipantau realtime.</span>';render()},e=>{$('status').textContent='Firebase gagal: '+e.message;$('status').className='badge err';$('systemInfo').textContent='Firebase gagal: '+e.message});
 db.ref('siteConfig/categories').on('value',s=>{categories=s.val()||{};window.__RYUZA_ADMIN_CATEGORIES__=categories;renderCategories();render()});
- db.ref('siteConfig/settings').on('value',s=>{settings=s.val()||{};window.__RYUZA_ADMIN_SETTINGS__=settings;loadSettings();loadIndexFeatures()});
+ db.ref('siteConfig/settings').on('value',s=>{settings=s.val()||{};window.__RYUZA_ADMIN_SETTINGS__=settings;const active=document.activeElement;const editingSettings=!!(active&&active.closest&&active.closest('#settings'));if(!editingSettings)loadSettings();loadIndexFeatures()});
 db.ref('siteConfig/indexFeatures').on('value',s=>{settings.indexFeatures=s.val()||{};loadIndexFeatures()});
  db.ref('onlineUsers').on('value',s=>{$('statOnline').textContent=Object.keys(s.val()||{}).length});
- db.ref('linkClicks').on('value',s=>{const v=s.val()||{};$('statClicks').textContent=Object.values(v).reduce((n,x)=>n+Number(x?.count||0),0)});
  watchRankings();
  /* Live Activity dinonaktifkan untuk mengurangi beban Firebase. */
  watchVisitors();
@@ -707,7 +710,7 @@ function addBannerRow(b={},i=0){
 let liveTimer=null;
 function scheduleLiveSave(){
   clearTimeout(liveTimer); const st=$('liveSaveStatus'); if(st){st.textContent='⏳ Menyimpan...';st.className='badge'}
-  liveTimer=setTimeout(saveSettingsRealtime,450);
+  liveTimer=setTimeout(saveSettingsRealtime,850);
 }
 async function saveSettingsRealtime(){
   const banners=[...$('bannerFields').children].map(r=>({image:r.querySelector('.bannerImage').value.trim(),title:r.querySelector('.bannerTitle').value.trim(),kicker:r.querySelector('.bannerKicker').value.trim()||'RYUZA OFFICIAL',link:r.querySelector('.bannerLink').value.trim()}));
@@ -786,7 +789,7 @@ $('clearVisitors').onclick=async()=>{
 function watchVisitors(){
  db.ref('searchStats/visitors').on('value',s=>{visitorData=s.val()||{};renderVisitors()},e=>{const st=$('visitorStatus');if(st){st.textContent='● Gagal membaca';st.className='badge err'};toast('Gagal memuat nama pengunjung: '+e.message)});
  db.ref('onlineUsers').on('value',s=>{onlineVisitorData=s.val()||{};renderVisitors()},e=>{console.warn('Gagal memuat status online:',e.message)});
- setInterval(renderVisitors,10000);
+ // Realtime listeners update this view; avoid a periodic full-list redraw.
 }
 let activityData={};
 
@@ -1778,9 +1781,12 @@ $('quickImport').onclick=()=>{$('.tab[data-tab="skins"]').click();$('seedBtn').c
   const btn=$('subscribeSaveBtn');btn.disabled=true;btn.textContent='⏳ Menyimpan...';
   try{
    await db.ref('siteConfig/settings').update({youtube:url,youtube1:url,updatedAt:Date.now()});
+   const verify=(await db.ref('siteConfig/settings').once('value')).val()||{};
+   if(String(verify.youtube||verify.youtube1||'').trim()!==url)throw Error('Firebase belum mengonfirmasi link baru. Periksa rules/izin tulis.');
    if(window.__RYUZA_ADMIN_SETTINGS__){window.__RYUZA_ADMIN_SETTINGS__.youtube=url;window.__RYUZA_ADMIN_SETTINGS__.youtube1=url;}
-   status('Link wajib subscribe tersimpan',true);
+   status('Tersimpan & terverifikasi: '+url,true);
    if(typeof window.toast==='function')window.toast('Link wajib subscribe berhasil disimpan.');
+   document.dispatchEvent(new CustomEvent('ryuza-admin-data-changed'));
   }catch(e){status('Gagal menyimpan: '+e.message,false);}
   finally{btn.disabled=false;btn.textContent='💾 Simpan Link';}
  }
@@ -1789,7 +1795,14 @@ $('quickImport').onclick=()=>{$('.tab[data-tab="skins"]').click();$('seedBtn').c
   const url=$('subscribeButtonUrl').value.trim();
   if(!url||!/^https:\/\/(www\.)?(youtube\.com|youtu\.be)\//i.test(url)){buttonStatus('Masukkan URL YouTube yang valid',false);return;}
   const btn=$('subscribeButtonSaveBtn');btn.disabled=true;btn.textContent='⏳ Menyimpan...';
-  try{await db.ref('siteConfig/settings').update({youtubeSub:url,youtubeSubLink:url,updatedAt:Date.now()});buttonStatus('Link SUB tersimpan',true);if(typeof window.toast==='function')window.toast('Link SUB berhasil disimpan.');}
+  try{
+   await db.ref('siteConfig/settings').update({youtubeSub:url,youtubeSubLink:url,updatedAt:Date.now()});
+   const verify=(await db.ref('siteConfig/settings').once('value')).val()||{};
+   if(String(verify.youtubeSub||verify.youtubeSubLink||'').trim()!==url)throw Error('Firebase belum mengonfirmasi link SUB. Periksa rules/izin tulis.');
+   buttonStatus('Tersimpan & terverifikasi: '+url,true);
+   if(typeof window.toast==='function')window.toast('Link SUB berhasil disimpan.');
+   document.dispatchEvent(new CustomEvent('ryuza-admin-data-changed'));
+  }
   catch(e){buttonStatus('Gagal menyimpan: '+e.message,false);}
   finally{btn.disabled=false;btn.textContent='💾 Simpan Link SUB';}
  }
@@ -1799,32 +1812,11 @@ $('quickImport').onclick=()=>{$('.tab[data-tab="skins"]').click();$('seedBtn').c
  $('subscribeReloadBtn')?.addEventListener('click',load);
  $('subscribeOpenBtn')?.addEventListener('click',()=>{const url=$('subscribeChannelUrl').value.trim();if(/^https:\/\/(www\.)?(youtube\.com|youtu\.be)\//i.test(url))window.open(url,'_blank','noopener');else status('Masukkan URL YouTube yang valid',false);});
  document.querySelector('.tab[data-tab="subscribeSettings"]')?.addEventListener('click',load);
- document.addEventListener('ryuza-admin-data-changed',()=>{const panel=$('subscribeSettings');if(panel?.classList.contains('active'))load();});
- setTimeout(load,1200);
+ // Do not reload on every generic admin data-change event; explicit tab/reload actions load settings.
+ let loadRetry=0; function safeInitialLoad(){const d=getDb();if(d){load();return;}if(loadRetry++<12)setTimeout(safeInitialLoad,500);else{status('Firebase belum siap. Muat ulang halaman setelah koneksi aktif.',false);buttonStatus('Firebase belum siap',false);}} safeInitialLoad();
 })();
 </script>
 
 </body>
 </html>
 
-<style id="ryuza-sync-audit-style">
-#ryuzaSyncAudit{position:fixed;right:12px;bottom:12px;z-index:99999;width:min(340px,calc(100vw - 24px));background:#100d1b;color:#f4eaff;border:1px solid #8b5cf6;border-radius:14px;box-shadow:0 0 22px #8b5cf655;padding:12px;font:12px/1.45 Arial,sans-serif}#ryuzaSyncAudit summary{cursor:pointer;font-weight:800;color:#d8b4fe}#ryuzaSyncAudit .audit-status{margin:7px 0;color:#c4b5fd}#ryuzaSyncAudit .audit-list{display:grid;gap:4px}#ryuzaSyncAudit .audit-row{display:flex;justify-content:space-between;gap:8px;border-top:1px solid #ffffff16;padding-top:4px}#ryuzaSyncAudit .ok{color:#86efac}#ryuzaSyncAudit .bad{color:#fda4af}#ryuzaSyncAudit button{background:#7c3aed;color:white;border:0;border-radius:8px;padding:6px 9px;margin-top:8px;cursor:pointer}
-</style>
-<details id="ryuzaSyncAudit" open><summary>🔄 Audit Sinkronisasi Index ↔ Admin</summary><div class="audit-status" id="ryuzaSyncAuditStatus">Memeriksa koneksi Firebase…</div><div class="audit-list" id="ryuzaSyncAuditList"></div><button type="button" id="ryuzaSyncAuditCheck">Periksa sekarang</button><div style="opacity:.7;margin-top:5px">Pemeriksaan otomatis setiap 60 detik. Tidak mengubah atau menghapus data.</div></details>
-<script id="ryuza-sync-audit-script">
-(function(){
- const $=id=>document.getElementById(id); let db=null, timer=null, busy=false;
- const paths=['siteConfig/settings','siteConfig/skins','siteConfig/indexFeatures','siteConfig/playlists','siteConfig/recalSkins'];
- const names={'siteConfig/settings':'Pengaturan index','siteConfig/skins':'Skin & Replace','siteConfig/indexFeatures':'Fitur index','siteConfig/playlists':'Playlist','siteConfig/recalSkins':'Skin Recal'};
- function row(path,state,detail){return '<div class="audit-row"><span>'+names[path]+'</span><b class="'+(state?'ok':'bad')+'">'+(state?'✓ OK':'⚠ '+detail)+'</b></div>'}
- async function check(){if(busy)return;busy=true;const status=$('ryuzaSyncAuditStatus'),list=$('ryuzaSyncAuditList');status.textContent='Memeriksa '+new Date().toLocaleTimeString('id-ID')+'…';let html='',failed=0;
- try{if(!db){if(!window.firebase||!firebase.database)throw Error('Firebase SDK belum siap');let app;try{app=firebase.app('ryuza-sync-audit')}catch(e){app=firebase.initializeApp({authDomain:'ryuza-official.firebaseapp.com',databaseURL:'https://ryuza-official-default-rtdb.firebaseio.com',projectId:'ryuza-official'},'ryuza-sync-audit')}db=app.database()}
- for(const path of paths){try{const snap=await db.ref(path).once('value');const val=snap.val();if(val===null && path!=='siteConfig/playlists' && path!=='siteConfig/recalSkins'){html+=row(path,false,'data kosong');failed++}else html+=row(path,true,'Sinkron');}catch(e){html+=row(path,false,'gagal baca');failed++}}
- status.textContent=failed?('Ditemukan '+failed+' masalah. Cek rules/koneksi Firebase.'):'Semua jalur data bisa dibaca. Cek terakhir '+new Date().toLocaleTimeString('id-ID');
- }catch(e){status.textContent='Pemeriksaan gagal: '+(e.message||e);html=paths.map(p=>row(p,false,'koneksi')).join('')}
- list.innerHTML=html;busy=false;
- }
- function boot(){if(!$('ryuzaSyncAudit'))return;check();timer=setInterval(check,60000);$('ryuzaSyncAuditCheck')?.addEventListener('click',check);document.addEventListener('visibilitychange',()=>{if(!document.hidden)check()});}
- if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',boot,{once:true});else boot();
-})();
-</script>
