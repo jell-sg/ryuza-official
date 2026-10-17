@@ -217,7 +217,6 @@ body.ryuza-desktop-mode #ryuzaDesktopModeToggle{bottom:18px}
   <div class="nav-group-title">DATA</div>
   <div class="nav-items">
    <button class="tab" data-tab="backup"><span class="tab-icon">▤</span><span>Backup</span></button>
-   <button class="tab" data-tab="tutorialSettings"><span class="tab-icon">▶</span><span>Tutorial Video</span></button>
   </div>
  </div>
 </nav>
@@ -457,17 +456,6 @@ Replace : Basic
 </div>
 </section>
 
-<section id="tutorialSettings" class="panel">
- <div class="card">
-  <h2 style="margin:0 0 8px">▶ Pengaturan Tutorial Video</h2>
-  <div class="notice">Ganti link video dari sini. Pengaturan disimpan ke <b>siteConfig/tutorial</b> di Firebase dan halaman Index akan mengikuti secara realtime.</div>
-  <div class="field" style="margin-top:14px"><label>Judul Tutorial</label><input id="tutorialTitleInput" maxlength="100" placeholder="Tutorial Ryuza Official"></div>
-  <div class="field"><label>Link Video YouTube</label><input id="tutorialUrlInput" type="url" placeholder="https://youtube.com/watch?v=..."><div class="hint">Terima link youtube.com/watch, youtu.be, atau youtube.com/embed.</div></div>
-  <div class="field"><label>Keterangan Tutorial</label><textarea id="tutorialDescInput" maxlength="500" placeholder="Panduan penggunaan website Ryuza Official..."></textarea></div>
-  <div class="actions"><button class="primary" id="saveTutorialSettings">💾 Simpan Tutorial</button><button class="secondary" id="reloadTutorialSettings">↻ Muat Ulang</button><span class="badge" id="tutorialSaveStatus">● Menunggu data</span></div>
-  <div id="tutorialPreviewBox" style="margin-top:14px;padding:12px;border:1px solid #293e58;border-radius:12px;background:#080d15"><b id="tutorialPreviewTitle">▶ Tutorial Ryuza Official</b><div id="tutorialPreviewUrl" class="hint">Belum ada link</div></div>
- </div>
-</section>
 <section id="backup" class="panel">
  <div class="card"><h3 style="margin-top:0">💾 Backup & Restore</h3><div class="notice">Backup menyimpan <b>siteConfig</b> dan data skin dalam satu file JSON. Jangan membagikan file backup karena dapat berisi konfigurasi website.</div><div class="actions" style="margin-top:12px"><button class="primary" id="exportBtn">⬇️ Download Backup JSON</button><button class="secondary" id="restoreBtn">⬆️ Restore JSON</button><input id="restoreInput" class="file" type="file" accept="application/json,.json"></div><div class="progress"><i id="progress"></i></div></div>
  <div class="card dangerbox"><h3 style="margin-top:0">⚠️ Zona Berbahaya</h3><p class="muted">Reset Subscribe akan menghapus status verifikasi subscribe yang tersimpan di semua perangkat pengunjung. Mereka akan diminta subscribe ulang.</p><div class="actions"><button class="danger" id="resetAllSubscribe">🔄 Reset Semua Subscribe</button><button class="danger" id="clearSkins">Hapus Semua Skin dari Database</button></div><div class="hint">Perintah reset dikirim <b>REALTIME</b> melalui Firebase settings. Pengunjung yang sedang membuka website akan otomatis kembali ke popup subscribe.</div></div>
@@ -953,7 +941,28 @@ $('detailVisitor')?.addEventListener('change',renderVisitorDetail);
 async function exportBackup(){const [a,b,c,d,e,f]=await Promise.all([db.ref('siteConfig').once('value'),db.ref('linkClicks').once('value'),db.ref('searchStats').once('value'),db.ref('downloadStats').once('value'),db.ref('downloadStatsByOption').once('value'),db.ref('searchStats/visitors').once('value')]);const data={version:3,exportedAt:new Date().toISOString(),siteConfig:a.val()||{},linkClicks:b.val()||{},searchStats:c.val()||{},downloadStats:d.val()||{},downloadStatsByOption:e.val()||{},visitorNames:f.val()||{}};const blob=new Blob([JSON.stringify(data,null,2)],{type:'application/json'}),url=URL.createObjectURL(blob),aEl=document.createElement('a');aEl.href=url;aEl.download='ryuza-backup-'+new Date().toISOString().slice(0,10)+'.json';aEl.click();URL.revokeObjectURL(url);toast('Backup berhasil dibuat')}
 $('exportBtn').onclick=exportBackup;$('quickBackup').onclick=()=>{switchTab('backup');exportBackup()};$('restoreBtn').onclick=()=>$('restoreInput').click();$('restoreInput').onchange=async e=>{const f=e.target.files?.[0];if(!f)return;try{const d=JSON.parse(await f.text());if(!d.siteConfig)throw Error('Format backup tidak valid');if(!confirm('Restore akan menimpa siteConfig. Lanjutkan?'))return;await db.ref('siteConfig').set(d.siteConfig);if(d.linkClicks)await db.ref('linkClicks').set(d.linkClicks);if(d.searchStats)await db.ref('searchStats').set(d.searchStats);if(d.downloadStats)await db.ref('downloadStats').set(d.downloadStats);if(d.downloadStatsByOption)await db.ref('downloadStatsByOption').set(d.downloadStatsByOption);if(d.visitorNames)await db.ref('searchStats/visitors').set(d.visitorNames);toast('Restore berhasil')}catch(x){toast('Restore gagal: '+x.message)}e.target.value=''};
 $('clearSkins').onclick=async()=>{if(!confirm('Yakin hapus SEMUA skin? Pastikan sudah punya backup.'))return;if(!confirm('Konfirmasi terakhir: semua siteConfig/skins akan dihapus.'))return;await db.ref('siteConfig/skins').remove();toast('Semua skin dihapus')}
-$('resetAllSubscribe').onclick=async()=>{if(!confirm('Reset SEMUA status subscribe pengunjung? Semua pengunjung akan diminta subscribe ulang.'))return;if(!confirm('Konfirmasi terakhir: reset status subscribe untuk SEMUA perangkat sekarang?'))return;try{const at=Date.now();await db.ref('siteConfig/settings/subscribeResetAt').set(at);toast('✅ Semua status subscribe berhasil di-reset realtime');}catch(e){toast('❌ Reset subscribe gagal: '+e.message)}};
+$('resetAllSubscribe').onclick=async()=>{
+ if(!db){toast('❌ Firebase belum terhubung. Coba muat ulang Admin.');return}
+ if(!confirm('Reset SEMUA status subscribe pengunjung? Semua pengunjung akan diminta subscribe ulang.'))return;
+ if(!confirm('Konfirmasi terakhir: reset status subscribe untuk SEMUA perangkat sekarang?'))return;
+ const btn=$('resetAllSubscribe'), original=btn.textContent;
+ btn.disabled=true;btn.textContent='⏳ Mereset...';
+ try{
+   const ref=db.ref('siteConfig/settings/subscribeResetAt');
+   const snap=await ref.once('value');
+   const previous=Number(snap.val()||0);
+   const at=Math.max(Date.now(),previous+1);
+   await ref.set(at);
+   const verify=await ref.once('value');
+   if(Number(verify.val()||0)!==at)throw Error('Perintah reset belum terkonfirmasi di Firebase.');
+   if(settings)settings.subscribeResetAt=at;
+   toast('✅ Perintah reset subscribe tersimpan di Firebase. Perangkat pengunjung akan mereset saat menerima update.');
+ }catch(e){
+   toast('❌ Reset subscribe gagal: '+(e?.message||e));
+ }finally{
+   btn.disabled=false;btn.textContent=original;
+ }
+};
 $('quickImport').onclick=()=>{$('.tab[data-tab="skins"]').click();$('seedBtn').click()};
 
 /* ===== RYUZA_REQUEST_ADMIN_FINAL ===== */
@@ -1708,20 +1717,6 @@ $('quickImport').onclick=()=>{$('.tab[data-tab="skins"]').click();$('seedBtn').c
  apply();
 })();
 </script>
-
-<script id="ryuza-admin-tutorial-settings">
-(()=>{const $=id=>document.getElementById(id);let tutorialRef=null,latest={};
-function embedId(raw){try{const u=new URL(String(raw||''));if(u.hostname==='youtu.be')return u.pathname.split('/').filter(Boolean)[0]||'';if(/youtube\.com$|youtube-nocookie\.com$/.test(u.hostname)){if(u.pathname==='/watch')return u.searchParams.get('v')||'';const m=u.pathname.match(/\/(?:embed|shorts|live)\/([^/?]+)/);return m?m[1]:''}}catch(e){}return ''}
-function show(x){latest=x||{};if($('tutorialTitleInput')&&!$('tutorialTitleInput').dataset.editing){$('tutorialTitleInput').value=latest.title||'Tutorial Ryuza Official';$('tutorialUrlInput').value=latest.url||'https://youtube.com/watch?v=5BQRtwDUb0Y';$('tutorialDescInput').value=latest.description||'Video tutorial online — tekan tombol putar untuk menonton.'}preview()}
-function preview(){if(!$('tutorialPreviewTitle'))return;$('tutorialPreviewTitle').textContent='▶ '+($('tutorialTitleInput').value.trim()||'Tutorial Ryuza Official');$('tutorialPreviewUrl').textContent=$('tutorialUrlInput').value.trim()||'Belum ada link'}
-['tutorialTitleInput','tutorialUrlInput','tutorialDescInput'].forEach(id=>$(id)?.addEventListener('input',()=>{if(id==='tutorialTitleInput')$('tutorialTitleInput').dataset.editing='1';preview()}));
-function start(){if(!window.db)return setTimeout(start,500);tutorialRef=window.db.ref('siteConfig/tutorial');tutorialRef.on('value',s=>{const x=s.val()||{};show(x);if($('tutorialTitleInput'))delete $('tutorialTitleInput').dataset.editing;$('tutorialSaveStatus').textContent='● Realtime aktif';$('tutorialSaveStatus').className='badge ok'},e=>{$('tutorialSaveStatus').textContent='● Gagal membaca';$('tutorialSaveStatus').className='badge err'})}
-$('saveTutorialSettings')?.addEventListener('click',async()=>{const title=$('tutorialTitleInput').value.trim()||'Tutorial Ryuza Official',url=$('tutorialUrlInput').value.trim(),description=$('tutorialDescInput').value.trim()||'Video tutorial online — tekan tombol putar untuk menonton.';if(!embedId(url)){alert('Link YouTube tidak valid. Gunakan link video YouTube biasa.');return}if(!tutorialRef){alert('Koneksi Firebase belum siap. Coba lagi sebentar.');return}const b=$('saveTutorialSettings');b.disabled=true;b.textContent='⏳ Menyimpan...';try{await tutorialRef.set({title,url,description,updatedAt:Date.now()});$('tutorialSaveStatus').textContent='● Tersimpan realtime';$('tutorialSaveStatus').className='badge ok';$('tutorialTitleInput').dataset.editing='';}catch(e){$('tutorialSaveStatus').textContent='● Gagal: '+e.message;$('tutorialSaveStatus').className='badge err'}finally{b.disabled=false;b.textContent='💾 Simpan Tutorial'}});
-$('reloadTutorialSettings')?.addEventListener('click',()=>tutorialRef?.once('value').then(s=>show(s.val()||{})));
-if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',start);else start();
-})();
-</script>
-
 </body>
 </html>
 
