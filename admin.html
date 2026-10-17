@@ -682,12 +682,12 @@ async function saveIndexFeatures(){
  try{await db.ref('siteConfig/indexFeatures').update(f);settings.indexFeatures={...(settings.indexFeatures||{}),...f};window.__RYUZA_ADMIN_FEATURES__=settings.indexFeatures;$('idxSaveStatus').textContent='● Tersimpan REALTIME';$('idxSaveStatus').className='badge ok';toast('✅ Pengaturan fitur Index tersimpan');document.dispatchEvent(new CustomEvent('ryuza-admin-data-changed'));}catch(e){$('idxSaveStatus').textContent='● Gagal menyimpan';$('idxSaveStatus').className='badge err';toast('❌ Gagal: '+e.message)}
 }
 $('saveIndexFeatures').onclick=saveIndexFeatures; $('reloadIndexFeatures').onclick=loadIndexFeatures; $('refreshIndexStats').onclick=()=>{watchRankings();toast('↻ Statistik direfresh')}; $('clearIndexFavorites').onclick=async()=>{if(!confirm('Reset penanda favorit global pada perangkat pengunjung?'))return;try{await db.ref('siteConfig/indexFeatures/favoriteResetAt').set(Date.now());toast('✅ Perintah reset favorit dikirim realtime')}catch(e){toast('❌ Gagal: '+e.message)}};
-try{app=firebase.initializeApp(CFG,'ryuza-admin-'+Math.random().toString(36).slice(2));db=app.database(); window.db=db;
+try{app=firebase.apps.find(a=>a.name==='ryuza-admin')||firebase.initializeApp(CFG,'ryuza-admin');db=app.database(); window.db=db;
  db.ref('siteConfig/skins').on('value',s=>{items=s.val()||{};window.__RYUZA_ADMIN_ITEMS__=items;renderFeaturedPicker();$('status').textContent='● REALTIME AKTIF';$('status').className='badge ok';$('systemInfo').innerHTML='<b class="ok">Terhubung ke Firebase Realtime Database</b><br><span class="small">Path skin: siteConfig/skins • Perubahan dipantau realtime.</span>';render()},e=>{$('status').textContent='Firebase gagal: '+e.message;$('status').className='badge err';$('systemInfo').textContent='Firebase gagal: '+e.message});
 db.ref('siteConfig/categories').on('value',s=>{categories=s.val()||{};window.__RYUZA_ADMIN_CATEGORIES__=categories;renderCategories();render()});
  db.ref('siteConfig/settings').on('value',s=>{settings=s.val()||{};window.__RYUZA_ADMIN_SETTINGS__=settings;const active=document.activeElement;const editingSettings=!!(active&&active.closest&&active.closest('#settings'));if(!editingSettings)loadSettings();loadIndexFeatures()});
 db.ref('siteConfig/indexFeatures').on('value',s=>{settings.indexFeatures=s.val()||{};loadIndexFeatures()});
- db.ref('onlineUsers').on('value',s=>{$('statOnline').textContent=Object.keys(s.val()||{}).length});
+ db.ref('onlineUsers').on('value',s=>{onlineVisitorData=s.val()||{};$('statOnline').textContent=Object.keys(onlineVisitorData).length;renderVisitors()});
  watchRankings();
  /* Live Activity dinonaktifkan untuk mengurangi beban Firebase. */
  watchVisitors();
@@ -702,10 +702,13 @@ function renderClickRanking(data){
  const arr=Object.entries(data||{}).map(([key,x])=>({key,...(x||{})})).filter(x=>Number(x.count||0)>0).sort((a,b)=>Number(b.count||0)-Number(a.count||0)).slice(0,10);
  el.innerHTML=arr.length?arr.map((x,i)=>`<li class="rank-item"><span class="rank-name">${i+1}. ${esc(x.title||x.key||'Link')}</span><span class="rank-count">${Number(x.count||0).toLocaleString('id-ID')}x</span></li>`).join(''):'<li class="muted">Belum ada klik.</li>';
 }
+const rankingRefs=['searchStats/queries','downloadStats','linkClicks'];
 function watchRankings(){
- db.ref('searchStats/queries').on('value',s=>renderRanking('topSearches',s.val()||{},'search'));
- db.ref('downloadStats').on('value',s=>renderRanking('topDownloads',s.val()||{},'download'));
- db.ref('linkClicks').on('value',s=>{const v=s.val()||{};renderClickRanking(v);$('statClicks').textContent=Object.values(v).reduce((n,x)=>n+Number(x?.count||0),0)});
+ // Pastikan tombol refresh tidak membuat listener Firebase bertambah setiap diklik.
+ rankingRefs.forEach(path=>db.ref(path).off('value'));
+ db.ref('searchStats/queries').on('value',s=>renderRanking('topSearches',s.val()||{},'search'),e=>console.warn('Gagal membaca statistik pencarian:',e.message));
+ db.ref('downloadStats').on('value',s=>renderRanking('topDownloads',s.val()||{},'download'),e=>console.warn('Gagal membaca statistik download:',e.message));
+ db.ref('linkClicks').on('value',s=>{const v=s.val()||{};renderClickRanking(v);$('statClicks').textContent=Object.values(v).reduce((n,x)=>n+Number(x?.count||0),0)},e=>console.warn('Gagal membaca statistik klik:',e.message));
 }
 function loadSettings(){
   $('setPageTitle').value=settings.pageTitle||'';$('setName').value=settings.name||'';$('setSubtitle').value=settings.subtitle||'';
@@ -805,8 +808,8 @@ $('clearVisitors').onclick=async()=>{
 };
 function watchVisitors(){
  db.ref('searchStats/visitors').on('value',s=>{visitorData=s.val()||{};renderVisitors()},e=>{const st=$('visitorStatus');if(st){st.textContent='● Gagal membaca';st.className='badge err'};toast('Gagal memuat nama pengunjung: '+e.message)});
- db.ref('onlineUsers').on('value',s=>{onlineVisitorData=s.val()||{};renderVisitors()},e=>{console.warn('Gagal memuat status online:',e.message)});
- // Realtime listeners update this view; avoid a periodic full-list redraw.
+ // onlineUsers dipantau satu kali oleh listener dashboard utama; hindari pembacaan ganda.
+ // Realtime listener visitor list updates this view; avoid a periodic full-list redraw.
 }
 let activityData={};
 
@@ -1634,37 +1637,14 @@ $('quickImport').onclick=()=>{$('.tab[data-tab="skins"]').click();$('seedBtn').c
   async function saveAll(){
     if(!window.db)return toast('❌ Firebase belum siap');const st=$('recalSaveStatus'),btn=$('recalSaveBtn');try{if(btn)btn.disabled=true;const data={};document.querySelectorAll('.recal-skin-card').forEach(card=>{const x=collect(card);data[x.id]=x;});recalItems=data;await db.ref('siteConfig/recalSkins').set(data);render();if(st){st.textContent='✓ Tersimpan realtime';st.className='badge ok'}toast('✅ Semua Skin Recal berhasil disimpan');}catch(e){toast('❌ Gagal menyimpan Recal: '+e.message)}finally{if(btn)btn.disabled=false}}
   $('recalAddBtn')?.addEventListener('click',add);$('recalSaveBtn')?.addEventListener('click',saveAll);$('recalReloadBtn')?.addEventListener('click',load);
-  const boot=setInterval(()=>{if(window.db){clearInterval(boot);load();db.ref('siteConfig/recalSkins').on('value',snap=>{recalItems=normalize(snap.val());render()})}},250);
+  const boot=setInterval(()=>{if(window.db){clearInterval(boot);load();db.ref('siteConfig/recalSkins').off('value');db.ref('siteConfig/recalSkins').on('value',snap=>{recalItems=normalize(snap.val());render()})}},250);
 })();
 </script>
 
 <script id="ryuza-daily-analytics-cleanup">
-/* Bersihkan data analitik selain data nama pengunjung setiap 24 jam.
-   searchStats/visitors, onlineUsers, dan siteVisits sengaja dipertahankan. */
-(function(){
-  const KEY='ryuzaAnalyticsCleanupAtV1', DAY=24*60*60*1000;
-  async function cleanup(){
-    if(!window.db || typeof window.db.ref!=='function') return;
-    let last=0;
-    try{last=Number(localStorage.getItem(KEY)||0)}catch(e){}
-    if(Date.now()-last < DAY) return;
-    try{
-      await Promise.all([
-        db.ref('searchStats/queries').remove(),
-        db.ref('searchStats/activityLog').remove(),
-        db.ref('downloadStats').remove(),
-        db.ref('downloadStatsByOption').remove(),
-        db.ref('linkClicks').remove()
-      ]);
-      try{localStorage.setItem(KEY,String(Date.now()))}catch(e){}
-      console.info('[Ryuza] Data analitik dibersihkan; data pengunjung/nama tetap disimpan.');
-      const status=document.getElementById('status');
-      if(status && /Firebase/i.test(status.textContent||'')) status.textContent='Firebase terhubung • analitik dibersihkan';
-    }catch(err){console.warn('[Ryuza] Pembersihan analitik gagal:',err)}
-  }
-  document.addEventListener('DOMContentLoaded',function(){setTimeout(cleanup,1800)});
-  window.addEventListener('load',function(){setTimeout(cleanup,2400)});
-})();
+/* Keamanan data: jangan menghapus seluruh node statistik otomatis saat Admin dibuka.
+   Data analitik agregat tidak selalu memiliki timestamp per item untuk dihapus secara aman.
+   Penghapusan statistik hanya dilakukan lewat kontrol Admin yang eksplisit. */
 </script>
 
 
