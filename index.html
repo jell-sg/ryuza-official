@@ -3071,12 +3071,14 @@ document.querySelectorAll('.replace-dropdown').forEach(function(box){
     // Link wajib subscribe dibaca dari Firebase siteConfig/settings, supaya perubahan dari Admin langsung berlaku.
     const defaultYoutube='https://youtube.com/@ryuzaaaaaaofficial?si=v1ucvpF2er_a19a1';
     const configuredYoutube=String(st.youtube||st.youtube1||defaultYoutube).trim();
-    const configuredSubButton=String(st.youtubeSub||st.youtubeSubLink||configuredYoutube).trim();
+    const configuredSub=String(st.youtubeSub||st.youtubeSubLink||configuredYoutube).trim();
     const addSubscribeConfirmation=(raw)=>{try{const u=new URL(raw);if(/(^|\.)youtube\.com$/i.test(u.hostname)&&!u.searchParams.has('sub_confirmation'))u.searchParams.set('sub_confirmation','1');return u.toString()}catch(e){return defaultYoutube}};
     const sub1=document.getElementById('youtubeSubscribe'),sub2=document.getElementById('youtubeSubscribe2');
     const waLink=document.getElementById('whatsappFollow'); if(waLink&&st.youtube2)waLink.href=st.youtube2;
-    if(sub1)sub1.href=addSubscribeConfirmation(configuredSubButton);
-    if(sub2)sub2.href=addSubscribeConfirmation(configuredYoutube);
+    const subVisit=document.querySelector('.ryuza-youtube-visit');
+    if(sub1)sub1.href=addSubscribeConfirmation(configuredYoutube);
+    if(sub2)sub2.href=addSubscribeConfirmation(configuredSub);
+    if(subVisit)subVisit.href=addSubscribeConfirmation(configuredSub);
   };
   db.ref('siteConfig/settings').on('value',snap=>applySettings(snap.val()||{}),err=>console.warn('[Ryuza Settings] gagal membaca:',err));
   /* Skin icon mode ikut diterapkan oleh skin manager; tidak perlu listener skins kedua. */
