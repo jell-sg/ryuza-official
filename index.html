@@ -3027,8 +3027,12 @@ document.querySelectorAll('.replace-dropdown').forEach(function(box){
 (function(){
   const CFG={authDomain:'ryuza-official.firebaseapp.com',databaseURL:'https://ryuza-official-default-rtdb.firebaseio.com',projectId:'ryuza-official'};
   /* Gunakan Firebase sebagai satu-satunya sumber pengaturan agar nilai lama yang tertanam di HTML tidak muncul sesaat. */
-  let db=null;
-  if(!window.firebase)return;let app;try{app=firebase.app('ryuza-site-settings');}catch(e){try{app=firebase.initializeApp(CFG,'ryuza-site-settings')}catch(err){console.error('[Ryuza Settings] init gagal',err);return;}}db=app.database();
+  function connectSettings(){
+    if(!window.firebase||!firebase.database){setTimeout(connectSettings,300);return;}
+    let app;try{app=firebase.app('ryuza-site-settings');}catch(e){try{app=firebase.initializeApp(CFG,'ryuza-site-settings')}catch(err){console.error('[Ryuza Settings] init gagal',err);setTimeout(connectSettings,1000);return;}}
+    const db=app.database();
+    db.ref('siteConfig/settings').on('value',snap=>applySettings(snap.val()||{}),err=>console.warn('[Ryuza Settings] gagal membaca:',err));
+  }
   const clean=s=>String(s||'').replace(/^[\s📌•·—–:-]+/,'').replace(/\s+/g,' ').trim();
   const initials=name=>{const t=clean(name).replace(/[^\p{L}\p{N}\s]/gu,' ').trim();if(!t)return 'R';const a=t.split(/\s+/).filter(Boolean);return (a.length===1?a[0].slice(0,2):a.slice(0,2).map(x=>x[0])).join('').toUpperCase().slice(0,2)};
   const esc=s=>String(s??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
@@ -3076,11 +3080,17 @@ document.querySelectorAll('.replace-dropdown').forEach(function(box){
     const sub1=document.getElementById('youtubeSubscribe'),sub2=document.getElementById('youtubeSubscribe2');
     const waLink=document.getElementById('whatsappFollow'); if(waLink&&st.youtube2)waLink.href=st.youtube2;
     const subVisit=document.querySelector('.ryuza-youtube-visit');
-    if(sub1)sub1.href=addSubscribeConfirmation(configuredYoutube);
-    if(sub2)sub2.href=addSubscribeConfirmation(configuredSub);
-    if(subVisit)subVisit.href=addSubscribeConfirmation(configuredSub);
+    const mainYoutube=addSubscribeConfirmation(configuredYoutube), buttonYoutube=addSubscribeConfirmation(configuredSub);
+    if(sub1)sub1.href=mainYoutube;
+    if(sub2)sub2.href=buttonYoutube;
+    if(subVisit)subVisit.href=buttonYoutube;
+    document.querySelectorAll('a[href*="youtube.com/@ryuzaaaaaaofficial"],a[href*="youtube.com/@ryuzaofficialr-x5r"]').forEach(a=>{
+      if(a.id==='youtubeSubscribe')a.href=mainYoutube;
+      else if(a.id==='youtubeSubscribe2'||a.classList.contains('ryuza-youtube-visit'))a.href=buttonYoutube;
+      else if(/YouTube Ryuza Official/i.test(a.textContent||''))a.href=mainYoutube;
+    });
   };
-  db.ref('siteConfig/settings').on('value',snap=>applySettings(snap.val()||{}),err=>console.warn('[Ryuza Settings] gagal membaca:',err));
+  connectSettings();
   /* Skin icon mode ikut diterapkan oleh skin manager; tidak perlu listener skins kedua. */
 })();
 </script>
