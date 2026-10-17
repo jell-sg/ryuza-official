@@ -202,6 +202,7 @@ body.ryuza-desktop-mode #ryuzaDesktopModeToggle{bottom:18px}
   <div class="nav-group-title">PENGELOLAAN</div>
   <div class="nav-items">
    <button class="tab" data-tab="settings"><span class="tab-icon">⚙</span><span>Pengaturan</span></button>
+    <button class="tab" data-tab="subscribeSettings"><span class="tab-icon">▶</span><span>Wajib Subscribe</span></button>
    <button class="tab" data-tab="visitors"><span class="tab-icon">♟</span><span>Pengunjung</span></button>
    <button class="tab" data-tab="requests"><span class="tab-icon">✉</span><span>Request Script</span><span id="requestCountBadge" class="request-count">0</span></button>
   </div>
@@ -348,6 +349,38 @@ Replace : Basic
   </div>
   <div class="card" style="margin-top:14px;background:#091522"><h3 style="margin:0 0 5px">🖼️ Pengaturan Banner 1–4</h3><div class="hint" style="margin-bottom:12px">Maksimal 4 banner. Perubahan tersimpan <b>REALTIME</b> ke Firebase dan otomatis dibaca index.html.</div><div id="bannerFields"></div></div>
   <div class="actions" style="margin-top:14px"><span id="liveSaveStatus" class="badge">● Siap realtime</span><button class="secondary" id="reloadSettings">↻ Muat Ulang</button></div>
+ </div>
+</section>
+
+
+
+<section id="subscribeSettings" class="panel">
+ <div class="card">
+  <h2 style="margin:0 0 8px">▶ Pengaturan Wajib Subscribe</h2>
+  <div class="notice">Ganti link channel YouTube yang muncul pada popup wajib subscribe tanpa mengedit HTML. Link disimpan ke Firebase pada <b>siteConfig/settings</b>, lalu index yang mendukung pengaturan Firebase akan membacanya.</div>
+  <div class="field" style="margin-top:16px">
+   <label for="subscribeChannelUrl">Link Channel YouTube</label>
+   <input id="subscribeChannelUrl" type="url" placeholder="https://youtube.com/@namachannel">
+   <div class="hint">Masukkan link channel YouTube yang ingin diwajibkan. Link ini digunakan untuk tombol buka channel dan tombol subscribe.</div>
+  </div>
+  <div class="actions">
+   <button type="button" class="primary" id="subscribeSaveBtn">💾 Simpan Link Wajib Subscribe</button>
+   <button type="button" class="secondary" id="subscribeReloadBtn">↻ Muat dari Firebase</button>
+   <button type="button" class="secondary" id="subscribeOpenBtn">↗ Tes Link Wajib</button>
+   <span id="subscribeSaveStatus" class="badge">● Memuat...</span>
+  </div>
+  <hr style="border:0;border-top:1px solid #26384d;margin:22px 0">
+  <div class="field">
+   <label for="subscribeButtonUrl">Link Tombol SUB (terpisah)</label>
+   <input id="subscribeButtonUrl" type="url" placeholder="https://youtube.com/@channel-sub">
+   <div class="hint">Link ini khusus untuk tombol SUB pada popup. Bisa berbeda dari link wajib subscribe di atas.</div>
+  </div>
+  <div class="actions">
+   <button type="button" class="primary" id="subscribeButtonSaveBtn">💾 Simpan Link SUB</button>
+   <button type="button" class="secondary" id="subscribeButtonOpenBtn">↗ Tes Link SUB</button>
+   <span id="subscribeButtonSaveStatus" class="badge">● Memuat...</span>
+  </div>
+  <div class="hint" style="margin-top:12px">Catatan: perubahan tersimpan di Firebase. Jika index.html yang dipakai masih memiliki link wajib subscribe yang ditulis permanen di HTML dan tidak membaca <b>siteConfig/settings</b>, index tersebut tetap perlu diperbarui sekali agar mendukung pengaturan ini.</div>
  </div>
 </section>
 
@@ -1717,6 +1750,60 @@ $('quickImport').onclick=()=>{$('.tab[data-tab="skins"]').click();$('seedBtn').c
  apply();
 })();
 </script>
+
+<script id="ryuza-subscribe-settings-tab">
+(function(){
+ const $=id=>document.getElementById(id);
+ const fallback='https://youtube.com/@ryuzaaaaaaofficial?si=v1ucvpF2er_a19a1';
+ function status(msg,ok){const el=$('subscribeSaveStatus');if(el){el.textContent=(ok?'✓ ':'● ')+msg;el.className='badge '+(ok?'ok':'');}}
+ function getDb(){return window.db||null;}
+ function buttonStatus(msg,ok){const el=$('subscribeButtonSaveStatus');if(el){el.textContent=(ok?'✓ ':'● ')+msg;el.className='badge '+(ok?'ok':'');}}
+ async function load(){
+  const db=getDb(); if(!db){status('Firebase belum siap',false);return;}
+  try{
+   const snap=await db.ref('siteConfig/settings').once('value');
+   const cfg=snap.val()||{};
+   $('subscribeChannelUrl').value=cfg.youtube||cfg.youtube1||fallback;
+   $('subscribeButtonUrl').value=cfg.youtubeSub||cfg.youtubeSubLink||cfg.youtube||cfg.youtube1||fallback;
+   status('Link berhasil dimuat',true);
+   buttonStatus('Link SUB berhasil dimuat',true);
+  }catch(e){status('Gagal memuat: '+e.message,false);}
+ }
+ async function save(){
+  const db=getDb(); if(!db){status('Firebase belum siap',false);return;}
+  const url=$('subscribeChannelUrl').value.trim();
+  if(!url||!/^https:\/\/(www\.)?(youtube\.com|youtu\.be)\//i.test(url)){
+   status('Masukkan URL YouTube yang valid',false);return;
+  }
+  const btn=$('subscribeSaveBtn');btn.disabled=true;btn.textContent='⏳ Menyimpan...';
+  try{
+   await db.ref('siteConfig/settings').update({youtube:url,youtube1:url,updatedAt:Date.now()});
+   if(window.__RYUZA_ADMIN_SETTINGS__){window.__RYUZA_ADMIN_SETTINGS__.youtube=url;window.__RYUZA_ADMIN_SETTINGS__.youtube1=url;}
+   status('Link wajib subscribe tersimpan',true);
+   if(typeof window.toast==='function')window.toast('Link wajib subscribe berhasil disimpan.');
+  }catch(e){status('Gagal menyimpan: '+e.message,false);}
+  finally{btn.disabled=false;btn.textContent='💾 Simpan Link';}
+ }
+ async function saveSub(){
+  const db=getDb(); if(!db){buttonStatus('Firebase belum siap',false);return;}
+  const url=$('subscribeButtonUrl').value.trim();
+  if(!url||!/^https:\/\/(www\.)?(youtube\.com|youtu\.be)\//i.test(url)){buttonStatus('Masukkan URL YouTube yang valid',false);return;}
+  const btn=$('subscribeButtonSaveBtn');btn.disabled=true;btn.textContent='⏳ Menyimpan...';
+  try{await db.ref('siteConfig/settings').update({youtubeSub:url,youtubeSubLink:url,updatedAt:Date.now()});buttonStatus('Link SUB tersimpan',true);if(typeof window.toast==='function')window.toast('Link SUB berhasil disimpan.');}
+  catch(e){buttonStatus('Gagal menyimpan: '+e.message,false);}
+  finally{btn.disabled=false;btn.textContent='💾 Simpan Link SUB';}
+ }
+ $('subscribeSaveBtn')?.addEventListener('click',save);
+ $('subscribeButtonSaveBtn')?.addEventListener('click',saveSub);
+ $('subscribeButtonOpenBtn')?.addEventListener('click',()=>{const url=$('subscribeButtonUrl').value.trim();if(/^https:\/\/(www\.)?(youtube\.com|youtu\.be)\//i.test(url))window.open(url,'_blank','noopener');else buttonStatus('Masukkan URL YouTube yang valid',false);});
+ $('subscribeReloadBtn')?.addEventListener('click',load);
+ $('subscribeOpenBtn')?.addEventListener('click',()=>{const url=$('subscribeChannelUrl').value.trim();if(/^https:\/\/(www\.)?(youtube\.com|youtu\.be)\//i.test(url))window.open(url,'_blank','noopener');else status('Masukkan URL YouTube yang valid',false);});
+ document.querySelector('.tab[data-tab="subscribeSettings"]')?.addEventListener('click',load);
+ document.addEventListener('ryuza-admin-data-changed',()=>{const panel=$('subscribeSettings');if(panel?.classList.contains('active'))load();});
+ setTimeout(load,1200);
+})();
+</script>
+
 </body>
 </html>
 
