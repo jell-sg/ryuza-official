@@ -2238,7 +2238,7 @@ html.ryuza-chrome-block #ryuzaChromeGate{display:flex!important}
 .ryuza-filter{border:1px solid rgba(130,170,220,.2);background:#0b1320;color:inherit;border-radius:11px;padding:9px 11px;font-weight:700;cursor:pointer}
 .ryuza-filter.active{outline:2px solid rgba(90,170,255,.35)}
 .ryuza-section{margin:18px 0}.ryuza-section-head{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:10px}.ryuza-section-head h3{margin:0;font-size:17px}.ryuza-section-head span{font-size:11px;opacity:.65}
-.ryuza-mini-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px}
+.ryuza-mini-grid{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:10px}
 .ryuza-mini{position:relative;padding:11px;border:1px solid rgba(130,170,220,.16);border-radius:15px;background:linear-gradient(145deg,rgba(20,30,45,.96),rgba(8,13,22,.98));cursor:pointer;transition:.18s;min-height:88px}.ryuza-mini:hover{transform:translateY(-2px);border-color:rgba(100,180,255,.35)}
 .ryuza-mini-top{display:flex;align-items:center;gap:9px}.ryuza-mini-icon{width:38px;height:38px;border-radius:11px;display:grid;place-items:center;background:#16263c;font-weight:900;overflow:hidden}.ryuza-mini-icon img{width:100%;height:100%;object-fit:cover}.ryuza-mini-title{font-weight:800;font-size:13px;line-height:1.25}.ryuza-mini-meta{margin-top:7px;font-size:11px;opacity:.72}.ryuza-mini-rank{position:absolute;right:8px;top:7px;font-size:11px;opacity:.75}.ryuza-mini-fav{position:absolute;right:7px;bottom:7px;border:0;background:transparent;color:inherit;font-size:18px;cursor:pointer}
 .ryuza-card-stats{display:flex;gap:7px;flex-wrap:wrap;margin-top:6px}.ryuza-chip{display:inline-flex;align-items:center;gap:4px;padding:3px 7px;border-radius:999px;background:rgba(100,150,210,.12);font-size:10px;font-weight:800}.ryuza-chip.hot{background:rgba(255,150,50,.14)}
@@ -3301,6 +3301,7 @@ document.querySelectorAll('.replace-dropdown').forEach(function(box){
   function close(){if(timer)clearInterval(timer);timer=null;locked=false;overlay.classList.remove('show');overlay.setAttribute('aria-hidden','true');bar.style.width='0%';percent.textContent='0%'}
   function start(btn,urlOverride,titleOverride,labelOverride){if(locked)return;const url=urlOverride||(btn?.getAttribute('href')||btn?.dataset?.url||'');if(!url||url==='#'||url==='javascript:void(0)')return;locked=true;
     const card=btn?.closest?.('.skin'),title=titleOverride||((card?.querySelector('.hero-title-text')?.textContent||card?.querySelector('.title')?.textContent||'Skin').replace(/\s+/g,' ').trim()),sel=card?.querySelector('.replace-select'),opt=sel?.options?.[sel.selectedIndex],label=labelOverride||((opt?.dataset?.label||opt?.textContent||'').replace(/\s+/g,' ').trim());
+    try{if(typeof window.ryuzaRecordDownload==='function')window.ryuzaRecordDownload(title,label)}catch(e){}
     nameEl.textContent=label?title+' • '+label:title;status.textContent='Melewati link, menyiapkan file...';bar.style.width='0%';percent.textContent='0%';overlay.classList.add('show');overlay.setAttribute('aria-hidden','false');
     // Jangan membuat about:blank. Jalur gratis tetap menampilkan progress popup, lalu membuka link asli yang dipilih.
     // Navigasi dilakukan pada tab yang sama agar tidak menghasilkan tab putih/about:blank.
@@ -3739,6 +3740,7 @@ document.querySelectorAll('.replace-dropdown').forEach(function(box){
  <button class="rz-nav-item" type="button" data-rz-nav="home" aria-current="page"><span class="rz-nav-icon" aria-hidden="true">⌂</span><span class="rz-nav-label">Beranda</span></button>
  <button class="rz-nav-item" type="button" data-rz-nav="search"><span class="rz-nav-icon" aria-hidden="true">⌕</span><span class="rz-nav-label">Cari</span></button>
  <button class="rz-nav-item" type="button" data-rz-nav="favorites"><span class="rz-nav-icon" aria-hidden="true">♡</span><span class="rz-nav-label">Favorit</span></button>
+ <button class="rz-nav-item" type="button" data-rz-nav="ranking"><span class="rz-nav-icon" aria-hidden="true">🏆</span><span class="rz-nav-label">Ranking</span></button>
  <a class="rz-nav-item" href="https://jell-sg.github.io/ryuza-official-VIP/" data-rz-nav="member"><span class="rz-nav-icon" aria-hidden="true">♙</span><span class="rz-nav-label">Member</span></a>
 </nav>
 <script id="ryuza-bottom-navigation-js">
@@ -3752,7 +3754,8 @@ document.querySelectorAll('.replace-dropdown').forEach(function(box){
   e.preventDefault();active(name);
   if(name==='home'){window.scrollTo({top:0,behavior:window.matchMedia('(prefers-reduced-motion: reduce)').matches?'auto':'smooth'});return;}
   if(name==='search'){const input=document.getElementById('q');if(input){goTo(input);window.setTimeout(()=>input.focus({preventScroll:true}),220);}return;}
-  if(name==='favorites'){let target=document.getElementById('ryuzaFavoriteSec')||document.getElementById('ryuzaFavorite')||document.getElementById('list');if(target){target.hidden=false;target.style.display='';goTo(target);}else{const input=document.getElementById('q');if(input){input.value='';input.dispatchEvent(new Event('input',{bubbles:true}));goTo(input);}}}
+  if(name==='favorites'){let target=document.getElementById('ryuzaFavoriteSec')||document.getElementById('ryuzaFavorite')||document.getElementById('list');if(target){target.hidden=false;target.style.display='';goTo(target);}else{const input=document.getElementById('q');if(input){input.value='';input.dispatchEvent(new Event('input',{bubbles:true}));goTo(input);}}return;}
+  if(name==='ranking'){const panel=document.getElementById('ryuzaRankingPanel');if(panel){panel.hidden=false;panel.style.display='block';if(typeof window.ryuzaLoadDownloadRanking==='function')window.ryuzaLoadDownloadRanking();goTo(panel);}return;}
  });
  const search=document.getElementById('q');if(search){search.addEventListener('focus',()=>active('search'));}
  window.addEventListener('scroll',()=>{if(window.scrollY<100)active('home')},{passive:true});
@@ -5057,6 +5060,56 @@ function start(){if(!window.firebase||!firebase.database)return setTimeout(start
 apply(fallback);if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',start);else start();})();
 </script>
 
+
+
+<!-- RYUZA DOWNLOAD RANKING: papan peringkat berdasarkan download yang dimulai -->
+<style id="ryuza-ranking-style">
+#ryuzaRankingPanel{display:none;max-width:960px;margin:24px auto 110px;padding:18px;box-sizing:border-box;color:var(--text,#f5f7ff);font-family:inherit}
+#ryuzaRankingPanel .rz-rank-shell{border:1px solid rgba(160,130,255,.24);border-radius:24px;padding:clamp(15px,3vw,26px);background:linear-gradient(145deg,rgba(35,22,66,.94),rgba(10,13,25,.97));box-shadow:0 18px 55px rgba(0,0,0,.22)}
+#ryuzaRankingPanel .rz-rank-kicker{font-size:11px;font-weight:800;letter-spacing:.15em;text-transform:uppercase;color:#bca2ff}
+#ryuzaRankingPanel h2{margin:7px 0 5px;font-size:clamp(22px,4vw,30px);letter-spacing:-.04em}
+#ryuzaRankingPanel .rz-rank-sub{color:#aeb4c8;font-size:13px;line-height:1.5;margin-bottom:18px}
+#ryuzaRankingPanel .rz-rank-list{display:grid;gap:9px}
+#ryuzaRankingPanel .rz-rank-row{display:grid;grid-template-columns:42px minmax(0,1fr) auto;gap:11px;align-items:center;padding:12px;border:1px solid rgba(255,255,255,.08);border-radius:16px;background:rgba(255,255,255,.045)}
+#ryuzaRankingPanel .rz-rank-place{width:36px;height:36px;display:grid;place-items:center;border-radius:12px;background:rgba(159,117,255,.14);font-weight:900;color:#d7c5ff}
+#ryuzaRankingPanel .rz-rank-row:nth-child(1) .rz-rank-place{background:linear-gradient(135deg,#ffe29a,#d99b2b);color:#251a05}
+#ryuzaRankingPanel .rz-rank-row:nth-child(2) .rz-rank-place{background:linear-gradient(135deg,#e8edf6,#8996ad);color:#121827}
+#ryuzaRankingPanel .rz-rank-row:nth-child(3) .rz-rank-place{background:linear-gradient(135deg,#e8b18a,#a65c35);color:#261208}
+#ryuzaRankingPanel .rz-rank-name{font-size:14px;font-weight:800;overflow-wrap:anywhere}
+#ryuzaRankingPanel .rz-rank-meta{font-size:11px;color:#9da6bb;margin-top:3px}
+#ryuzaRankingPanel .rz-rank-total{font-size:15px;font-weight:900;white-space:nowrap;color:#d7c5ff;text-align:right}
+#ryuzaRankingPanel .rz-rank-total small{display:block;font-size:10px;font-weight:650;color:#9da6bb}
+#ryuzaRankingPanel .rz-rank-state{padding:16px;text-align:center;border:1px dashed rgba(255,255,255,.15);border-radius:16px;color:#aeb4c8;font-size:13px}
+#ryuzaRankingPanel .rz-rank-actions{display:flex;justify-content:space-between;gap:10px;align-items:center;margin-top:14px;flex-wrap:wrap}
+#ryuzaRankingPanel .rz-rank-btn{border:1px solid rgba(190,160,255,.24);background:rgba(150,110,255,.13);color:#eee8ff;padding:10px 14px;border-radius:12px;font-weight:800;cursor:pointer}
+#ryuzaRankingPanel .rz-rank-note{font-size:10px;color:#858da2;line-height:1.45}
+@media(max-width:560px){#ryuzaRankingPanel{padding:10px;margin:18px auto 100px}#ryuzaRankingPanel .rz-rank-row{grid-template-columns:36px minmax(0,1fr) auto;padding:10px;gap:8px}#ryuzaRankingPanel .rz-rank-place{width:32px;height:32px}#ryuzaRankingPanel .rz-rank-total{font-size:13px}}
+</style>
+<section id="ryuzaRankingPanel" aria-labelledby="ryuzaRankingTitle" hidden>
+ <div class="rz-rank-shell">
+  <div class="rz-rank-kicker">RYUZA COMMUNITY</div>
+  <h2 id="ryuzaRankingTitle">🏆 Ranking Downloader</h2>
+  <div class="rz-rank-sub">Pengunjung dengan jumlah download terbanyak ada di posisi teratas.</div>
+  <div id="ryuzaRankingList" class="rz-rank-list"><div class="rz-rank-state">Tekan muat ulang untuk mengambil ranking.</div></div>
+  <div class="rz-rank-actions"><button class="rz-rank-btn" type="button" id="ryuzaRankingRefresh">↻ Muat ulang ranking</button><span class="rz-rank-note">Peringkat dihitung saat proses download dimulai. Maksimal 50 akun ditampilkan.</span></div>
+ </div>
+</section>
+<script id="ryuza-download-ranking-script">
+(function(){
+ 'use strict';if(window.__RYUZA_DOWNLOAD_RANKING__)return;window.__RYUZA_DOWNLOAD_RANKING__=true;
+ const CFG={databaseURL:'https://ryuza-official-default-rtdb.firebaseio.com',projectId:'ryuza-official',authDomain:'ryuza-official.firebaseapp.com'};
+ const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+ function db(){try{if(!window.firebase||!firebase.database)return null;let app;try{app=firebase.app('ryuza-download-ranking')}catch(e){app=firebase.initializeApp(CFG,'ryuza-download-ranking')}return app.database()}catch(e){try{return firebase.database()}catch(_){return null}}}
+ function identity(){let id='',name='Pengunjung';try{id=localStorage.getItem('ryuzaVisitorId')||'';name=(localStorage.getItem('ryuzaVisitorName')||'').trim()}catch(e){}if(!id){id='rz-'+Date.now().toString(36)+'-'+Math.random().toString(36).slice(2,12);try{localStorage.setItem('ryuzaVisitorId',id)}catch(e){}}if(!name)name='Pengunjung';return{id:id.replace(/[^a-zA-Z0-9_-]/g,'_'),name:name.slice(0,40)}}
+ window.ryuzaRecordDownload=function(title,label){const database=db();if(!database)return;const who=identity(),path=database.ref('downloadRankings/'+who.id);path.transaction(function(current){current=current&&typeof current==='object'?current:{};return{visitorId:who.id,name:who.name,totalDownloads:(Number(current.totalDownloads)||0)+1,lastSkin:String(title||'Skin').slice(0,120),lastReplace:String(label||'').slice(0,80),lastDownloadAt:Date.now(),updatedAt:Date.now(),createdAt:current.createdAt||Date.now()}},function(error,committed){if(error)console.warn('[Ryuza ranking] gagal mencatat download',error);});};
+ const panel=()=>document.getElementById('ryuzaRankingPanel'),list=()=>document.getElementById('ryuzaRankingList');
+ window.ryuzaLoadDownloadRanking=function(){const target=list(),database=db();if(!target)return;if(!database){target.innerHTML='<div class="rz-rank-state">Firebase belum tersedia. Coba muat ulang halaman.</div>';return}target.innerHTML='<div class="rz-rank-state">Memuat ranking...</div>';database.ref('downloadRankings').once('value').then(snapshot=>{const data=snapshot.val()||{};const rows=Object.values(data).filter(x=>x&&typeof x==='object').map(x=>({name:String(x.name||'Pengunjung').slice(0,40),totalDownloads:Math.max(0,Number(x.totalDownloads)||0),lastSkin:String(x.lastSkin||''),updatedAt:Number(x.updatedAt)||0})).sort((a,b)=>b.totalDownloads-a.totalDownloads||b.updatedAt-a.updatedAt).slice(0,50);if(!rows.length){target.innerHTML='<div class="rz-rank-state">Belum ada data ranking. Download yang dimulai setelah fitur ini dipasang akan dihitung.</div>';return}target.innerHTML=rows.map((x,i)=>'<div class="rz-rank-row"><div class="rz-rank-place">'+(i+1)+'</div><div><div class="rz-rank-name">'+esc(x.name)+'</div><div class="rz-rank-meta">'+(x.lastSkin?'Terakhir: '+esc(x.lastSkin):'Downloader Ryuza Official')+'</div></div><div class="rz-rank-total">'+x.totalDownloads.toLocaleString('id-ID')+'<small>download</small></div></div>').join('')}).catch(error=>{console.warn('[Ryuza ranking] tidak dapat membaca data',error);target.innerHTML='<div class="rz-rank-state">Data ranking belum bisa dibaca. Periksa Firebase Database Rules untuk path downloadRankings.</div>'})};
+ document.getElementById('ryuzaRankingRefresh')?.addEventListener('click',()=>window.ryuzaLoadDownloadRanking());
+ // Add desktop-accessible shortcut near the skin search / category controls.
+ function addDesktopShortcut(){if(document.getElementById('ryuzaRankingShortcut'))return;const bar=document.getElementById('ryuzaSmartbar')||document.querySelector('.search');if(!bar||!bar.parentNode)return;const b=document.createElement('button');b.id='ryuzaRankingShortcut';b.type='button';b.textContent='🏆 Ranking Downloader';b.style.cssText='display:inline-flex;align-items:center;justify-content:center;margin:8px 0;padding:10px 14px;border:1px solid rgba(166,126,255,.35);border-radius:13px;background:rgba(126,87,255,.12);color:inherit;font:700 12px system-ui,sans-serif;cursor:pointer';b.addEventListener('click',()=>{const p=panel();if(p){p.hidden=false;p.style.display='block';window.ryuzaLoadDownloadRanking();p.scrollIntoView({behavior:'smooth',block:'start'})}});bar.parentNode.insertBefore(b,bar.nextSibling)}
+ if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',addDesktopShortcut,{once:true});else addDesktopShortcut();
+})();
+</script>
 
 </body></html>
 
