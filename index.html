@@ -5132,7 +5132,7 @@ apply(fallback);if(document.readyState==='loading')document.addEventListener('DO
  const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
  function db(){try{if(!window.firebase||!firebase.database)return null;let app;try{app=firebase.app('ryuza-download-ranking')}catch(e){app=firebase.initializeApp(CFG,'ryuza-download-ranking')}return app.database()}catch(e){try{return firebase.database()}catch(_){return null}}}
  function identity(){let id='',name='Pengunjung';try{id=localStorage.getItem('ryuzaVisitorId')||'';name=(localStorage.getItem('ryuzaVisitorName')||'').trim()}catch(e){}if(!id){id='rz-'+Date.now().toString(36)+'-'+Math.random().toString(36).slice(2,12);try{localStorage.setItem('ryuzaVisitorId',id)}catch(e){}}if(!name)name='Pengunjung';return{id:id.replace(/[^a-zA-Z0-9_-]/g,'_'),name:name.slice(0,40)}}
- window.ryuzaRecordDownload=function(title,label){const database=db();if(!database)return;const who=identity(),path=database.ref('downloadRankings/'+who.id);path.transaction(function(current){current=current&&typeof current==='object'?current:{};return{visitorId:who.id,name:who.name,totalDownloads:(Number(current.totalDownloads)||0)+1,lastSkin:String(title||'Skin').slice(0,120),lastReplace:String(label||'').slice(0,80),lastDownloadAt:Date.now(),updatedAt:Date.now(),createdAt:current.createdAt||Date.now()}},function(error,committed){if(error)console.warn('[Ryuza ranking] gagal mencatat download',error);});};
+ window.ryuzaRecordDownload=function(title,label){const database=db();if(!database)return;const who=identity(),path=database.ref('downloadRankings/'+who.id);path.transaction(function(current){current=current&&typeof current==='object'?current:{};return{visitorId:who.id,name:who.name,totalDownloads:(Number(current.totalDownloads)||0)+1,lastSkin:String(title||'Skin').slice(0,120),lastReplace:String(label||'').slice(0,80),lastDownloadAt:Date.now(),updatedAt:Date.now(),createdAt:current.createdAt||Date.now()}},function(error,committed,snapshot){if(error)console.warn('[Ryuza ranking] gagal mencatat download',error);else if(committed&&typeof window.ryuzaRefreshMemberRank==='function')setTimeout(window.ryuzaRefreshMemberRank,350);});};
  const panel=()=>document.getElementById('ryuzaRankingPanel'),list=()=>document.getElementById('ryuzaRankingList');
  window.ryuzaLoadDownloadRanking=function(){const target=list(),database=db();if(!target)return;if(!database){target.innerHTML='<div class="rz-rank-state">Firebase belum tersedia. Coba muat ulang halaman.</div>';return}target.innerHTML='<div class="rz-rank-state">Memuat ranking...</div>';database.ref('downloadRankings').once('value').then(snapshot=>{const data=snapshot.val()||{};const rows=Object.values(data).filter(x=>x&&typeof x==='object').map(x=>({name:String(x.name||'Pengunjung').slice(0,40),totalDownloads:Math.max(0,Number(x.totalDownloads)||0),lastSkin:String(x.lastSkin||''),updatedAt:Number(x.updatedAt)||0})).sort((a,b)=>b.totalDownloads-a.totalDownloads||b.updatedAt-a.updatedAt).slice(0,35);if(!rows.length){target.innerHTML='<div class="rz-rank-state">Belum ada data ranking. Download yang dimulai setelah fitur ini dipasang akan dihitung.</div>';return}target.innerHTML=rows.map((x,i)=>'<div class="rz-rank-row"><div class="rz-rank-place">'+(i+1)+'</div><div><div class="rz-rank-name">'+esc(x.name)+'</div><div class="rz-rank-meta">'+(x.lastSkin?'Terakhir: '+esc(x.lastSkin):'Downloader Ryuza Official')+'</div></div><div class="rz-rank-total">'+x.totalDownloads.toLocaleString('id-ID')+'<small>download</small></div></div>').join('')}).catch(error=>{console.warn('[Ryuza ranking] tidak dapat membaca data',error);target.innerHTML='<div class="rz-rank-state">Data ranking belum bisa dibaca. Periksa Firebase Database Rules untuk path downloadRankings.</div>'})};
  document.getElementById('ryuzaRankingRefresh')?.addEventListener('click',()=>window.ryuzaLoadDownloadRanking());
@@ -5146,6 +5146,84 @@ apply(fallback);if(document.readyState==='loading')document.addEventListener('DO
 })();
 </script>
 
+
+<!-- RYUZA OFFICIAL: LEFT-SWIPE MEMBER RANK MENU -->
+<style id="ryuza-member-rank-drawer-css">
+#ryuzaRankEdge{position:fixed;left:0;top:42%;z-index:9988;width:22px;height:104px;border:1px solid rgba(190,130,255,.42);border-left:0;border-radius:0 14px 14px 0;background:linear-gradient(180deg,#9a4dff,#5b21b6);color:#fff;box-shadow:0 0 20px rgba(154,77,255,.25);display:flex;align-items:center;justify-content:center;cursor:pointer;padding:0}
+#ryuzaRankEdge span{writing-mode:vertical-rl;transform:rotate(180deg);font:800 10px/1 Arial,sans-serif;letter-spacing:1px;white-space:nowrap}
+#ryuzaRankShade{position:fixed;inset:0;z-index:9995;background:rgba(5,3,13,.66);backdrop-filter:blur(5px);-webkit-backdrop-filter:blur(5px);opacity:0;visibility:hidden;transition:opacity .22s,visibility .22s}
+#ryuzaRankShade.open{opacity:1;visibility:visible}
+#ryuzaMemberRankDrawer{position:fixed;z-index:9996;inset:0 auto 0 0;width:min(340px,86vw);height:100dvh;box-sizing:border-box;padding:calc(18px + env(safe-area-inset-top,0px)) 16px calc(18px + env(safe-area-inset-bottom,0px));overflow-y:auto;color:#f8f5ff;background:radial-gradient(ellipse at 0 0,rgba(144,61,255,.24),transparent 48%),linear-gradient(160deg,#151021,#090711 72%);border-right:1px solid rgba(185,120,255,.28);box-shadow:18px 0 60px rgba(0,0,0,.42);transform:translateX(-105%);visibility:hidden;transition:transform .26s ease,visibility .26s; font-family:inherit}
+#ryuzaMemberRankDrawer.open{transform:translateX(0);visibility:visible}
+#ryuzaMemberRankDrawer *{box-sizing:border-box}
+#ryuzaMemberRankDrawer .rzmr-head{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:20px}
+#ryuzaMemberRankDrawer .rzmr-brand{font-size:11px;letter-spacing:2px;font-weight:900;color:#cba8ff}
+#ryuzaMemberRankDrawer .rzmr-title{font-size:23px;font-weight:950;line-height:1.1;margin-top:5px}
+#ryuzaMemberRankDrawer .rzmr-close{width:36px;height:36px;border-radius:12px;border:1px solid #49335e;background:#21152e;color:#fff;font-size:21px;cursor:pointer}
+#ryuzaMemberRankDrawer .rzmr-sub{font-size:12px;line-height:1.55;color:#b8aec8;margin:-8px 0 16px}
+#ryuzaMemberRankDrawer .rzmr-rank{width:100%;display:flex;align-items:center;gap:12px;text-align:left;padding:13px;margin:9px 0;border-radius:17px;border:1px solid rgba(255,255,255,.1);background:rgba(255,255,255,.035);color:#fff;cursor:pointer;transition:transform .16s,border-color .16s,background .16s}
+#ryuzaMemberRankDrawer .rzmr-rank:active{transform:scale(.98)}
+#ryuzaMemberRankDrawer .rzmr-rank[aria-pressed="true"]{background:rgba(163,91,255,.14);border-color:#b46aff;box-shadow:0 0 22px rgba(155,80,255,.14)}
+#ryuzaMemberRankDrawer .rzmr-icon{width:52px;height:52px;flex:0 0 52px;display:grid;place-items:center;border-radius:15px;font-size:25px;font-weight:1000;border:1px solid currentColor;background:rgba(255,255,255,.045)}
+#ryuzaMemberRankDrawer .rzmr-epic .rzmr-icon{color:#c99cff;text-shadow:0 0 14px #a855f7}
+#ryuzaMemberRankDrawer .rzmr-legend .rzmr-icon{color:#ffd875;text-shadow:0 0 14px #d99b21}
+#ryuzaMemberRankDrawer .rzmr-mythic .rzmr-icon{color:#ff82b5;text-shadow:0 0 14px #ef3e91}
+#ryuzaMemberRankDrawer .rzmr-rname{font-size:14px;font-weight:950;letter-spacing:1.3px}
+#ryuzaMemberRankDrawer .rzmr-desc{font-size:11px;color:#b9b0c8;line-height:1.45;margin-top:4px}
+#ryuzaMemberRankDrawer .rzmr-tag{margin-left:auto;font-size:9px;letter-spacing:.7px;border-radius:999px;padding:5px 7px;background:rgba(255,255,255,.08);color:#e8ddf7;white-space:nowrap}
+#ryuzaMemberRankDrawer .rzmr-status{margin-top:16px;padding:13px;border-radius:15px;border:1px solid rgba(175,115,255,.22);background:rgba(129,70,190,.09)}
+#ryuzaMemberRankDrawer .rzmr-status small{display:block;font-size:10px;color:#b9a7cf;letter-spacing:1px}
+#ryuzaMemberRankDrawer .rzmr-current{display:block;font-size:18px;font-weight:950;margin-top:5px;color:#d5b0ff}
+#ryuzaMemberRankDrawer .rzmr-note{font-size:10px;color:#9e93ad;line-height:1.55;margin-top:12px}
+#ryuzaMemberRankDrawer .rzmr-rank{cursor:default;pointer-events:none;}
+#ryuzaMemberRankDrawer .rzmr-icon{border:0;background:transparent;border-radius:0;width:58px;height:58px;flex-basis:58px;padding:0;filter:drop-shadow(0 5px 7px rgba(0,0,0,.35))}
+#ryuzaMemberRankDrawer .rzmr-icon svg{display:block;width:100%;height:100%}
+#ryuzaMemberRankDrawer .rzmr-copy{display:flex;flex-direction:column;min-width:0;gap:4px}
+#ryuzaMemberRankDrawer .rzmr-rank{opacity:.55;filter:saturate(.65)}
+#ryuzaMemberRankDrawer .rzmr-rank[aria-pressed="true"]{opacity:1;filter:none;border-color:#c084fc;background:rgba(163,91,255,.15);box-shadow:0 0 22px rgba(155,80,255,.18)}
+#ryuzaMemberRankDrawer .rzmr-progress{padding:13px;margin:0 0 14px;border-radius:15px;background:rgba(255,255,255,.045);border:1px solid rgba(190,150,255,.16)}
+#ryuzaMemberRankDrawer .rzmr-progress-top{display:flex;align-items:center;justify-content:space-between;font-size:12px;color:#c8bdd8;gap:10px}
+#ryuzaMemberRankDrawer .rzmr-progress-top b{font-size:18px;color:#fff}
+#ryuzaMemberRankDrawer .rzmr-track{height:7px;margin-top:10px;background:#292137;border-radius:99px;overflow:hidden}
+#ryuzaMemberRankDrawer .rzmr-track span{display:block;width:0;height:100%;border-radius:99px;background:linear-gradient(90deg,#8b5cf6,#ec4899);transition:width .25s ease}
+#ryuzaMemberRankDrawer .rzmr-progress-hint{font-size:10px;color:#b7a9c8;line-height:1.5;margin-top:8px}
+@media(min-width:769px){#ryuzaRankEdge{top:48%}}
+@media(prefers-reduced-motion:reduce){#ryuzaRankShade,#ryuzaMemberRankDrawer,#ryuzaMemberRankDrawer .rzmr-rank{transition:none}}
+</style>
+<button id="ryuzaRankEdge" type="button" aria-label="Buka Rank Member"><span>♛ RANK MEMBER</span></button>
+<div id="ryuzaRankShade" aria-hidden="true"></div>
+<aside id="ryuzaMemberRankDrawer" aria-label="Rank Member Ryuza Official" aria-hidden="true">
+ <div class="rzmr-head"><div><div class="rzmr-brand">RYUZA OFFICIAL</div><div class="rzmr-title">Rank Member</div></div><button class="rzmr-close" id="ryuzaRankClose" type="button" aria-label="Tutup menu">×</button></div>
+ <p class="rzmr-sub">Rank naik otomatis berdasarkan jumlah download yang tercatat. Emblem dibuat bergaya rank Mobile Legends.</p>
+ <div class="rzmr-progress"><div class="rzmr-progress-top"><span>Total download kamu</span><b id="ryuzaRankDownloads">0</b></div><div class="rzmr-track"><span id="ryuzaRankProgressBar"></span></div><div class="rzmr-progress-hint" id="ryuzaRankProgressHint">Butuh 20 download untuk mencapai EPIC.</div></div>
+ <div class="rzmr-rank rzmr-epic" data-rz-member-rank="EPIC" aria-pressed="false"><span class="rzmr-icon"><svg viewBox="0 0 64 64" aria-hidden="true"><path d="M32 3 49 11 59 29 49 49 32 61 15 49 5 29 15 11Z" fill="#5e5a9c" stroke="#d7d4ff" stroke-width="2.5"/><path d="M32 10 43 17 51 30 43 44 32 53 21 44 13 30 21 17Z" fill="#b7b9e9" stroke="#f2f1ff" stroke-width="2"/><path d="M32 16 39 27 48 30 39 36 32 47 25 36 16 30 25 27Z" fill="#514a91" stroke="#e6e4ff" stroke-width="2"/><path d="M32 21 37 30 32 40 27 30Z" fill="#f4f0ff"/></svg></span><span class="rzmr-copy"><span class="rzmr-rname">1. EPIC</span><span class="rzmr-desc">20–49 download</span></span><span class="rzmr-tag">20+</span></div>
+ <div class="rzmr-rank rzmr-legend" data-rz-member-rank="LEGEND" aria-pressed="false"><span class="rzmr-icon"><svg viewBox="0 0 64 64" aria-hidden="true"><path d="M32 3 49 11 59 29 49 49 32 61 15 49 5 29 15 11Z" fill="#8d6724" stroke="#ffe6a0" stroke-width="2.5"/><path d="M32 9 44 16 52 30 43 45 32 54 21 45 12 30 20 16Z" fill="#f4cf65" stroke="#fff0b8" stroke-width="2"/><path d="M32 15 39 25 49 29 40 36 32 47 24 36 15 29 25 25Z" fill="#a97622" stroke="#fff2bd" stroke-width="2"/><path d="M32 20 37 30 32 40 27 30Z" fill="#fff8d8"/></svg></span><span class="rzmr-copy"><span class="rzmr-rname">2. LEGEND</span><span class="rzmr-desc">50–99 download</span></span><span class="rzmr-tag">50+</span></div>
+ <div class="rzmr-rank rzmr-mythic" data-rz-member-rank="MYTHIC" aria-pressed="false"><span class="rzmr-icon"><svg viewBox="0 0 64 64" aria-hidden="true"><path d="M32 3 49 11 59 29 49 49 32 61 15 49 5 29 15 11Z" fill="#7e285b" stroke="#ffb3e2" stroke-width="2.5"/><path d="M32 9 44 16 52 30 43 45 32 54 21 45 12 30 20 16Z" fill="#ec79c1" stroke="#ffe0f3" stroke-width="2"/><path d="M32 14 39 25 49 29 40 36 32 48 24 36 15 29 25 25Z" fill="#a33178" stroke="#ffd0ed" stroke-width="2"/><path d="M32 19 37 30 32 41 27 30Z" fill="#fff0fb"/><circle cx="32" cy="30" r="3" fill="#fff"/></svg></span><span class="rzmr-copy"><span class="rzmr-rname">3. MYTHIC</span><span class="rzmr-desc">100+ download</span></span><span class="rzmr-tag">100+</span></div>
+ <div class="rzmr-status"><small>RANK MEMBER KAMU</small><span class="rzmr-current" id="ryuzaRankCurrent">BELUM EPIC</span></div>
+ <p class="rzmr-note">Rank dihitung dari total download pada ID pengunjung yang tersimpan di browser ini. Gunakan perangkat/browser yang sama agar hitungan tetap cocok.</p>
+</aside>
+<script id="ryuza-member-rank-drawer-js">
+(function(){
+ const drawer=document.getElementById('ryuzaMemberRankDrawer'),shade=document.getElementById('ryuzaRankShade'),edge=document.getElementById('ryuzaRankEdge'),close=document.getElementById('ryuzaRankClose'),current=document.getElementById('ryuzaRankCurrent'),downloadsEl=document.getElementById('ryuzaRankDownloads'),bar=document.getElementById('ryuzaRankProgressBar'),hint=document.getElementById('ryuzaRankProgressHint');
+ if(!drawer||!shade||!edge||!close)return;
+ function getDB(){try{if(!window.firebase||!firebase.database)return null;let app;try{app=firebase.app('ryuza-download-ranking')}catch(e){app=firebase.initializeApp({databaseURL:'https://ryuza-official-default-rtdb.firebaseio.com',projectId:'ryuza-official',authDomain:'ryuza-official.firebaseapp.com'},'ryuza-download-ranking')}return app.database()}catch(e){try{return firebase.database()}catch(_){return null}}}
+ function getIdentity(){let id='',name='Pengunjung';try{id=localStorage.getItem('ryuzaVisitorId')||'';name=(localStorage.getItem('ryuzaVisitorName')||'').trim()}catch(e){}if(!id)return null;return{id:id.replace(/[^a-zA-Z0-9_-]/g,'_'),name};}
+ function updateRank(total){total=Math.max(0,Number(total)||0);let rank='BELUM EPIC',target=20,next='EPIC';if(total>=100){rank='MYTHIC';target=100;next='MYTHIC'}else if(total>=50){rank='LEGEND';target=100;next='MYTHIC'}else if(total>=20){rank='EPIC';target=50;next='LEGEND'}
+  if(current)current.textContent=rank;if(downloadsEl)downloadsEl.textContent=total.toLocaleString('id-ID');
+  const progress=total>=100?100:total>=50?(total/100*100):total>=20?(total/50*100):(total/20*100);if(bar)bar.style.width=Math.min(100,progress)+'%';
+  if(hint){if(total<20)hint.textContent='Butuh '+(20-total)+' download lagi untuk mencapai EPIC.';else if(total<50)hint.textContent='EPIC aktif · '+(50-total)+' download lagi untuk mencapai LEGEND.';else if(total<100)hint.textContent='LEGEND aktif · '+(100-total)+' download lagi untuk mencapai MYTHIC.';else hint.textContent='Rank tertinggi tercapai! Kamu sudah MYTHIC.'}
+  drawer.querySelectorAll('[data-rz-member-rank]').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.rzMemberRank===rank)));
+ }
+ window.ryuzaRefreshMemberRank=function(){const database=getDB(),who=getIdentity();if(!database||!who){updateRank(0);return}database.ref('downloadRankings/'+who.id+'/totalDownloads').once('value').then(s=>updateRank(s.val()||0)).catch(()=>{if(hint)hint.textContent='Rank belum bisa dimuat dari Firebase. Periksa koneksi lalu buka kembali.'})};
+ function open(){drawer.classList.add('open');shade.classList.add('open');drawer.setAttribute('aria-hidden','false');shade.setAttribute('aria-hidden','false');document.body.style.overflow='hidden';window.ryuzaRefreshMemberRank();close.focus({preventScroll:true});}
+ function shut(){drawer.classList.remove('open');shade.classList.remove('open');drawer.setAttribute('aria-hidden','true');shade.setAttribute('aria-hidden','true');document.body.style.overflow='';edge.focus({preventScroll:true});}
+ edge.addEventListener('click',open);close.addEventListener('click',shut);shade.addEventListener('click',shut);
+ document.addEventListener('keydown',e=>{if(e.key==='Escape'&&drawer.classList.contains('open'))shut()});
+ let sx=0,sy=0;document.addEventListener('touchstart',e=>{if(!e.touches||!e.touches[0])return;sx=e.touches[0].clientX;sy=e.touches[0].clientY},{passive:true});
+ document.addEventListener('touchend',e=>{if(!e.changedTouches||!e.changedTouches[0])return;const dx=e.changedTouches[0].clientX-sx,dy=e.changedTouches[0].clientY-sy;if(Math.abs(dy)>Math.abs(dx))return;if(!drawer.classList.contains('open')&&sx<24&&dx>75)open();else if(drawer.classList.contains('open')&&dx< -90)shut()},{passive:true});
+ window.ryuzaRefreshMemberRank();
+})();
+</script>
 </body></html>
 
 <style id="ryuza-banner-smaller-final">
