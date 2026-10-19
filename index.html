@@ -5224,6 +5224,38 @@ apply(fallback);if(document.readyState==='loading')document.addEventListener('DO
  window.ryuzaRefreshMemberRank();
 })();
 </script>
+
+<style id="ryuza-member-rank-mobile-polish">
+/* Rapikan tiga kartu rank khusus layar HP: tersusun vertikal dan teks sejajar. */
+@media(max-width:600px){
+ #ryuzaMemberRankDrawer{width:min(340px,88vw);padding:calc(16px + env(safe-area-inset-top,0px)) 14px calc(16px + env(safe-area-inset-bottom,0px));}
+ #ryuzaMemberRankDrawer .rzmr-head{align-items:center;gap:10px;margin-bottom:16px;}
+ #ryuzaMemberRankDrawer .rzmr-title{font-size:22px;line-height:1.15;}
+ #ryuzaMemberRankDrawer .rzmr-sub{font-size:11.5px;line-height:1.5;margin:-5px 0 13px;}
+ #ryuzaMemberRankDrawer .rzmr-progress{padding:12px;margin-bottom:12px;border-radius:14px;}
+ #ryuzaMemberRankDrawer .rzmr-progress-top{align-items:center;font-size:11px;}
+ #ryuzaMemberRankDrawer .rzmr-progress-top b{font-size:17px;min-width:2ch;text-align:right;}
+ #ryuzaMemberRankDrawer .rzmr-rank{display:grid!important;grid-template-columns:50px minmax(0,1fr) auto;grid-template-rows:auto auto;grid-template-areas:"emblem title tag" "emblem desc tag";align-items:center;column-gap:11px;row-gap:4px;width:100%;min-height:82px;padding:11px 10px;margin:8px 0;border-radius:15px;text-align:left;}
+ #ryuzaMemberRankDrawer .rzmr-icon{grid-area:emblem;width:48px;height:48px;min-width:48px;}
+ #ryuzaMemberRankDrawer .rzmr-copy{display:contents;}
+ #ryuzaMemberRankDrawer .rzmr-rname{grid-area:title;align-self:end;font-size:13px;line-height:1.25;letter-spacing:1px;min-width:0;}
+ #ryuzaMemberRankDrawer .rzmr-desc{grid-area:desc;align-self:start;margin:0;font-size:10.5px;line-height:1.35;overflow-wrap:anywhere;}
+ #ryuzaMemberRankDrawer .rzmr-tag{grid-area:tag;align-self:center;justify-self:end;margin:0;padding:6px 8px;font-size:9px;line-height:1;letter-spacing:.4px;}
+ #ryuzaMemberRankDrawer .rzmr-status{margin-top:13px;padding:12px;border-radius:14px;}
+ #ryuzaMemberRankDrawer .rzmr-status small{font-size:9px;line-height:1.4;}
+ #ryuzaMemberRankDrawer .rzmr-current{font-size:17px;line-height:1.25;margin-top:6px;overflow-wrap:anywhere;}
+ #ryuzaMemberRankDrawer .rzmr-note{font-size:9.5px;line-height:1.5;margin-top:10px;}
+}
+@media(max-width:360px){
+ #ryuzaMemberRankDrawer{padding-left:11px;padding-right:11px;}
+ #ryuzaMemberRankDrawer .rzmr-rank{grid-template-columns:43px minmax(0,1fr) auto;column-gap:8px;padding:10px 8px;min-height:76px;}
+ #ryuzaMemberRankDrawer .rzmr-icon{width:42px;height:42px;min-width:42px;}
+ #ryuzaMemberRankDrawer .rzmr-rname{font-size:12px;}
+ #ryuzaMemberRankDrawer .rzmr-desc{font-size:10px;}
+ #ryuzaMemberRankDrawer .rzmr-tag{font-size:8px;padding:5px 6px;}
+}
+</style>
+
 </body></html>
 
 <style id="ryuza-banner-smaller-final">
