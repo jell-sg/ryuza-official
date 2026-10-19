@@ -3725,7 +3725,7 @@ document.querySelectorAll('.replace-dropdown').forEach(function(box){
 :root{--rz-bottom-bg:rgba(17,19,25,.88);--rz-bottom-line:rgba(255,255,255,.10);--rz-bottom-muted:#9298a7;--rz-bottom-active:#a9c8ff}
 @media(max-width:768px){
  body{padding-bottom:calc(88px + env(safe-area-inset-bottom, 0px))!important}
- #ryuzaBottomNav{position:fixed;z-index:9990;left:50%;bottom:calc(10px + env(safe-area-inset-bottom, 0px));transform:translateX(-50%);width:min(440px,calc(100% - 24px));display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:4px;padding:7px;background:var(--rz-bottom-bg);border:1px solid var(--rz-bottom-line);border-radius:24px;box-shadow:0 12px 40px rgba(0,0,0,.42);backdrop-filter:blur(22px) saturate(150%);-webkit-backdrop-filter:blur(22px) saturate(150%)}
+ #ryuzaBottomNav{position:fixed;z-index:9990;left:50%;bottom:calc(10px + env(safe-area-inset-bottom, 0px));transform:translateX(-50%);width:min(440px,calc(100% - 24px));display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:5px;padding:7px;background:var(--rz-bottom-bg);border:1px solid var(--rz-bottom-line);border-radius:24px;box-shadow:0 12px 40px rgba(0,0,0,.42);backdrop-filter:blur(22px) saturate(150%);-webkit-backdrop-filter:blur(22px) saturate(150%)}
  #ryuzaBottomNav .rz-nav-item{appearance:none;-webkit-appearance:none;border:0;background:transparent;color:var(--rz-bottom-muted);min-width:0;min-height:52px;border-radius:17px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;padding:5px 2px;font:inherit;cursor:pointer;text-decoration:none;transition:background .18s ease,color .18s ease,transform .18s ease; -webkit-tap-highlight-color:transparent}
  #ryuzaBottomNav .rz-nav-item:active{transform:scale(.94)}
  #ryuzaBottomNav .rz-nav-item .rz-nav-icon{font-size:19px;line-height:1.05}
@@ -3741,7 +3741,6 @@ document.querySelectorAll('.replace-dropdown').forEach(function(box){
  <button class="rz-nav-item" type="button" data-rz-nav="search"><span class="rz-nav-icon" aria-hidden="true">⌕</span><span class="rz-nav-label">Cari</span></button>
  <button class="rz-nav-item" type="button" data-rz-nav="favorites"><span class="rz-nav-icon" aria-hidden="true">♡</span><span class="rz-nav-label">Favorit</span></button>
  <button class="rz-nav-item" type="button" data-rz-nav="ranking"><span class="rz-nav-icon" aria-hidden="true">🏆</span><span class="rz-nav-label">Ranking</span></button>
- <a class="rz-nav-item" href="https://jell-sg.github.io/ryuza-official-VIP/" data-rz-nav="member"><span class="rz-nav-icon" aria-hidden="true">♙</span><span class="rz-nav-label">Member</span></a>
 </nav>
 <script id="ryuza-bottom-navigation-js">
 (function(){
@@ -4982,43 +4981,51 @@ input,textarea,select{background:#0e0b10!important;color:#fff2f5!important;borde
 <script id="ryuza-youtube-subscriber-script">
 (function(){
   'use strict';
-  /* API key diperlukan oleh YouTube Data API.
-     Buat key di Google Cloud Console, aktifkan YouTube Data API v3,
-     lalu ganti teks di bawah dengan API key milikmu. */
   const YOUTUBE_API_KEY = 'AIzaSyCZbwvumv6lJoUGRGyRZdYiYsxsEiX6cKM';
-  const HANDLE = '@ryuzaaaaaaofficial';
+  const HANDLE = '@ryuzaofficial1';
   const countEl = document.getElementById('ryuzaYoutubeCount');
   const statusEl = document.getElementById('ryuzaYoutubeStatus');
   if (!countEl || !statusEl) return;
+  let loading = false;
   function status(message){ statusEl.textContent = message; }
   function formatCount(value){ return Number(value).toLocaleString('id-ID'); }
   async function loadSubscribers(){
+    if (loading) return;
     if (!YOUTUBE_API_KEY || YOUTUBE_API_KEY === 'MASUKKAN_API_KEY_YOUTUBE_DI_SINI') {
-      status('Siapkan API key YouTube agar angka tampil otomatis');
-      return;
+      status('API key YouTube belum diatur'); return;
     }
+    loading = true;
+    status('Memuat jumlah subscriber…');
     try {
       const url = 'https://www.googleapis.com/youtube/v3/channels?part=statistics&forHandle=' + encodeURIComponent(HANDLE) + '&key=' + encodeURIComponent(YOUTUBE_API_KEY);
       const response = await fetch(url, {cache:'no-store'});
-      if (!response.ok) throw new Error('YouTube API HTTP ' + response.status);
-      const data = await response.json();
+      let data = {};
+      try { data = await response.json(); } catch (_) {}
+      if (!response.ok) {
+        const reason = data && data.error && data.error.errors && data.error.errors[0] && data.error.errors[0].reason;
+        if (response.status === 403) throw new Error('API ditolak (403). Cek YouTube Data API v3, kuota, dan pembatasan API key' + (reason ? ' • ' + reason : ''));
+        if (response.status === 400) throw new Error('Permintaan API salah (400). Periksa API key');
+        throw new Error('YouTube API HTTP ' + response.status + (reason ? ' • ' + reason : ''));
+      }
       const channel = data.items && data.items[0];
-      if (!channel || !channel.statistics) throw new Error('Data channel tidak ditemukan');
+      if (!channel || !channel.statistics) throw new Error('Channel ' + HANDLE + ' tidak ditemukan. Periksa handle channel');
       const stats = channel.statistics;
       if (stats.hiddenSubscriberCount) {
         countEl.innerHTML = 'Disembunyikan<small>SUBSCRIBERS</small>';
         status('Channel menyembunyikan jumlah subscriber');
       } else {
         countEl.innerHTML = formatCount(stats.subscriberCount) + '<small>SUBSCRIBERS</small>';
-        status('Data YouTube • diperbarui otomatis');
+        status('Subscriber diperbarui • cek otomatis tiap 5 menit');
       }
     } catch (error) {
-      status('Jumlah subscriber belum dapat dimuat • cek API key');
+      status('Gagal memuat subscriber: ' + (error.message || 'periksa koneksi/API key'));
       console.warn('[Ryuza YouTube Subscribers]', error);
-    }
+    } finally { loading = false; }
   }
   loadSubscribers();
   window.addEventListener('online', loadSubscribers);
+  window.addEventListener('focus', loadSubscribers);
+  window.setInterval(loadSubscribers, 5 * 60 * 1000);
 })();
 </script>
 
@@ -5125,4 +5132,41 @@ apply(fallback);if(document.readyState==='loading')document.addEventListener('DO
 .ryuza-banner{aspect-ratio:16/4.2!important;min-height:125px!important;max-height:260px!important;margin:8px auto 12px!important;border-radius:15px!important}
 @media(max-width:900px){.ryuza-banner{aspect-ratio:16/5.2!important;min-height:115px!important;max-height:210px!important}}
 @media(max-width:600px){.ryuza-banner{aspect-ratio:16/6.2!important;min-height:95px!important;max-height:155px!important;margin:6px auto 10px!important;border-radius:12px!important}.ryuza-slide-caption{left:12px!important;bottom:18px!important;max-width:78%!important}.ryuza-slide-caption h2{font-size:clamp(15px,4.5vw,23px)!important;margin-top:4px!important}.ryuza-slide-caption span{font-size:8px!important;letter-spacing:1px!important}.ryuza-arrow{width:27px!important;height:27px!important;font-size:19px!important}.ryuza-dots{bottom:7px!important;right:9px!important;gap:5px!important}.ryuza-dot{width:6px!important;height:6px!important}.ryuza-dot.active{width:15px!important}}
+</style>
+
+
+<style id="ryuza-navigation-responsive-clean-final">
+/* Navigasi dirapikan untuk HP dan desktop; tautan Member di navigasi dihilangkan. */
+#ryuzaSmartbar{
+  box-sizing:border-box!important;width:min(100% - 32px,1180px)!important;max-width:1180px!important;
+  margin:16px auto 12px!important;padding:12px!important;display:flex!important;flex-wrap:wrap!important;
+  justify-content:center!important;align-items:center!important;gap:8px!important;max-height:none!important;
+  overflow:visible!important;border-radius:18px!important;
+}
+#ryuzaSmartbar .ryuza-filter{
+  box-sizing:border-box!important;flex:0 0 auto!important;width:auto!important;max-width:100%!important;
+  min-width:0!important;min-height:40px!important;padding:9px 15px!important;font-size:14px!important;
+  line-height:1.2!important;white-space:normal!important;overflow-wrap:anywhere!important;text-align:center!important;
+}
+#ryuzaBottomNav{grid-template-columns:repeat(4,minmax(0,1fr))!important;}
+#ryuzaBottomNav .rz-nav-item{min-width:0!important;overflow:hidden!important;}
+#ryuzaBottomNav .rz-nav-label{max-width:100%;overflow:hidden;text-overflow:ellipsis;}
+@media(max-width:700px){
+  #ryuzaSmartbar{width:calc(100% - 20px)!important;margin:10px auto 12px!important;padding:8px!important;
+    display:grid!important;grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:7px!important;
+    max-height:252px!important;overflow-x:hidden!important;overflow-y:auto!important;align-items:stretch!important;
+    justify-content:stretch!important;overscroll-behavior:contain!important;-webkit-overflow-scrolling:touch!important;}
+  #ryuzaSmartbar .ryuza-filter{width:100%!important;min-height:42px!important;padding:8px 7px!important;
+    font-size:13px!important;line-height:1.2!important;}
+  #ryuzaBottomNav{width:calc(100% - 20px)!important;max-width:440px!important;bottom:calc(8px + env(safe-area-inset-bottom,0px))!important;
+    padding:6px!important;gap:4px!important;border-radius:20px!important;}
+  #ryuzaBottomNav .rz-nav-item{min-height:48px!important;border-radius:14px!important;gap:3px!important;padding:4px 2px!important;}
+  #ryuzaBottomNav .rz-nav-item .rz-nav-icon{font-size:18px!important;}
+  #ryuzaBottomNav .rz-nav-item .rz-nav-label{font-size:10px!important;}
+}
+@media(min-width:701px){
+  #ryuzaSmartbar{position:relative!important;}
+  #ryuzaSmartbar .ryuza-filter{max-width:220px!important;}
+}
+@media(prefers-reduced-motion:reduce){#ryuzaSmartbar .ryuza-filter{transition:none!important;}}
 </style>
