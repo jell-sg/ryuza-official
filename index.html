@@ -3067,7 +3067,12 @@ document.querySelectorAll('.replace-dropdown').forEach(function(box){
   else {
     const cached=readSkinCache();
     let ready=false;
-    // Jika Firebase benar-benar tidak bisa dijangkau, tampilkan cache sebagai cadangan setelah 8 detik.
+    // Terapkan cache langsung pada saat script berjalan; Firebase hanya memperbarui di latar belakang.
+    if(cached&&Object.keys(cached).length){
+      apply(cached);
+      window.dispatchEvent(new CustomEvent('ryuza:skins-data-ready',{detail:{skins:cached,source:'instant-cache'}}));
+      markReady();
+    }
     const fallbackTimer=setTimeout(()=>{
       if(ready)return;
       if(cached&&Object.keys(cached).length){
@@ -3093,15 +3098,15 @@ document.querySelectorAll('.replace-dropdown').forEach(function(box){
 
 
 <style id="ryuza-no-stale-skins">
-/* Jangan tampilkan card bawaan HTML (mis. Badang Saint Seiya) sebelum data terbaru Firebase siap. */
-#list{visibility:hidden!important;opacity:0!important;transition:none!important}
+/* Tampilkan kartu bawaan index.html langsung; Firebase memperbarui data setelah halaman tampil. */
+#list{visibility:visible!important;opacity:1!important;transition:none!important}
 #list.ryuza-live-skins-ready{visibility:visible!important;opacity:1!important}
-#list.ryuza-live-skins-ready:empty{display:none!important}
-#ryuzaSkinSyncWait{display:flex;align-items:center;justify-content:center;gap:9px;min-height:70px;margin:12px 0;padding:14px;border:1px solid rgba(255,55,115,.22);border-radius:14px;background:rgba(12,15,26,.9);color:#c7ccda;font:600 13px/1.4 system-ui,sans-serif}
-#ryuzaSkinSyncWait[hidden]{display:none!important}
+#list:empty{display:none!important}
+#ryuzaSkinSyncWait{display:none!important}
 </style>
 <script id="ryuza-no-stale-skins-init">
-(()=>{const list=document.getElementById('list');if(!list)return;const wait=document.createElement('div');wait.id='ryuzaSkinSyncWait';wait.setAttribute('role','status');wait.innerHTML='<span aria-hidden="true">⏳</span><span>Memuat skin terbaru…</span>';list.parentNode.insertBefore(wait,list);const done=()=>{if(list.classList.contains('ryuza-live-skins-ready'))wait.hidden=true};new MutationObserver(done).observe(list,{attributes:true,attributeFilter:['class']});done();})();
+/* Tidak menahan tampilan utama menunggu koneksi Firebase. */
+(()=>{const list=document.getElementById('list');if(!list)return;const wait=document.getElementById('ryuzaSkinSyncWait');if(wait)wait.remove();})();
 </script>
 
 <style id="ryuza-live-settings-first">
@@ -5935,3 +5940,447 @@ apply(fallback);if(document.readyState==='loading')document.addEventListener('DO
  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',wire,{once:true});else wire();
 })();
 </script>
+
+<style id="ryuza-all-navigation-in-sidebar-final">
+/* Satukan semua navigasi utama dan Rank Member ke dalam sidebar. */
+#ryuzaRankEdge{display:none!important}
+#ryuzaSideNav .rz-side-unified{appearance:none;display:flex;align-items:center;gap:12px;width:100%;min-height:43px;padding:10px 12px;margin:0;border:1px solid transparent;border-radius:11px;background:transparent;color:#aebed1;text-decoration:none;font:650 13px/1.35 inherit;text-align:left;cursor:pointer;box-sizing:border-box}
+#ryuzaSideNav .rz-side-unified:hover{background:#ffffff0b;color:#fff;border-color:#168cff35}
+#ryuzaSideNav .rz-side-unified .rz-side-unified-icon{width:22px;flex:0 0 22px;text-align:center;font-size:17px;color:#7f9ab8}
+#ryuzaSideNav .rz-side-unified .rz-side-unified-label{flex:1;min-width:0}
+#ryuzaSideNav .rz-side-unified-vip{color:#e6c17a}
+#ryuzaSideNav .rz-side-unified-rank .rz-side-unified-icon{color:#c084fc}
+#ryuzaSideNav .kaiji-community{width:100%;margin:0!important;position:relative}
+#ryuzaSideNav .kaiji-community>.community{appearance:none;display:flex;align-items:center;gap:12px;width:100%;min-height:43px;padding:10px 12px;border:1px solid transparent;border-radius:11px;background:transparent;color:#aebed1;font:650 13px/1.35 inherit;text-align:left;cursor:pointer;box-sizing:border-box}
+#ryuzaSideNav .kaiji-community>.community:hover{background:#ffffff0b;color:#fff;border-color:#168cff35}
+#ryuzaSideNav .kaiji-community>.community span{margin-left:auto}
+#ryuzaSideNav .kaiji-community-menu{position:static!important;display:none;width:100%;margin:3px 0 5px!important;padding:5px 0 5px 12px!important;border:0!important;background:transparent!important;box-shadow:none!important}
+#ryuzaSideNav .kaiji-community.open .kaiji-community-menu{display:block!important}
+#ryuzaSideNav .kaiji-community-menu a{display:flex;align-items:center;min-height:36px;padding:8px 10px;border-radius:9px;color:#aebed1;font-size:12px;text-decoration:none}
+#ryuzaSideNav .kaiji-community-menu a:hover{background:#ffffff0b;color:#fff}
+@media(max-width:999px){#ryuzaSideNav .rz-side-unified{min-height:42px;font-size:13px}}
+</style>
+<script id="ryuza-all-navigation-in-sidebar-js">
+(function(){
+ function init(){
+  const side=document.getElementById('ryuzaSideNav');
+  if(!side||side.dataset.allNavUnified==='1')return;
+  side.dataset.allNavUnified='1';
+  const foot=side.querySelector('.rz-side-foot');
+  const addLabel=(id,text)=>{let n=side.querySelector('#'+id);if(!n){n=document.createElement('div');n.id=id;n.className='rz-side-label rz-side-label-gap';n.textContent=text;side.insertBefore(n,foot||null)}return n};
+  // Pull the two navigation items previously kept in the top navigation into the sidebar.
+  const community=document.querySelector('.kaiji-nav .kaiji-community');
+  if(community&&community.parentElement!==side){addLabel('rzSideCommunityLabel','KOMUNITAS');side.insertBefore(community,foot||null)}
+  const vip=document.getElementById('openVipOrder');
+  if(vip&&vip.parentElement!==side){
+   addLabel('rzSideVipLabel','VIP & DUKUNGAN');
+   const wrap=document.createElement('div');wrap.className='rz-side-moved';
+   vip.classList.add('rz-side-unified','rz-side-unified-vip');vip.innerHTML='<span class="rz-side-unified-icon">♛</span><span class="rz-side-unified-label">Order VIP Script</span><span>⌄</span>';
+   wrap.appendChild(vip);side.insertBefore(wrap,foot||null);
+  }
+  // Add Rank Member as a normal sidebar item and reuse the existing rank drawer logic.
+  if(!side.querySelector('#rzSideMemberRank')){
+   addLabel('rzSideRankLabel','MEMBER & RANK');
+   const b=document.createElement('button');b.type='button';b.id='rzSideMemberRank';b.className='rz-side-unified rz-side-unified-rank';b.innerHTML='<span class="rz-side-unified-icon">♛</span><span class="rz-side-unified-label">Rank Member</span><span>›</span>';
+   b.addEventListener('click',()=>{const edge=document.getElementById('ryuzaRankEdge');if(edge)edge.click();document.body.classList.remove('rz-side-open');document.getElementById('ryuzaSideToggle')?.setAttribute('aria-expanded','false')});
+   side.insertBefore(b,foot||null);
+  }
+  // Put existing community and VIP controls before the request/statistics area for a consistent menu.
+ }
+ if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init,{once:true});else init();
+})();
+</script>
+
+<style id="ryuza-lainnya-bottom-style">
+/* Bagian LAINNYA diletakkan di bagian paling bawah sidebar, sebelum footer. */
+#ryuzaSideNav #rzSideLainnyaBottomLabel{margin-top:auto!important;padding-top:16px!important;border-top:1px solid rgba(148,163,184,.13)!important}
+#ryuzaSideNav .rz-lainnya-bottom-item{flex-shrink:0}
+</style>
+<script id="ryuza-lainnya-bottom-script">
+(function(){
+ function moveLainnyaBottom(){
+  const side=document.getElementById('ryuzaSideNav');
+  if(!side||side.dataset.lainnyaBottom==='1')return;
+  const labels=Array.from(side.querySelectorAll('.rz-side-label'));
+  const label=labels.find(el=>(el.textContent||'').trim().toUpperCase()==='LAINNYA');
+  const foot=side.querySelector('.rz-side-foot');
+  if(!label||!foot)return;
+  side.dataset.lainnyaBottom='1';
+  label.id='rzSideLainnyaBottomLabel';
+  const section=[label];
+  let node=label.nextElementSibling;
+  while(node&&node!==foot){
+   if(node.classList.contains('rz-side-label'))break;
+   const next=node.nextElementSibling;
+   if(node.classList.contains('rz-side-moved')||node.matches('a,button,[role="button"]')){
+    node.classList.add('rz-lainnya-bottom-item');section.push(node);
+   }
+   node=next;
+  }
+  section.forEach(el=>side.insertBefore(el,foot));
+ }
+ if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',moveLainnyaBottom,{once:true});else moveLainnyaBottom();
+})();
+</script>
+
+<style id="ryuza-vip-order-sidebar-top-style">
+/* VIP Script menjadi menu pertama di sidebar, tepat di bawah identitas brand. */
+#ryuzaSideNav #rzSideVipLabel{margin-top:10px!important;padding-top:8px!important}
+#ryuzaSideNav .rz-side-moved:has(#openVipOrder){order:-10}
+</style>
+<script id="ryuza-vip-order-sidebar-top-script">
+(function(){
+ function moveVipTop(){
+  const side=document.getElementById('ryuzaSideNav');
+  if(!side||side.dataset.vipOrderTop==='1')return;
+  const vip=document.getElementById('openVipOrder');
+  const wrap=vip?.closest('.rz-side-moved');
+  const label=side.querySelector('#rzSideVipLabel');
+  const brand=side.querySelector('.rz-side-brand');
+  if(!vip||!wrap||!label||!brand)return;
+  side.dataset.vipOrderTop='1';
+  // Letakkan label VIP dan tombol tepat setelah brand, sebelum navigasi lain.
+  brand.insertAdjacentElement('afterend',label);
+  label.insertAdjacentElement('afterend',wrap);
+ }
+ if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',moveVipTop,{once:true});else moveVipTop();
+})();
+</script>
+
+
+<style id="ryuza-rank-member-popup-and-community-order">
+/* Rank Member dibuka sebagai popup modal di tengah layar, bukan drawer samping. */
+#ryuzaRankShade{z-index:10020!important;background:rgba(3,6,15,.72)!important;backdrop-filter:blur(7px)!important;-webkit-backdrop-filter:blur(7px)!important}
+#ryuzaMemberRankDrawer{inset:50% auto auto 50%!important;width:min(420px,calc(100vw - 28px))!important;max-width:420px!important;height:auto!important;max-height: min(86dvh,760px)!important;overflow-y:auto!important;padding:20px 18px calc(20px + env(safe-area-inset-bottom,0px))!important;border:1px solid rgba(192,132,252,.34)!important;border-radius:22px!important;box-shadow:0 24px 90px rgba(0,0,0,.6),0 0 40px rgba(139,92,246,.12)!important;transform:translate(-50%,-46%) scale(.96)!important;opacity:0!important;visibility:hidden!important;transition:transform .22s ease,opacity .22s ease,visibility .22s ease!important;z-index:10021!important}
+#ryuzaMemberRankDrawer.open{transform:translate(-50%,-50%) scale(1)!important;opacity:1!important;visibility:visible!important}
+#ryuzaMemberRankDrawer .rzmr-head{margin-bottom:14px!important}
+#ryuzaMemberRankDrawer .rzmr-title{font-size:22px!important}
+@media(max-width:600px){#ryuzaMemberRankDrawer{width:calc(100vw - 24px)!important;max-height:84dvh!important;padding:17px 14px calc(16px + env(safe-area-inset-bottom,0px))!important;border-radius:19px!important}#ryuzaMemberRankDrawer .rzmr-icon{width:48px!important;height:48px!important;flex-basis:48px!important}}
+@media(prefers-reduced-motion:reduce){#ryuzaMemberRankDrawer,#ryuzaRankShade{transition:none!important}}
+</style>
+<script id="ryuza-community-below-vip-and-rank-popup-fix">
+(function(){
+ function arrange(){
+  const side=document.getElementById('ryuzaSideNav');
+  if(!side)return;
+  const vip=side.querySelector('.rz-side-moved:has(#openVipOrder)');
+  const community=side.querySelector('.kaiji-community');
+  if(vip&&community&&vip.nextElementSibling!==community){side.insertBefore(community,vip.nextElementSibling)}
+  const communityLabel=side.querySelector('#rzSideCommunityLabel');
+  if(communityLabel&&community&&communityLabel.nextElementSibling!==community){side.insertBefore(communityLabel,community)}
+  // Keep Rank Member in the sidebar; clicking it opens the existing rank popup modal.
+  const rank=side.querySelector('#rzSideMemberRank');
+  if(rank&&!rank.dataset.popupBound){rank.dataset.popupBound='1';rank.addEventListener('click',function(){
+    const edge=document.getElementById('ryuzaRankEdge');
+    if(edge)edge.click();
+    document.body.classList.remove('rz-side-open');
+    document.getElementById('ryuzaSideToggle')?.setAttribute('aria-expanded','false');
+  })}
+ }
+ if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',arrange,{once:true});else arrange();
+})();
+</script>
+
+
+<style id="ryuza-sidebar-priority-order-style">
+/* Urutan visual sidebar: aksi utama dahulu, utilitas dan menu pelengkap di bawah. */
+#ryuzaSideNav{display:flex!important;flex-direction:column!important}
+#ryuzaSideNav .rz-side-brand{order:0!important}
+#ryuzaSideNav #rzSideVipLabel{order:1!important}
+#ryuzaSideNav .rz-side-moved:has(#openVipOrder){order:2!important}
+#ryuzaSideNav #rzSideCommunityLabel{order:3!important}
+#ryuzaSideNav .kaiji-community{order:4!important}
+#ryuzaSideNav [data-side-action="categories"]{order:5!important}
+#ryuzaSideNav #rzSideRankLabel{order:80!important}
+#ryuzaSideNav #rzSideMemberRank{order:81!important}
+#ryuzaSideNav #rzSideRankingLabel{order:82!important}
+#ryuzaSideNav #ryuzaRankingShortcut{order:83!important}
+#ryuzaSideNav .rz-side-request-moved{order:90!important}
+#ryuzaSideNav #rzSideLainnyaBottomLabel{order:100!important;margin-top:12px!important}
+#ryuzaSideNav .rz-lainnya-bottom-item{order:101!important}
+#ryuzaSideNav .rz-side-foot{order:110!important;margin-top: auto!important}
+</style>
+<script id="ryuza-sidebar-priority-order-script">
+(function(){
+ function tidy(){
+  const side=document.getElementById('ryuzaSideNav');if(!side)return;
+  const kids=Array.from(side.children);
+  const get=(sel)=>side.querySelector(sel);
+  const set=(el,n)=>{if(el&&el.parentElement===side)el.style.setProperty('order',String(n),'important')};
+  // Pin the high-value actions at the top, retaining existing nodes and click handlers.
+  set(get('.rz-side-brand'),0);
+  set(get('#rzSideVipLabel'),1);set(get('.rz-side-moved:has(#openVipOrder)'),2);
+  set(get('#rzSideCommunityLabel'),3);set(get('.kaiji-community'),4);
+  set(get('[data-side-action="categories"]'),5);
+  // General navigation items are useful daily, so keep them above stats and requests.
+  let next=10;
+  kids.forEach(el=>{
+   if(el.matches('.rz-side-brand,#rzSideVipLabel,.rz-side-moved:has(#openVipOrder),#rzSideCommunityLabel,.kaiji-community,[data-side-action="categories"],.rz-side-foot,#rzSideLainnyaBottomLabel,.rz-lainnya-bottom-item,#rzSideRankLabel,#rzSideMemberRank,#rzSideRankingLabel,#ryuzaRankingShortcut,.rz-side-request-moved'))return;
+   if(el.classList.contains('rz-side-label')){set(el,next++);return}
+   if(el.classList.contains('rz-side-moved')){set(el,next++);return}
+   if(el.matches('a,button,[role="button"]'))set(el,next++);
+  });
+  set(get('#rzSideRankLabel'),80);set(get('#rzSideMemberRank'),81);
+  set(get('#rzSideRankingLabel'),82);set(get('#ryuzaRankingShortcut'),83);
+  kids.forEach(el=>{if(el.classList.contains('rz-side-request-moved'))set(el,90)});
+  set(get('#rzSideLainnyaBottomLabel'),100);
+  kids.forEach(el=>{if(el.classList.contains('rz-lainnya-bottom-item'))set(el,101)});
+  set(get('.rz-side-foot'),110);
+ }
+ function start(){tidy();const side=document.getElementById('ryuzaSideNav');if(!side)return;const obs=new MutationObserver(()=>tidy());obs.observe(side,{childList:true,subtree:false});}
+ if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',()=>setTimeout(start,80),{once:true});else setTimeout(start,80);
+})();
+</script>
+
+
+<style id="ryuza-remove-empty-old-tab-boxes">
+/* Bersihkan kotak kosong yang tertinggal dari tab/navigasi lama, tanpa mengganggu konten aktif. */
+.ryuza-tab-placeholder:empty,
+.ryuza-old-tab:empty,
+.old-tab-placeholder:empty,
+.tab-placeholder:empty,
+.tab-content:empty,
+.tab-pane:empty,
+[role="tabpanel"]:empty,
+.ryuza-tab-section:empty,
+.ryuza-smartbar:empty,
+.ryuza-tab-note:empty {display:none!important;min-height:0!important;height:0!important;margin:0!important;padding:0!important;border:0!important;box-shadow:none!important}
+.ryuza-tab-placeholder,.ryuza-old-tab,.old-tab-placeholder,.tab-placeholder {display:none!important}
+</style>
+<script id="ryuza-remove-empty-old-tab-boxes-js">
+(function(){
+ function cleanEmptyTabBoxes(){
+  const selectors=['.ryuza-tab-placeholder','.ryuza-old-tab','.old-tab-placeholder','.tab-placeholder','.tab-content','.tab-pane','[role="tabpanel"]','.ryuza-tab-section','.ryuza-smartbar','.ryuza-tab-note'];
+  document.querySelectorAll(selectors.join(',')).forEach(function(el){
+   if(!el.isConnected)return;
+   const meaningful=el.querySelector('img,video,canvas,iframe,input,select,textarea,a,button,[data-skin-id],.ryuza-mini,.skin-card,.product-card');
+   const text=(el.textContent||'').replace(/\s+/g,'').trim();
+   if(!meaningful&&!text){el.style.setProperty('display','none','important');el.style.setProperty('min-height','0','important');el.style.setProperty('height','0','important');el.style.setProperty('margin','0','important');el.style.setProperty('padding','0','important');el.style.setProperty('border','0','important');el.style.setProperty('box-shadow','none','important');}
+  });
+ }
+ if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',cleanEmptyTabBoxes,{once:true});else cleanEmptyTabBoxes();
+ setTimeout(cleanEmptyTabBoxes,500);setTimeout(cleanEmptyTabBoxes,1600);
+})();
+</script>
+
+
+<style id="ryuza-main-area-remove-empty-tab-boxes">
+/* Hapus sisa kotak tab kosong di area KONTEN UTAMA saja; sidebar tidak disentuh. */
+main .ryuza-tab-placeholder, main .ryuza-old-tab, main .old-tab-placeholder,
+main .tab-placeholder, main .ryuza-tab-section, main .ryuza-tab-note,
+#mainContent .ryuza-tab-placeholder, #mainContent .ryuza-old-tab,
+#mainContent .old-tab-placeholder, #mainContent .tab-placeholder,
+#mainContent .ryuza-tab-section, #mainContent .ryuza-tab-note,
+#content .ryuza-tab-placeholder, #content .ryuza-old-tab,
+#content .old-tab-placeholder, #content .tab-placeholder,
+#content .ryuza-tab-section, #content .ryuza-tab-note {
+  display:none!important; min-height:0!important; height:0!important;
+  margin:0!important; padding:0!important; border:0!important; box-shadow:none!important;
+}
+</style>
+<script id="ryuza-main-area-clean-empty-tab-boxes">
+(function(){
+ function cleanMainEmptyTabs(){
+  const roots=[...document.querySelectorAll('main, #mainContent, #content, .main-content, .content-area, .container')]
+    .filter(root=>!root.closest('#ryuzaSideNav,aside,.sidebar,.drawer,#ryuzaMemberRankDrawer'));
+  const selectors=['.ryuza-tab-placeholder','.ryuza-old-tab','.old-tab-placeholder','.tab-placeholder','.tab-content','.tab-pane','[role="tabpanel"]','.ryuza-tab-section','.ryuza-tab-note'];
+  const candidates=new Set();
+  roots.forEach(root=>root.querySelectorAll(selectors.join(',')).forEach(el=>candidates.add(el)));
+  candidates.forEach(el=>{
+   if(!el.isConnected||el.closest('#ryuzaSideNav,aside,.sidebar,.drawer,#ryuzaMemberRankDrawer'))return;
+   // Only remove containers with no visible content. Do not touch tabs that contain cards, controls, or text.
+   const visible=(node)=>{
+    if(!(node instanceof Element))return false;
+    const cs=getComputedStyle(node);
+    if(cs.display==='none'||cs.visibility==='hidden'||Number(cs.opacity)===0)return false;
+    if(node.matches('img,video,canvas,iframe,input,select,textarea,a,button,[data-skin-id],.skin-card,.product-card,.card'))return true;
+    if((node.textContent||'').replace(/\s+/g,'').length)return true;
+    return [...node.children].some(visible);
+   };
+   if(!visible(el)){
+    el.style.setProperty('display','none','important');
+    el.style.setProperty('min-height','0','important');el.style.setProperty('height','0','important');
+    el.style.setProperty('margin','0','important');el.style.setProperty('padding','0','important');
+    el.style.setProperty('border','0','important');el.style.setProperty('box-shadow','none','important');
+   }
+  });
+ }
+ if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',cleanMainEmptyTabs,{once:true});else cleanMainEmptyTabs();
+ setTimeout(cleanMainEmptyTabs,500);setTimeout(cleanMainEmptyTabs,1500);setTimeout(cleanMainEmptyTabs,3000);
+})();
+</script>
+
+
+<!-- RYUZA FIX: remove empty containers left behind by the old main-page category tabs -->
+<style id="ryuza-remove-empty-main-tab-containers-final">
+  /* The category controls now live in the sidebar/popup, so remove their entire old wrappers. */
+  #ryuzaSmartbar,
+  #ryuzaTabNote,
+  #ryuzaMobileFilters,
+  .ryuza-mobile-filters,
+  .ryuza-main-tabs,
+  .ryuza-category-tabs,
+  .ryuza-tab-strip {
+    display: none !important;
+    visibility: hidden !important;
+    height: 0 !important;
+    min-height: 0 !important;
+    max-height: 0 !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    border: 0 !important;
+    box-shadow: none !important;
+    overflow: hidden !important;
+  }
+</style>
+
+<!-- RYUZA FINAL PATCH: remove the visible empty category-tab bar in main content -->
+<style id="ryuza-final-remove-main-category-bar">
+  #ryuzaSuper > #ryuzaSmartbar,
+  #ryuzaSuper > #ryuzaTabNote,
+  #ryuzaSuper .ryuza-smartbar,
+  #ryuzaSuper .ryuza-tab-note,
+  #ryuzaSuper .ryuza-filter,
+  #ryuzaMobileFilters,
+  .ryuza-mobile-filters,
+  nav.ryuza-bottom {
+    display: none !important;
+    visibility: hidden !important;
+    height: 0 !important;
+    min-height: 0 !important;
+    max-height: 0 !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    border: 0 !important;
+    outline: 0 !important;
+    box-shadow: none !important;
+    overflow: hidden !important;
+  }
+  #ryuzaSuper { margin-top: 0 !important; padding-top: 0 !important; }
+</style>
+<script id="ryuza-final-remove-main-category-bar-js">
+(function(){
+  function removeOldCategoryBar(){
+    const selectors = [
+      '#ryuzaSmartbar', '#ryuzaTabNote', '#ryuzaMobileFilters',
+      '.ryuza-mobile-filters', '.ryuza-main-tabs', '.ryuza-category-tabs',
+      '.ryuza-tab-strip', '.ryuza-smartbar', '.ryuza-tab-note'
+    ];
+    document.querySelectorAll(selectors.join(',')).forEach(el=>{
+      if(el.closest('#ryuzaSideNav, aside, .sidebar, .drawer, #ryuzaMemberRankDrawer')) return;
+      el.style.setProperty('display','none','important');
+      el.style.setProperty('height','0','important');
+      el.style.setProperty('min-height','0','important');
+      el.style.setProperty('margin','0','important');
+      el.style.setProperty('padding','0','important');
+      el.style.setProperty('border','0','important');
+      el.style.setProperty('box-shadow','none','important');
+    });
+  }
+  if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',removeOldCategoryBar,{once:true}); else removeOldCategoryBar();
+  window.addEventListener('load',removeOldCategoryBar,{once:true});
+  setTimeout(removeOldCategoryBar,250); setTimeout(removeOldCategoryBar,1000); setTimeout(removeOldCategoryBar,2500);
+})();
+</script>
+
+
+<!-- RYUZA FIX v2: remove the actual empty rounded bar directly below the hero banner -->
+<style id="ryuza-remove-empty-banner-spacer-v2">
+  #ryuzaSuper > #ryuzaSmartbar,
+  #ryuzaSuper > #ryuzaTabNote,
+  #ryuzaSuper > #ryuzaAnnouncement,
+  #ryuzaAnnouncement:empty,
+  #ryuzaAnnouncement:not(.show),
+  #ryuzaSuper .ryuza-smartbar,
+  #ryuzaSuper .ryuza-tab-note {
+    display:none !important; visibility:hidden !important;
+    height:0 !important; min-height:0 !important; max-height:0 !important;
+    margin:0 !important; padding:0 !important; border:0 !important;
+    outline:0 !important; box-shadow:none !important; overflow:hidden !important;
+  }
+  #ryuzaSuper { margin-top:0 !important; padding-top:0 !important; }
+</style>
+<script id="ryuza-remove-empty-banner-spacer-v2-js">
+(function(){
+ function removeSpacer(){
+  ['#ryuzaSmartbar','#ryuzaTabNote','#ryuzaAnnouncement'].forEach(sel=>{
+   document.querySelectorAll(sel).forEach(el=>{
+    if(el.closest('#ryuzaSideNav,aside,.sidebar,.drawer,#ryuzaMemberRankDrawer')) return;
+    if(sel==='#ryuzaAnnouncement' && el.classList.contains('show') && el.textContent.trim()) return;
+    el.remove();
+   });
+  });
+  const superBox=document.getElementById('ryuzaSuper');
+  if(superBox){superBox.style.setProperty('margin-top','0','important');superBox.style.setProperty('padding-top','0','important');}
+ }
+ if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',removeSpacer,{once:true});else removeSpacer();
+ window.addEventListener('load',removeSpacer,{once:true});
+ setTimeout(removeSpacer,300);setTimeout(removeSpacer,1200);setTimeout(removeSpacer,2500);
+})();
+</script>
+
+<style id="ryuza-remove-main-banner-final">
+/* Permintaan pengguna: hilangkan banner utama sepenuhnya dan rapatkan ruangnya */
+.ryuza-banner,
+#ryuzaBanner,
+.ryuza-hero-banner,
+.ryuza-banner-wrap,
+.ryuza-banner-container { display:none !important; visibility:hidden !important; height:0 !important; min-height:0 !important; max-height:0 !important; margin:0 !important; padding:0 !important; border:0 !important; overflow:hidden !important; }
+</style>
+
+<!-- Targeted removal of the MAIN hero avatar + RYUZA wordmark shown above the content -->
+<style id="remove-main-ryuza-wordmark">
+.ryuza-banner-brand, .ryuza-banner-brand .ryuza-avatar-ring, .ryuza-banner-brand .ryuza-banner-divider, .ryuza-banner-brand h1 { display:none!important; visibility:hidden!important; width:0!important; height:0!important; min-height:0!important; max-height:0!important; margin:0!important; padding:0!important; border:0!important; overflow:hidden!important; }
+</style>
+<script id="remove-main-ryuza-wordmark-js">
+(function(){function removeMainBrand(){document.querySelectorAll('.ryuza-banner-brand').forEach(function(el){var p=el.parentElement;el.remove();if(p && p.children.length===0 && !(p.textContent||'').trim()){p.style.setProperty('display','none','important');p.style.setProperty('height','0','important');p.style.setProperty('min-height','0','important');p.style.setProperty('margin','0','important');p.style.setProperty('padding','0','important');}});}if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',removeMainBrand);else removeMainBrand();setTimeout(removeMainBrand,100);setTimeout(removeMainBrand,500);})();
+</script>
+
+<!-- Final targeted fix: remove the blank rounded announcement/tab box above YouTube -->
+<style id="ryuza-remove-blank-box-above-youtube">
+#ryuzaAnnouncement, .ryuza-announce, #ryuzaTabNote, #ryuzaSmartbar, .ryuza-smartbar { display:none !important; visibility:hidden !important; height:0 !important; min-height:0 !important; max-height:0 !important; margin:0 !important; padding:0 !important; border:0 !important; outline:0 !important; box-shadow:none !important; overflow:hidden !important; }
+#ryuzaSuper { margin-top:0 !important; padding-top:0 !important; }
+</style>
+<script id="ryuza-remove-blank-box-above-youtube-js">
+(function(){function clean(){['#ryuzaAnnouncement','.ryuza-announce','#ryuzaTabNote','#ryuzaSmartbar','.ryuza-smartbar'].forEach(function(sel){document.querySelectorAll(sel).forEach(function(el){if(!el.closest('#ryuzaSideNav,aside,.sidebar,.drawer,#ryuzaMemberRankDrawer'))el.remove();});});}if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',clean,{once:true});else clean();window.addEventListener('load',clean,{once:true});setTimeout(clean,300);setTimeout(clean,1000);})();
+</script>
+
+<style id="ryuza-remove-category-bar-definitive">
+/* Hilangkan seluruh bar tab kategori lama di area utama, bukan hanya tombolnya. */
+#ryuzaSmartbar, .ryuza-smartbar, #ryuzaTabNote, .ryuza-tab-note { display:none !important; visibility:hidden !important; height:0 !important; min-height:0 !important; max-height:0 !important; margin:0 !important; padding:0 !important; border:0 !important; box-shadow:none !important; overflow:hidden !important; }
+</style>
+
+<style id="ryuza-instant-index-load">#list{visibility:visible!important;opacity:1!important}#ryuzaSkinSyncWait{display:none!important}</style>
+<script id="ryuza-instant-index-load-init">(()=>{const l=document.getElementById('list');if(l){l.style.visibility='visible';l.style.opacity='1'}document.getElementById('ryuzaSkinSyncWait')?.remove()})();</script>
+
+<style id="ryuza-zero-delay-final">#list,#list .skin,#ryuzaSkinSyncWait{visibility:visible!important;opacity:1!important;transition:none!important;animation:none!important}#ryuzaSkinSyncWait{display:none!important}</style>
+<script id="ryuza-zero-delay-final-init">(()=>{const l=document.getElementById("list");if(l){l.style.setProperty("visibility","visible","important");l.style.setProperty("opacity","1","important");l.querySelectorAll(".skin").forEach(c=>{c.style.setProperty("visibility","visible","important");c.style.setProperty("opacity","1","important")})}document.getElementById("ryuzaSkinSyncWait")?.remove()})();</script>
+
+
+<style id="ryuza-premium-sidebar-v1">
+:root{--rz-side-width:250px;--rz-side-bg:#07111f;--rz-side-border:rgba(148,163,184,.13);--rz-side-accent:#38bdf8}
+#ryuzaSideNav{width:var(--rz-side-width)!important;padding:20px 14px 14px!important;gap:7px!important;background:radial-gradient(ellipse at 0% 0%,rgba(14,165,233,.12),transparent 38%),linear-gradient(180deg,#0b1728 0%,#070e1a 58%,#050a12 100%)!important;border-right:1px solid rgba(125,180,230,.18)!important;box-shadow:10px 0 35px rgba(0,0,0,.16),inset -1px 0 rgba(255,255,255,.025)!important;scrollbar-width:thin;scrollbar-color:#263e59 transparent}
+#ryuzaSideNav::-webkit-scrollbar{width:5px}#ryuzaSideNav::-webkit-scrollbar-thumb{background:#263e59;border-radius:20px}
+#ryuzaSideNav .rz-side-brand{padding:4px 9px 20px!important;margin:0 0 8px!important;gap:12px!important;border-bottom:1px solid rgba(148,163,184,.14)!important}
+#ryuzaSideNav .rz-side-logo{width:42px!important;height:42px!important;border-radius:14px!important;background:linear-gradient(145deg,#0ea5ff,#0874e8 62%,#0754b8)!important;box-shadow:0 7px 24px rgba(14,165,233,.27),inset 0 1px rgba(255,255,255,.3)!important;font-size:22px!important}
+#ryuzaSideNav .rz-side-brand b{font-size:14px!important;letter-spacing:2.2px!important;color:#f0f7ff!important}#ryuzaSideNav .rz-side-brand small{font-size:9px!important;letter-spacing:3px!important;color:#7793b4!important}
+#ryuzaSideNav .rz-side-label{display:flex;align-items:center;gap:8px;padding:13px 10px 5px!important;color:#718aa8!important;font-size:9px!important;letter-spacing:1.7px!important;font-weight:850!important}
+#ryuzaSideNav .rz-side-label::before{content:"";display:block;width:4px;height:4px;border-radius:50%;background:#38bdf8;box-shadow:0 0 8px #38bdf855}
+#ryuzaSideNav .rz-side-label-gap{margin-top:8px!important}
+#ryuzaSideNav .rz-side-item,#ryuzaSideNav .rz-side-unified,#ryuzaSideNav .kaiji-community>.community,#ryuzaSideNav .rz-side-moved>a,#ryuzaSideNav .rz-side-moved>button{position:relative;min-height:42px!important;gap:11px!important;padding:9px 11px!important;border:1px solid transparent!important;border-radius:12px!important;background:transparent!important;color:#b3c3d7!important;font-size:12.5px!important;font-weight:650!important;line-height:1.35!important;box-shadow:none!important;transition:background .16s ease,border-color .16s ease,color .16s ease,transform .16s ease!important}
+#ryuzaSideNav .rz-side-item>span:first-child{width:22px;flex:0 0 22px;font-size:17px!important;color:#829bb8!important;transition:color .16s ease}
+#ryuzaSideNav .rz-side-item:hover,#ryuzaSideNav .rz-side-unified:hover,#ryuzaSideNav .kaiji-community>.community:hover,#ryuzaSideNav .rz-side-moved>a:hover,#ryuzaSideNav .rz-side-moved>button:hover{background:linear-gradient(100deg,rgba(56,189,248,.11),rgba(56,189,248,.035))!important;border-color:rgba(56,189,248,.17)!important;color:#f5fbff!important;transform:translateX(2px)}
+#ryuzaSideNav .rz-side-item.active{background:linear-gradient(100deg,rgba(14,165,233,.2),rgba(59,130,246,.075))!important;border-color:rgba(56,189,248,.28)!important;color:#f7fcff!important;box-shadow:inset 2px 0 #38bdf8,0 4px 14px rgba(2,132,199,.07)!important}
+#ryuzaSideNav .rz-side-item.active>span:first-child{color:#67d7ff!important}
+#ryuzaSideNav #openVipOrder,#ryuzaSideNav .rz-side-moved:has(#openVipOrder)>button{background:linear-gradient(110deg,rgba(245,158,11,.1),rgba(245,158,11,.025))!important;border-color:rgba(245,190,90,.17)!important;color:#f5d69a!important}
+#ryuzaSideNav #openVipOrder .rz-side-unified-icon{color:#f4c66f!important}
+#ryuzaSideNav .kaiji-community-menu{margin:4px 0 6px!important;padding:5px 0 5px 10px!important;border-left:1px solid rgba(56,189,248,.2)!important}
+#ryuzaSideNav .kaiji-community-menu a{min-height:34px!important;border-radius:9px!important;font-size:12px!important;color:#94abc5!important}
+#ryuzaSideNav .kaiji-community-menu a:hover{background:rgba(56,189,248,.08)!important;color:#e9f8ff!important}
+#ryuzaSideNav .rz-side-foot{margin-top:auto!important;padding:14px 10px 4px!important;border-top:1px solid rgba(148,163,184,.13)!important;color:#8097b3!important;font-size:10.5px!important}
+#ryuzaSideNav .rz-side-foot small{color:#536b88!important}
+#ryuzaSideToggle{width:42px!important;height:42px!important;border-radius:13px!important;background:linear-gradient(145deg,#10243a,#081321)!important;border:1px solid rgba(125,180,230,.22)!important;box-shadow:0 8px 24px rgba(0,0,0,.32)!important;color:#dff6ff!important}
+#ryuzaSideScrim{backdrop-filter:blur(5px)!important}
+@media(max-width:999px){#ryuzaSideNav{width:min(285px,86vw)!important;padding:17px 13px 13px!important}#ryuzaSideNav .rz-side-brand{padding-bottom:17px!important}#ryuzaSideNav .rz-side-item,#ryuzaSideNav .rz-side-unified,#ryuzaSideNav .kaiji-community>.community,#ryuzaSideNav .rz-side-moved>a,#ryuzaSideNav .rz-side-moved>button{min-height:41px!important}}
+@media(prefers-reduced-motion:reduce){#ryuzaSideNav *{transition:none!important}}
+</style>
