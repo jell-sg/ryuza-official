@@ -1908,6 +1908,21 @@ html{scroll-behavior:auto!important}
 @media(max-width:480px){.ryuza-youtube-subs{padding:12px;gap:8px}.ryuza-youtube-icon{width:37px;height:37px;flex-basis:37px;font-size:19px}.ryuza-youtube-name{font-size:12px}.ryuza-youtube-status{max-width:170px;line-height:1.35}.ryuza-youtube-visit{padding:9px;font-size:10px}.ryuza-youtube-count{font-size:19px}}
 </style>
 
+<style id="ryuza-skin-detail-popup-style">
+#ryuzaPreviewModal .rzm-preview-panel{width:min(440px,100%);padding:20px 18px 18px}
+#ryuzaPreviewModal .rzm-preview-img{width:min(340px,82vw);max-height:42dvh;aspect-ratio:4/3;object-fit:contain}
+#ryuzaPreviewModal .rzm-preview-caption{margin:7px 0 14px;color:#aebbd0;font-size:12px;line-height:1.5}
+#ryuzaPreviewModal .rzm-detail-label{margin:13px 0 7px;text-align:left;color:#91a7c1;font-size:10px;font-weight:900;letter-spacing:.8px;text-transform:uppercase}
+#ryuzaPreviewModal .rzm-detail-description{padding:11px 12px;text-align:left;border:1px solid #263b55;border-radius:12px;background:#0c1523;color:#c6d3e4;font-size:12px;line-height:1.55;overflow-wrap:anywhere}
+#ryuzaPreviewModal .rzm-download-options{display:grid;gap:8px}
+#ryuzaPreviewModal .rzm-download-option{display:flex;align-items:center;justify-content:space-between;gap:10px;width:100%;min-height:42px;padding:11px 12px;border:1px solid #2d4b6d;border-radius:11px;background:linear-gradient(135deg,#14263d,#101a2a);color:#f5f8ff;text-align:left;font:800 12px/1.3 system-ui,-apple-system,sans-serif;cursor:pointer}
+#ryuzaPreviewModal .rzm-download-option span:last-child{color:#7dd3fc;font-size:18px}
+#ryuzaPreviewModal .rzm-download-option:active{transform:scale(.99);background:#1b3450}
+#ryuzaPreviewModal .rzm-no-options{padding:12px;border:1px dashed #344963;border-radius:11px;color:#9eb2ca;font-size:11px;line-height:1.5}
+@media(max-width:500px){#ryuzaPreviewModal{padding:10px!important}#ryuzaPreviewModal .rzm-preview-panel{max-height:92dvh!important;padding:17px 14px!important;border-radius:20px!important}#ryuzaPreviewModal .rzm-preview-img{max-height:34dvh!important;width:min(300px,80vw)!important}}
+#list .card.skin{cursor:pointer}
+#list .card.skin button,#list .card.skin select,#list .card.skin a{cursor:pointer}
+</style>
 </head><body>
 <style id="ryuza-chrome-gate-style">
 #ryuzaChromeGate{
@@ -5337,10 +5352,15 @@ apply(fallback);if(document.readyState==='loading')document.addEventListener('DO
     search.addEventListener('input',()=>{if(search.value.trim()&&current!=='all'){current='all';apply();}}, {passive:true});
 
     // Lightweight visual preview using the existing skin icon/image (no external image URLs invented).
-    const modal=document.createElement('div');modal.id='ryuzaPreviewModal';modal.setAttribute('aria-hidden','true');modal.innerHTML='<div class="rzm-preview-panel" role="dialog" aria-modal="true" aria-label="Preview ikon skin"><button type="button" class="rzm-preview-close" aria-label="Tutup preview">×</button><div class="rzm-preview-title"></div><img class="rzm-preview-img" alt="Preview ikon skin" loading="lazy" decoding="async"><p class="rzm-preview-caption">Preview ikon yang tersedia di halaman ini</p></div>';document.body.appendChild(modal);
-    const close=()=>{modal.classList.remove('open');modal.setAttribute('aria-hidden','true');document.body.style.overflow='';};
-    function show(img){const card=img.closest('.card.skin');if(!card)return;const title=(card.querySelector('.hero-title-text')||card.querySelector('.title'))?.textContent?.trim()||img.alt||'Skin';const artwork=card.querySelector('.ryuza-card-art-image');const source=artwork?.currentSrc||artwork?.src||img.currentSrc||img.src;const image=modal.querySelector('.rzm-preview-img');image.src=source;image.alt='Preview gambar '+title;modal.querySelector('.rzm-preview-title').textContent=title;modal.querySelector('.rzm-preview-caption').textContent=artwork?'Preview gambar skin dari katalog Ryuza Official':'Preview ikon skin yang tersedia di halaman ini';modal.classList.add('open');modal.setAttribute('aria-hidden','false');document.body.style.overflow='hidden';modal.querySelector('.rzm-preview-close').focus({preventScroll:true});}
-    list.addEventListener('click',e=>{const img=e.target.closest('.ryuza-card-art-image, .hero-icon');if(!img)return;e.preventDefault();e.stopPropagation();show(img);});
+    const modal=document.createElement('div');modal.id='ryuzaPreviewModal';modal.setAttribute('aria-hidden','true');modal.innerHTML='<div class="rzm-preview-panel" role="dialog" aria-modal="true" aria-label="Detail skin"><button type="button" class="rzm-preview-close" aria-label="Tutup detail">×</button><div class="rzm-preview-title"></div><img class="rzm-preview-img" alt="Preview skin" loading="lazy" decoding="async"><p class="rzm-preview-caption">Detail skin dari katalog Ryuza Official</p><div class="rzm-detail-label">Tentang skin</div><div class="rzm-detail-description"></div><div class="rzm-detail-label">Pilih versi download</div><div class="rzm-download-options"></div></div>';document.body.appendChild(modal);
+    const close=()=>{modal.classList.remove('open');modal.setAttribute('aria-hidden','true');document.body.style.overflow='';modal._activeCard=null;};
+    function show(card){if(!card)return;const title=(card.querySelector('.hero-title-text')||card.querySelector('.title'))?.textContent?.trim()||'Skin';const artwork=card.querySelector('.ryuza-card-art-image');const icon=card.querySelector('.hero-icon');const source=artwork?.currentSrc||artwork?.src||icon?.currentSrc||icon?.src||'';const image=modal.querySelector('.rzm-preview-img');if(source)image.src=source;image.alt='Preview gambar '+title;modal.querySelector('.rzm-preview-title').textContent=title;modal.querySelector('.rzm-preview-caption').textContent='Preview skin • Ryuza Official';
+      const description=modal.querySelector('.rzm-detail-description');const info=[];card.querySelectorAll('.repname').forEach(el=>{const t=el.textContent.trim();if(t&& !info.includes(t))info.push(t)});const searchable=(card.dataset.search||'').trim();description.textContent=info.length?info.join(' • '):(searchable||'Skin ini dibagikan melalui katalog Ryuza Official. Pilih versi download yang tersedia di bawah.');
+      const options=modal.querySelector('.rzm-download-options');options.replaceChildren();const select=card.querySelector('.replace-select');const btn=card.querySelector('.replace-download');
+      if(select&&select.options.length){Array.from(select.options).forEach((opt,index)=>{const url=String(opt.value||'').trim();if(!url||url==='#'||opt.disabled)return;const label=String(opt.dataset.label||opt.textContent||('Versi '+(index+1))).trim();const option=document.createElement('button');option.type='button';option.className='rzm-download-option';const name=document.createElement('span');name.textContent=label;const arrow=document.createElement('span');arrow.textContent='›';option.append(name,arrow);option.addEventListener('click',()=>{select.selectedIndex=index;select.dispatchEvent(new Event('change',{bubbles:true}));if(btn){btn.href=url;btn.dataset.url=url;btn.dataset.replaceLabel=label;}close();if(btn&&typeof window.__ryuzaOpenOriginalDownloadChoice==='function'){window.__ryuzaOpenOriginalDownloadChoice(btn);}else if(btn){btn.click();}});options.appendChild(option);});}
+      if(!options.children.length){const empty=document.createElement('div');empty.className='rzm-no-options';empty.textContent='Pilihan versi download belum tersedia untuk skin ini.';options.appendChild(empty);}
+      modal._activeCard=card;modal.classList.add('open');modal.setAttribute('aria-hidden','false');document.body.style.overflow='hidden';}
+    list.addEventListener('click',e=>{const card=e.target.closest('.card.skin');if(!card)return;if(e.target.closest('button,a,select,input,label,.replace-dropdown,.replace-download,.card-report-btn'))return;e.preventDefault();e.stopPropagation();show(card);});
     modal.addEventListener('click',e=>{if(e.target===modal||e.target.closest('.rzm-preview-close'))close();});
     document.addEventListener('keydown',e=>{if(e.key==='Escape'&&modal.classList.contains('open'))close();});
     list.querySelectorAll('img').forEach(img=>{if(!img.hasAttribute('loading'))img.loading='lazy';if('decoding' in img)img.decoding='async';});
