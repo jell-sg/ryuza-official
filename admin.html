@@ -201,6 +201,48 @@ body:before{display:none!important;animation:none!important}
 @media(prefers-reduced-motion:reduce){*{scroll-behavior:auto!important;animation:none!important;transition:none!important}}
 </style>
 
+
+<style id="ryuza-sidebar-layout-v1">
+/* Sidebar layout: navigasi samping untuk desktop, tetap ringkas di mobile. */
+@media(min-width:861px){
+  .wrap{display:grid!important;grid-template-columns:244px minmax(0,1fr)!important;column-gap:22px!important;row-gap:0!important;align-content:start!important;max-width:1500px!important;padding:20px!important}
+  .wrap>.top{grid-column:2;grid-row:1;min-width:0;margin-bottom:16px;align-self:start}
+  .wrap>.nav-modern{grid-column:1;grid-row:1 / span 2;position:sticky!important;top:18px!important;align-self:start!important;width:244px!important;max-height:calc(100vh - 36px);overflow-y:auto!important;overflow-x:hidden!important;display:flex!important;flex-direction:column!important;flex-wrap:nowrap!important;gap:8px!important;margin:0!important;padding:12px!important;border-radius:19px!important;background:linear-gradient(180deg,#171b25,#10131b)!important;border:1px solid rgba(255,255,255,.09)!important;box-shadow:0 16px 45px rgba(0,0,0,.24)!important;scrollbar-width:thin}
+  .wrap>.nav-modern::-webkit-scrollbar{width:5px}.wrap>.nav-modern::-webkit-scrollbar-thumb{background:#333c50;border-radius:99px}
+  .nav-group{flex:0 0 auto!important;min-width:0!important;width:100%!important;padding:9px 0!important;border:0!important;border-bottom:1px solid rgba(255,255,255,.07)!important}
+  .nav-group-last{border-bottom:0!important}
+  .nav-group-title{font-size:10px!important;letter-spacing:.13em!important;margin:0 9px 8px!important;color:#77849c!important}
+  .nav-items{display:flex!important;flex-direction:column!important;align-items:stretch!important;gap:4px!important;width:100%!important}
+  .nav-modern .tab{width:100%!important;min-height:42px!important;display:flex!important;justify-content:flex-start!important;gap:10px!important;padding:10px 11px!important;border:1px solid transparent!important;border-radius:11px!important;text-align:left!important;white-space:normal!important;line-height:1.25!important;background:transparent!important;color:#aeb8cb!important;box-shadow:none!important}
+  .nav-modern .tab:hover{background:#232936!important;border-color:rgba(255,255,255,.06)!important;color:#fff!important;transform:none!important}
+  .nav-modern .tab.active{background:linear-gradient(110deg,#496fe0,#6e91f5)!important;color:#fff!important;box-shadow:0 6px 18px rgba(80,111,225,.22)!important}
+  .nav-modern .tab.active:after{display:none!important}
+  .tab-icon{flex:0 0 24px!important;width:24px!important;height:24px!important;border-radius:8px!important;background:rgba(255,255,255,.07)!important;color:#b7c8ff!important}
+  .nav-modern .tab.active .tab-icon{background:rgba(255,255,255,.18)!important;color:#fff!important}
+  .wrap>.panel{grid-column:2;grid-row:2;min-width:0}
+  .wrap>.panel.active{grid-column:2;grid-row:2}
+  body.ryuza-desktop-mode .wrap{display:grid!important;grid-template-columns:244px minmax(900px,1fr)!important;width:auto!important;max-width:none!important;margin:0!important;padding:18px!important}
+  body.ryuza-desktop-mode .wrap>.top{min-width:0!important;grid-column:2!important}
+  body.ryuza-desktop-mode .wrap>.nav-modern{width:244px!important;flex-direction:column!important;flex-wrap:nowrap!important;overflow-y:auto!important;overflow-x:hidden!important;grid-column:1!important}
+  body.ryuza-desktop-mode .wrap>.panel{grid-column:2!important}
+}
+@media(max-width:860px){
+  .wrap{display:flex!important;flex-direction:column!important;gap:0!important}
+  .wrap>.top{order:0!important;width:100%;margin-bottom:8px}
+  .wrap>.nav-modern{order:1!important;position:sticky!important;top:5px!important;z-index:80!important;width:100%!important;max-height:none!important;display:flex!important;flex-direction:row!important;flex-wrap:nowrap!important;align-items:stretch!important;gap:7px!important;overflow-x:auto!important;overflow-y:hidden!important;margin:10px 0 12px!important;padding:7px!important;border-radius:14px!important;background:rgba(20,22,29,.97)!important;backdrop-filter:blur(14px)!important}
+  .nav-group{flex:0 0 auto!important;min-width:max-content!important;width:auto!important;padding:0 6px!important;border:0!important;border-right:1px solid rgba(255,255,255,.08)!important}
+  .nav-group-title{display:none!important}
+  .nav-items{display:flex!important;flex-direction:row!important;flex-wrap:nowrap!important;gap:5px!important;width:auto!important}
+  .nav-modern .tab{width:auto!important;min-width:max-content!important;min-height:38px!important;display:inline-flex!important;justify-content:center!important;gap:6px!important;padding:8px 10px!important;white-space:nowrap!important;font-size:12px!important}
+  .nav-modern .tab.active:after{display:none!important}
+  .tab-icon{width:20px!important;height:20px!important;flex-basis:20px!important}
+  .wrap>.panel{order:2!important;width:100%;min-width:0}
+}
+@media(max-width:480px){
+  .wrap{padding:10px!important}.wrap>.top{gap:8px!important}.brand h1{font-size:18px!important}.brand .muted{font-size:11px!important}.wrap>.nav-modern{margin-top:8px!important;padding:5px!important;gap:4px!important}.nav-group{padding:0 3px!important}.nav-modern .tab{padding:8px!important;font-size:11px!important}.nav-modern .tab span:last-child{font-size:11px!important}
+}
+</style>
+
 </head>
 </head>
 <body>
@@ -521,7 +563,7 @@ Replace : Basic
 <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
 <script>
 const CFG={authDomain:'ryuza-official.firebaseapp.com',databaseURL:'https://ryuza-official-default-rtdb.firebaseio.com',projectId:'ryuza-official'};
-let app,db,items={},settings={},categories={}; window.__RYUZA_ADMIN_CATEGORIES__=categories; window.__RYUZA_ADMIN_ITEMS__=items; window.__RYUZA_ADMIN_SETTINGS__=settings;
+let app,db,items=(()=>{try{const v=JSON.parse(localStorage.getItem('ryuza_skins_cache_v2')||'null');return v&&typeof v==='object'&&!Array.isArray(v)?v:{}}catch(e){return {}}})(),settings={},categories={}; window.__RYUZA_ADMIN_CATEGORIES__=categories; window.__RYUZA_ADMIN_ITEMS__=items; window.__RYUZA_ADMIN_SETTINGS__=settings;
 const $=id=>document.getElementById(id);
 function esc(s){return String(s??'').replace(/[&<>\"]/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','\\':'&#92;','"':'&quot;'}[m]));}
 function cleanTitle(s){return String(s??'').replace(/^[\s📌•·—–:-]+/,'').replace(/\s+/g,' ').trim()}function initials(name){const t=cleanTitle(name).replace(/[^\p{L}\p{N}\s]/gu,' ').trim();if(!t)return 'R';const a=t.split(/\s+/).filter(Boolean);return (a.length===1?a[0].slice(0,2):a.slice(0,2).map(x=>x[0])).join('').toUpperCase().slice(0,3)}
@@ -682,8 +724,9 @@ async function saveIndexFeatures(){
  try{await db.ref('siteConfig/indexFeatures').update(f);settings.indexFeatures={...(settings.indexFeatures||{}),...f};window.__RYUZA_ADMIN_FEATURES__=settings.indexFeatures;$('idxSaveStatus').textContent='● Tersimpan REALTIME';$('idxSaveStatus').className='badge ok';toast('✅ Pengaturan fitur Index tersimpan');document.dispatchEvent(new CustomEvent('ryuza-admin-data-changed'));}catch(e){$('idxSaveStatus').textContent='● Gagal menyimpan';$('idxSaveStatus').className='badge err';toast('❌ Gagal: '+e.message)}
 }
 $('saveIndexFeatures').onclick=saveIndexFeatures; $('reloadIndexFeatures').onclick=loadIndexFeatures; $('refreshIndexStats').onclick=()=>{watchRankings();toast('↻ Statistik direfresh')}; $('clearIndexFavorites').onclick=async()=>{if(!confirm('Reset penanda favorit global pada perangkat pengunjung?'))return;try{await db.ref('siteConfig/indexFeatures/favoriteResetAt').set(Date.now());toast('✅ Perintah reset favorit dikirim realtime')}catch(e){toast('❌ Gagal: '+e.message)}};
+try{render();}catch(e){}
 try{app=firebase.apps.find(a=>a.name==='ryuza-admin')||firebase.initializeApp(CFG,'ryuza-admin');db=app.database(); window.db=db;
- db.ref('siteConfig/skins').on('value',s=>{items=s.val()||{};window.__RYUZA_ADMIN_ITEMS__=items;renderFeaturedPicker();$('status').textContent='● REALTIME AKTIF';$('status').className='badge ok';$('systemInfo').innerHTML='<b class="ok">Terhubung ke Firebase Realtime Database</b><br><span class="small">Path skin: siteConfig/skins • Perubahan dipantau realtime.</span>';render()},e=>{$('status').textContent='Firebase gagal: '+e.message;$('status').className='badge err';$('systemInfo').textContent='Firebase gagal: '+e.message});
+ db.ref('siteConfig/skins').on('value',s=>{items=s.val()||{};try{localStorage.setItem('ryuza_skins_cache_v2',JSON.stringify(items))}catch(e){}window.__RYUZA_ADMIN_ITEMS__=items;renderFeaturedPicker();$('status').textContent='● REALTIME AKTIF';$('status').className='badge ok';$('systemInfo').innerHTML='<b class="ok">Terhubung ke Firebase Realtime Database</b><br><span class="small">Path skin: siteConfig/skins • Perubahan dipantau realtime.</span>';render()},e=>{$('status').textContent='Firebase gagal: '+e.message;$('status').className='badge err';$('systemInfo').textContent='Firebase gagal: '+e.message});
 db.ref('siteConfig/categories').on('value',s=>{categories=s.val()||{};window.__RYUZA_ADMIN_CATEGORIES__=categories;renderCategories();render()});
  db.ref('siteConfig/settings').on('value',s=>{settings=s.val()||{};window.__RYUZA_ADMIN_SETTINGS__=settings;const active=document.activeElement;const editingSettings=!!(active&&active.closest&&active.closest('#settings'));if(!editingSettings)loadSettings();loadIndexFeatures()});
 db.ref('siteConfig/indexFeatures').on('value',s=>{settings.indexFeatures=s.val()||{};loadIndexFeatures()});
@@ -786,18 +829,31 @@ let onlineVisitorData={};
 function visitorDate(ts){if(!ts)return '-';try{return new Date(Number(ts)).toLocaleString('id-ID',{dateStyle:'medium',timeStyle:'short'})}catch(e){return '-'}}
 function renderVisitors(){
  const q=String($('visitorSearch')?.value||'').toLowerCase().trim();
- const arr=Object.entries(visitorData||{}).map(([id,x])=>({id,...(x||{})})).filter(x=>x&&x.name).sort((a,b)=>Number(b.lastSeen||0)-Number(a.lastSeen||0));
- const filtered=arr.filter(x=>!q||String(x.name).toLowerCase().includes(q));
  const onlineIds=new Set(Object.keys(onlineVisitorData||{}));
- const online=arr.filter(x=>onlineIds.has(x.id)).length;
+ // Gabungkan daftar pengunjung tersimpan dan sesi online. Jadi pengunjung aktif
+ // tetap terlihat walau registrasi nama lama belum tertulis di searchStats/visitors.
+ const merged=new Map();
+ Object.entries(visitorData||{}).forEach(([id,x])=>{
+   if(!x||typeof x!=='object')return;
+   merged.set(id,{id,...x});
+ });
+ Object.entries(onlineVisitorData||{}).forEach(([id,x])=>{
+   if(!x||typeof x!=='object')return;
+   const old=merged.get(id)||{id,firstSeen:0,lastSeen:0};
+   merged.set(id,{...old,...x,id,name:String(x.name||old.name||'Pengunjung'),firstSeen:old.firstSeen||x.firstSeen||0,lastSeen:old.lastSeen||x.lastSeen||x.connectedAt||0});
+ });
+ const arr=[...merged.values()].filter(x=>x&&x.name).sort((a,b)=>Number(b.lastSeen||b.connectedAt||0)-Number(a.lastSeen||a.connectedAt||0));
+ const filtered=arr.filter(x=>!q||String(x.name).toLowerCase().includes(q)||String(x.id).toLowerCase().includes(q));
+ const online=onlineIds.size;
  $('visitorTotal').textContent=arr.length.toLocaleString('id-ID');
  $('visitorOnline').textContent=online.toLocaleString('id-ID');
- $('visitorStatus').textContent='● REALTIME AKTIF';$('visitorStatus').className='badge ok';
+ const status=$('visitorStatus');
+ if(status&&!status.classList.contains('err')){status.textContent='● REALTIME AKTIF';status.className='badge ok'}
  const el=$('visitorList');
  el.innerHTML=filtered.length?filtered.map(x=>{
    const isOnline=onlineIds.has(x.id);
-   return `<div class="visitor-item"><div class="visitor-head"><span class="visitor-name">${esc(x.name)}</span><span class="${isOnline?'visitor-online':'visitor-offline'}">${isOnline?'● ONLINE':'○ OFFLINE'}</span></div><div class="visitor-meta">ID: ${esc(x.id)}<br>Pertama terdaftar: ${visitorDate(x.firstSeen)}<br>Terakhir terlihat: ${visitorDate(x.lastSeen)}</div></div>`
- }).join(''):'<div class="visitor-empty">Tidak ada nama yang cocok.</div>';
+   return `<div class="visitor-item"><div class="visitor-head"><span class="visitor-name">${esc(x.name||'Pengunjung')}</span><span class="${isOnline?'visitor-online':'visitor-offline'}">${isOnline?'● ONLINE':'○ OFFLINE'}</span></div><div class="visitor-meta">ID: ${esc(x.id)}<br>Pertama terdaftar: ${visitorDate(x.firstSeen)}<br>Terakhir terlihat: ${visitorDate(x.lastSeen||x.connectedAt)}</div></div>`
+ }).join(''):'<div class="visitor-empty">Belum ada data pengunjung. Buka website Index dari browser lain dan isi nama pengunjung untuk menguji.</div>';
 }
 $('visitorSearch').oninput=renderVisitors;
 $('clearVisitors').onclick=async()=>{
@@ -807,9 +863,7 @@ $('clearVisitors').onclick=async()=>{
  catch(e){toast('❌ Gagal menghapus nama: '+e.message)}
 };
 function watchVisitors(){
- db.ref('searchStats/visitors').on('value',s=>{visitorData=s.val()||{};renderVisitors()},e=>{const st=$('visitorStatus');if(st){st.textContent='● Gagal membaca';st.className='badge err'};toast('Gagal memuat nama pengunjung: '+e.message)});
- // onlineUsers dipantau satu kali oleh listener dashboard utama; hindari pembacaan ganda.
- // Realtime listener visitor list updates this view; avoid a periodic full-list redraw.
+ db.ref('searchStats/visitors').on('value',s=>{visitorData=s.val()||{};renderVisitors()},e=>{const st=$('visitorStatus');if(st){st.textContent='● Gagal membaca daftar nama';st.className='badge err'};const el=$('visitorList');if(el)el.innerHTML='<div class="visitor-empty">Gagal membaca daftar pengunjung dari Firebase: '+esc(e.message)+'</div>';console.warn('Gagal memuat nama pengunjung:',e)});
 }
 let activityData={};
 
