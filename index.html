@@ -5581,3 +5581,53 @@ apply(fallback);if(document.readyState==='loading')document.addEventListener('DO
 }
 </style>
 
+
+<style id="ryuza-mobile-nav-cleanup-final">
+/* Rapikan navigasi utama di bawah banner untuk layar HP */
+@media (max-width: 600px) {
+  .kaiji-nav {
+    display: flex !important;
+    width: 100% !important;
+    max-width: 480px !important;
+    margin: 8px auto 12px !important;
+    padding: 8px !important;
+    gap: 6px !important;
+    flex-wrap: wrap !important;
+    justify-content: center !important;
+    align-items: stretch !important;
+    border: 1px solid #263b55 !important;
+    border-radius: 14px !important;
+    background: #0d1726 !important;
+    box-sizing: border-box !important;
+  }
+  .kaiji-nav > a,
+  .kaiji-nav > button,
+  .kaiji-nav > .kaiji-community {
+    flex: 1 1 calc(50% - 6px) !important;
+    min-width: 0 !important;
+    min-height: 36px !important;
+    margin: 0 !important;
+    padding: 9px 7px !important;
+    border-radius: 9px !important;
+    font-size: 11px !important;
+    line-height: 1.25 !important;
+    text-align: center !important;
+    justify-content: center !important;
+    box-sizing: border-box !important;
+  }
+  .kaiji-nav .kaiji-community > .community {
+    width: 100% !important;
+    min-height: 36px !important;
+    padding: 9px 7px !important;
+    font-size: 11px !important;
+    justify-content: center !important;
+  }
+  .kaiji-nav .kaiji-community-menu {
+    z-index: 1000 !important;
+  }
+}
+/* Hapus tab navigasi bawah yang muncul setelah kolom pencarian */
+.ryuza-bottom {
+  display: none !important;
+}
+</style>
