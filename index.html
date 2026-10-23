@@ -1908,21 +1908,39 @@ html{scroll-behavior:auto!important}
 @media(max-width:480px){.ryuza-youtube-subs{padding:12px;gap:8px}.ryuza-youtube-icon{width:37px;height:37px;flex-basis:37px;font-size:19px}.ryuza-youtube-name{font-size:12px}.ryuza-youtube-status{max-width:170px;line-height:1.35}.ryuza-youtube-visit{padding:9px;font-size:10px}.ryuza-youtube-count{font-size:19px}}
 </style>
 
+
+<style id="ryuza-hide-main-category-tabs">
+/* Kategori hanya diakses melalui sidebar; sembunyikan tombol kategori pada area utama. */
+#ryuzaSmartbar .ryuza-filter[data-mode^="CAT:"] { display: none !important; }
+</style>
+
+<style id="ryuza-sidebar-polish-final">
+/* Sidebar polish: hierarchy, spacing, active state, and mobile touch targets */
+#ryuzaSideNav{width:var(--rz-side-width,228px)!important;padding:18px 12px 14px!important;gap:4px!important;scrollbar-width:thin;scrollbar-color:#243b55 transparent;background:linear-gradient(180deg,#0a1728 0%,#07111e 48%,#050b13 100%)!important}
+#ryuzaSideNav .rz-side-brand{padding:5px 9px 18px!important;margin:0 0 8px!important;gap:10px!important;border-bottom:1px solid rgba(148,163,184,.13)!important}
+#ryuzaSideNav .rz-side-logo{width:40px!important;height:40px!important;flex:0 0 40px!important;border-radius:13px!important;font-size:23px!important;background:linear-gradient(145deg,#087cff,#24c8ff)!important;box-shadow:0 5px 18px #0788ff30!important}
+#ryuzaSideNav .rz-side-brand b{font-size:14px!important;letter-spacing:1.8px!important;line-height:1.2!important}
+#ryuzaSideNav .rz-side-brand small{font-size:9px!important;letter-spacing:2.3px!important}
+#ryuzaSideNav .rz-side-item,#ryuzaSideNav .rz-side-moved>a,#ryuzaSideNav .rz-side-moved>button,#ryuzaSideNav #ryuzaRankingShortcut{min-height:41px!important;padding:9px 11px!important;border-radius:10px!important;gap:10px!important;font-size:12.5px!important;line-height:1.35!important}
+#ryuzaSideNav .rz-side-item>span{width:20px!important;flex:0 0 20px!important;font-size:17px!important}
+#ryuzaSideNav .rz-side-label{padding:7px 10px 4px!important;margin-top:9px!important;color:#7892b0!important;font-size:9px!important;letter-spacing:1.6px!important}
+#ryuzaSideNav .rz-side-label-gap{margin-top:9px!important}
+#ryuzaSideNav .rz-side-item.active,#ryuzaSideNav .rz-side-moved>a:focus-visible,#ryuzaSideNav .rz-side-moved>button:focus-visible{background:linear-gradient(100deg,#087cff25,#14b8ff0d)!important;border-color:#168cff45!important;color:#f5faff!important;outline:none}
+#ryuzaSideNav .rz-side-item:hover,#ryuzaSideNav .rz-side-moved>a:hover,#ryuzaSideNav .rz-side-moved>button:hover,#ryuzaSideNav #ryuzaRankingShortcut:hover{background:#ffffff0a!important;border-color:#ffffff12!important}
+#ryuzaSideNav .rz-side-foot{padding:13px 10px 2px!important;margin-top:auto!important;border-top:1px solid rgba(148,163,184,.13)!important;font-size:10px!important;line-height:1.65!important}
+#ryuzaSideNav .rz-side-foot small{font-size:10px!important}
+#ryuzaSideNav .rz-side-moved .badge{font-size:10px!important;line-height:1.2!important;padding:3px 6px!important;border-radius:999px!important}
+#ryuzaSideNav .rz-side-request-moved .download-tool{min-height:41px!important;padding:9px 11px!important;border-radius:10px!important;font-size:12.5px!important}
+#ryuzaSideToggle{width:40px!important;height:40px!important;border-radius:11px!important;font-size:19px!important;backdrop-filter:blur(14px)}
+@media(max-width:999px){#ryuzaSideNav{width:min(282px,84vw)!important;padding:17px 12px 13px!important}#ryuzaSideNav .rz-side-brand{padding-bottom:16px!important}#ryuzaSideNav .rz-side-item,#ryuzaSideNav .rz-side-moved>a,#ryuzaSideNav .rz-side-moved>button,#ryuzaSideNav #ryuzaRankingShortcut{min-height:42px!important;font-size:13px!important}}
+</style>
 </head><body>
 
 <!-- RYUZA SIDEBAR NAVIGATION -->
 <aside id="ryuzaSideNav" aria-label="Menu samping Ryuza Official">
   <div class="rz-side-brand"><span class="rz-side-logo">R</span><div><b>RYUZA</b><small>OFFICIAL</small></div></div>
-  <div class="rz-side-label">MENU UTAMA</div>
-  <button class="rz-side-item active" data-side-action="home"><span>⌂</span>Beranda</button>
-  <button class="rz-side-item" data-side-action="search"><span>⌕</span>Cari Skin</button>
   <button class="rz-side-item" data-side-action="categories"><span>▦</span>Kategori</button>
-  <button class="rz-side-item" data-side-action="favorites"><span>♡</span>Favorit</button>
-  <button class="rz-side-item" data-side-action="ranking"><span>🏆</span>Ranking</button>
-  <div class="rz-side-label rz-side-label-gap">KOMUNITAS</div>
-  <button class="rz-side-item" data-side-action="community"><span>♟</span>Komunitas</button>
-  <button class="rz-side-item" data-side-action="request"><span>✉</span>Request Script</button>
-  <a class="rz-side-item rz-side-link" href="https://saweria.co/Ryuzareal" target="_blank" rel="noopener"><span>♥</span>Donate</a>
+  <div class="rz-side-label rz-side-label-gap">MENU</div>
   <div class="rz-side-foot">Ryuza Official<br><small>Skin &amp; Script Hub</small></div>
 </aside>
 <button id="ryuzaSideToggle" type="button" aria-label="Buka menu" aria-expanded="false">☰</button>
@@ -4768,6 +4786,7 @@ body{background:radial-gradient(ellipse at 50% 0%,rgba(168,85,247,.18),transpare
  function render(){const q=slug(search.value);grid.innerHTML='';let count=0;sourceCards.forEach(card=>{if(!match(card,activeId,activeName))return;const title=clean(card.querySelector('.hero-title-text')?.textContent||card.querySelector('.title')?.textContent||card.dataset.rtdbId||'Skin');const hay=slug(title+' '+(card.dataset.search||'')+' '+card.textContent);if(q&&!hay.includes(q))return;const wrap=document.createElement('div');wrap.className='rzcp-card';const clone=card.cloneNode(true);clone.hidden=false;clone.removeAttribute('aria-hidden');clone.style.display='';clone.querySelectorAll('[id]').forEach(x=>x.removeAttribute('id'));wrap.appendChild(clone);grid.appendChild(wrap);count++});document.getElementById('rzcpCount').textContent=count+' skin ditemukan';if(!count)grid.innerHTML='<div class="rzcp-empty">Tidak ada skin pada kategori ini atau cocok dengan pencarian.</div>'}
  function open(id){const cats=window.__RYUZA_CATEGORY_DATA__||window.__RYUZA_STATIC_CONFIG__?.categories||{};let c=cats[id]||{};if(!c.name){try{const bar=document.getElementById('ryuzaSmartbar');const b=bar?.querySelector('[data-mode="CAT:'+CSS.escape(id)+'"]');c={name:b?.textContent||id}}catch(e){c={name:id}}}activeId=id;activeName=clean(c.name||id);document.getElementById('rzcpTitle').textContent=activeName;sourceCards=[...document.querySelectorAll('#list .skin[data-rtdb-id]')];search.value='';render();modal.classList.add('open');modal.setAttribute('aria-hidden','false');document.body.classList.add('rzcp-lock');setTimeout(()=>search.focus(),40)}
  function close(){modal.classList.remove('open');modal.setAttribute('aria-hidden','true');document.body.classList.remove('rzcp-lock')}
+ window.__RYUZA_OPEN_CATEGORY_POPUP__=open; window.__RYUZA_CLOSE_CATEGORY_POPUP__=close;
  document.getElementById('ryuzaSmartbar')?.addEventListener('click',e=>{const b=e.target.closest('[data-mode^="CAT:"]');if(!b)return;const id=b.dataset.mode.slice(4);setTimeout(()=>open(id),0)},true);
  search.addEventListener('input',render);document.getElementById('rzcpClose').addEventListener('click',close);modal.addEventListener('click',e=>{if(e.target===modal)close()});document.addEventListener('keydown',e=>{if(e.key==='Escape'&&modal.classList.contains('open'))close()});
 })();
@@ -4778,7 +4797,7 @@ body{background:radial-gradient(ellipse at 50% 0%,rgba(168,85,247,.18),transpare
 #ryuzaCategoryPopup{overflow-y:auto!important;align-items:center!important;overscroll-behavior:contain!important}
 #ryuzaCategoryPopup .rzcp-panel{height:min(92dvh,900px)!important;max-height:92dvh!important;min-height:0!important;overflow:hidden!important;display:flex!important;flex-direction:column!important}
 #ryuzaCategoryPopup .rzcp-head{flex:0 0 auto!important}
-#ryuzaCategoryPopup .rzcp-search,#ryuzaCategoryPopup .rzcp-count{flex:0 0 auto!important}
+#ryuzaCategoryPopup .rzcp-search,#ryuzaCategoryPopup .rzcp-count{flex:0 0 auto!important}#ryuzaCategoryPopup .rzcp-search{display:none!important}
 #ryuzaCategoryPopup .rzcp-grid{flex:1 1 auto!important;min-height:0!important;height:auto!important;overflow-y:auto!important;overflow-x:hidden!important;overscroll-behavior:contain!important;-webkit-overflow-scrolling:touch!important;touch-action:pan-y!important;align-content:start!important}
 #ryuzaCategoryPopup .rzcp-card .ryuza-card-meta,#ryuzaCategoryPopup .rzcp-card .ryuza-views,#ryuzaCategoryPopup .rzcp-card .ryuza-downloads{display:none!important}
 #ryuzaCategoryPopup .rzcp-card .ryuza-card-meta{display:none!important}
@@ -4892,6 +4911,8 @@ body{background:radial-gradient(ellipse at 50% 0%,rgba(168,85,247,.18),transpare
 <script id="ryuza-clean-stats-search-layout-js">
 (function(){
   function placeSearch(){
+    /* Keep the search input inside its dedicated panel once initialized. */
+    if(document.getElementById('ryuzaSearchPanel')) return false;
     var search=document.querySelector('body > .search, .search:has(#q)');
     var bar=document.getElementById('ryuzaSmartbar');
     if(!search||!bar)return false;
@@ -5468,12 +5489,166 @@ apply(fallback);if(document.readyState==='loading')document.addEventListener('DO
   if(name==='search'){clickBottom('search');const q=document.getElementById('q');if(q){q.scrollIntoView({behavior:'smooth',block:'center'});setTimeout(()=>q.focus({preventScroll:true}),250)}return}
   if(name==='favorites'){clickBottom('favorites');const el=document.getElementById('ryuzaFavoriteSec')||document.getElementById('ryuzaFavorite');if(el)el.scrollIntoView({behavior:'smooth',block:'start'});return}
   if(name==='ranking'){clickBottom('ranking');const el=document.getElementById('ryuzaRankingPanel');if(el)el.scrollIntoView({behavior:'smooth',block:'start'});return}
-  if(name==='categories'){const p=document.getElementById('ryuzaCategoryPopup');if(p){p.classList.add('open');p.setAttribute('aria-hidden','false')}else{const b=[...document.querySelectorAll('button,a')].find(x=>/kategori/i.test(x.textContent||''));if(b)b.click()}return}
+  if(name==='categories'){if(window.__RYUZA_SHOW_CATEGORY_CHOOSER__)window.__RYUZA_SHOW_CATEGORY_CHOOSER__();else{const p=document.getElementById('ryuzaCategoryPopup');if(p){p.classList.add('open');p.setAttribute('aria-hidden','false');document.body.classList.add('rzcp-lock')}}return}
   if(name==='community'){const b=document.getElementById('kaijiCommunityToggle');if(b){b.click();b.scrollIntoView({behavior:'smooth',block:'center'})}return}
   if(name==='request'){const b=document.getElementById('openRequestScript')||document.getElementById('openRequestInbox');if(b)b.click();else{const x=document.getElementById('requestScriptModal');if(x){x.style.display='flex';x.setAttribute('aria-hidden','false')}}}
  }
  nav.addEventListener('click',e=>{const b=e.target.closest('[data-side-action]');if(b)go(b.dataset.sideAction)});
  toggle?.addEventListener('click',()=>{const open=!document.body.classList.contains('rz-side-open');document.body.classList.toggle('rz-side-open',open);toggle.setAttribute('aria-expanded',String(open))});scrim?.addEventListener('click',close);document.addEventListener('keydown',e=>{if(e.key==='Escape')close()});
+})();
+</script>
+
+<script id="ryuza-sidebar-category-chooser-fix">
+(function(){
+ const modal=document.getElementById('ryuzaCategoryPopup'),grid=document.getElementById('rzcpGrid'),title=document.getElementById('rzcpTitle'),search=document.getElementById('rzcpSearch'),count=document.getElementById('rzcpCount');
+ if(!modal||!grid||!title||!search)return;
+ const clean=v=>String(v??'').replace(/\s+/g,' ').trim();
+ const slug=v=>clean(v).toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'');
+ let chooser=false, categories={};
+ function readCats(){
+   categories=window.__RYUZA_CATEGORY_DATA__||window.__RYUZA_STATIC_CONFIG__?.categories||{};
+   // Smartbar buttons are the same category source used by the existing skin filter.
+   document.querySelectorAll('#ryuzaSmartbar [data-mode^="CAT:"]').forEach(b=>{const id=b.dataset.mode.slice(4);if(!categories[id])categories[id]={name:clean(b.textContent)||id};});
+   return categories;
+ }
+ function showChooser(){
+   chooser=true;readCats();title.textContent='Semua Kategori';search.placeholder='Cari kategori...';search.value='';search.style.display='none';
+   modal.classList.add('open');modal.setAttribute('aria-hidden','false');document.body.classList.add('rzcp-lock');renderCats();
+   // If categories are loaded asynchronously, refresh after Firebase/static data events.
+   if(window.firebase?.database){try{const app=window.firebase.app();app.database().ref('siteConfig/categories').once('value').then(snap=>{const data=snap.val();if(data&&Object.keys(data).length){window.__RYUZA_CATEGORY_DATA__=data;categories=data;if(chooser)renderCats()}}).catch(()=>{})}catch(e){}}
+ }
+ function renderCats(){
+   readCats();grid.innerHTML='';let n=0;
+   Object.entries(categories).sort((a,b)=>Number(a[1]?.order||0)-Number(b[1]?.order||0)).forEach(([id,c])=>{
+     const name=clean(c?.name||c?.title||id),icon=clean(c?.icon||'✦');
+     const b=document.createElement('button');b.type='button';b.className='rzcp-category-choice';b.dataset.categoryId=id;b.innerHTML='<span class="rzcp-cat-icon"></span><span class="rzcp-cat-name"></span><span class="rzcp-cat-arrow">›</span>';
+     b.querySelector('.rzcp-cat-icon').textContent=icon;b.querySelector('.rzcp-cat-name').textContent=name;b.addEventListener('click',()=>{chooser=false;search.style.display='';search.placeholder='Cari skin dalam kategori...';const fn=window.__RYUZA_OPEN_CATEGORY_POPUP__;if(fn)fn(id);else{title.textContent=name;modal.classList.add('open');modal.setAttribute('aria-hidden','false')}});grid.appendChild(b);n++;
+   });
+   count.textContent=n+' kategori tersedia';if(!n)grid.innerHTML='<div class="rzcp-empty">Kategori belum ditemukan. Pastikan kategori sudah dibuat dan tersimpan.</div>';
+ }
+ window.__RYUZA_SHOW_CATEGORY_CHOOSER__=showChooser;
+ search.addEventListener('input',()=>{if(chooser)renderCats()});
+ document.getElementById('rzcpClose')?.addEventListener('click',()=>{chooser=false;search.style.display='';search.placeholder='Cari skin dalam kategori...'});
+ const style=document.createElement('style');style.textContent='#ryuzaCategoryPopup .rzcp-search[style*=\"display: none\"]{display:none!important}#ryuzaCategoryPopup .rzcp-category-choice{display:flex;align-items:center;gap:12px;width:100%;min-height:58px;padding:13px;border:1px solid #ffffff1c;border-radius:13px;background:linear-gradient(135deg,#10243a,#0b1728);color:#f8fafc;text-align:left;cursor:pointer;font:inherit}#ryuzaCategoryPopup .rzcp-category-choice:hover{border-color:#38bdf8;background:#12304a}#ryuzaCategoryPopup .rzcp-cat-icon{display:grid;place-items:center;width:34px;height:34px;flex:0 0 34px;border-radius:10px;background:#0c8bff22;color:#55c7ff;font-size:18px}#ryuzaCategoryPopup .rzcp-cat-name{flex:1;font-size:14px;font-weight:700}#ryuzaCategoryPopup .rzcp-cat-arrow{font-size:24px;color:#38bdf8}#ryuzaCategoryPopup .rzcp-grid:has(.rzcp-category-choice){grid-template-columns:repeat(2,minmax(0,1fr))!important;align-content:start}@media(max-width:560px){#ryuzaCategoryPopup .rzcp-grid:has(.rzcp-category-choice){grid-template-columns:minmax(0,1fr)!important}}';document.head.appendChild(style);
+})();
+</script>
+
+<style id="ryuza-move-tabs-into-sidebar-style">
+#ryuzaSideNav .rz-side-moved{flex-shrink:0}
+#ryuzaSideNav .rz-side-moved>a,#ryuzaSideNav .rz-side-moved>button{appearance:none;display:flex;align-items:center;gap:12px;width:100%;min-height:43px;padding:10px 12px;border:1px solid transparent;border-radius:11px;background:transparent;color:#aebed1;text-decoration:none;font:650 13px/1.35 inherit;text-align:left;cursor:pointer;box-sizing:border-box}
+#ryuzaSideNav .rz-side-moved>a:hover,#ryuzaSideNav .rz-side-moved>button:hover{background:#ffffff0b;color:#fff;border-color:#168cff35}
+#ryuzaSideNav .rz-side-moved .donate{color:#ffb49b}
+#ryuzaSideNav .rz-side-request-moved .download-tool{appearance:none!important;display:flex!important;align-items:center!important;gap:10px!important;width:100%!important;min-width:0!important;min-height:43px!important;padding:10px 12px!important;border:1px solid transparent!important;border-radius:11px!important;background:transparent!important;color:#aebed1!important;font:650 12px/1.35 inherit!important;text-align:left!important;white-space:normal!important;box-sizing:border-box!important;box-shadow:none!important}
+#ryuzaSideNav .rz-side-request-moved .download-tool:hover{background:#ffffff0b!important;color:#fff!important;border-color:#168cff35!important}
+#ryuzaSideNav .rz-side-request-moved .badge{margin-left:auto}
+@media(min-width:1000px){.kaiji-nav{justify-content:center!important}.kaiji-nav>.kaiji-community,.kaiji-nav>#openVipOrder{flex:0 0 auto!important}}
+</style>
+<script id="ryuza-move-tabs-into-sidebar">
+(function(){
+ const nav=document.querySelector('.kaiji-nav'),side=document.getElementById('ryuzaSideNav');
+ if(!nav||!side||side.dataset.tabsMoved==='1')return;
+ side.dataset.tabsMoved='1';
+ const label=document.createElement('div');label.className='rz-side-label rz-side-label-gap';label.textContent='LAINNYA';
+ const foot=side.querySelector('.rz-side-foot');
+ if(foot)side.insertBefore(label,foot);else side.appendChild(label);
+ const keep=new Set(['kaijiCommunityToggle','openVipOrder']);
+ Array.from(nav.children).forEach(node=>{
+   if(node.classList.contains('kaiji-community')||keep.has(node.id))return;
+   const wrap=document.createElement('div');wrap.className='rz-side-moved';
+   const child=node;
+   // Move original elements to preserve their IDs and existing click handlers.
+   wrap.appendChild(child);
+   if(foot)side.insertBefore(wrap,foot);else side.appendChild(wrap);
+ });
+ // Move Request Script and Kotak Masuk into sidebar as well, preserving their IDs and handlers.
+ const tools=document.getElementById('ryuzaDownloadTools');
+ const requestButtons=[document.getElementById('openRequestScript'),document.getElementById('openRequestInbox')].filter(Boolean);
+ if(requestButtons.length){
+   const reqLabel=document.createElement('div');reqLabel.className='rz-side-label rz-side-label-gap';reqLabel.textContent='REQUEST';
+   if(foot)side.insertBefore(reqLabel,foot);else side.appendChild(reqLabel);
+   requestButtons.forEach(btn=>{
+     const wrap=document.createElement('div');wrap.className='rz-side-moved rz-side-request-moved';
+     wrap.appendChild(btn);
+     if(foot)side.insertBefore(wrap,foot);else side.appendChild(wrap);
+   });
+   if(tools)tools.style.display='none';
+   const fixed=document.getElementById('ryuza-request-fixed');if(fixed)fixed.style.display='none';
+ }
+})();
+</script>
+
+
+<style id="ryuza-ranking-sidebar-and-remove-tabs-final">
+/* Hapus tab Semua Skin dan Recal dari smartbar; konten utama tetap utuh. */
+#ryuzaSmartbar .ryuza-filter[data-mode="ALL"],
+#ryuzaSmartbar .ryuza-filter[data-mode="RECAL"],
+#ryuzaSmartbar [data-mode*="RECAL" i]{display:none!important}
+#ryuzaRankingShortcut{display:none!important}
+#ryuzaSideNav #ryuzaRankingShortcut{display:flex!important;margin:0!important;width:100%!important;min-height:43px!important;padding:10px 12px!important;border:1px solid transparent!important;border-radius:11px!important;background:transparent!important;color:#aebed1!important;font:650 13px/1.35 inherit!important;text-align:left!important;box-shadow:none!important}
+#ryuzaSideNav #ryuzaRankingShortcut:hover{background:#ffffff0b!important;color:#fff!important;border-color:#168cff35!important}
+</style>
+<script id="ryuza-ranking-sidebar-move-and-clean-tabs">
+(function(){
+ function cleanAndMove(){
+  const side=document.getElementById('ryuzaSideNav');
+  if(!side)return;
+  const bar=document.getElementById('ryuzaSmartbar');
+  if(bar){
+   bar.querySelectorAll('button,a,[role="button"]').forEach(el=>{
+    const text=(el.textContent||'').replace(/\s+/g,' ').trim().toLowerCase();
+    const mode=(el.getAttribute('data-mode')||'').toLowerCase();
+    if(text==='semua skin'||text==='recal'||text==='recal list'||text==='recal skin'||mode==='all'||mode.includes('recal'))el.style.setProperty('display','none','important');
+   });
+  }
+  // Ranking button is created by the site's original ranking script; move that original node to sidebar.
+  const ranking=document.getElementById('ryuzaRankingShortcut');
+  if(ranking&&ranking.parentElement!==side){
+   let label=side.querySelector('#rzSideRankingLabel');
+   if(!label){label=document.createElement('div');label.id='rzSideRankingLabel';label.className='rz-side-label rz-side-label-gap';label.textContent='STATISTIK';const foot=side.querySelector('.rz-side-foot');side.insertBefore(label,foot||null);}
+   const foot=side.querySelector('.rz-side-foot');side.insertBefore(ranking,foot||null);
+  }
+  // If the ranking shortcut is created later, the observer will move it when available.
+ }
+ cleanAndMove();
+ const observer=new MutationObserver(cleanAndMove);observer.observe(document.documentElement,{childList:true,subtree:true});
+})();
+</script>
+
+
+<style id="ryuza-search-tab-separate-ui">
+#ryuzaSearchTab{position:fixed;pointer-events:auto;z-index:2147483001;top:12px;left:calc(var(--rz-side-width) + 12px);display:flex;align-items:center;justify-content:center;gap:8px;min-height:42px;padding:0 14px;border:1px solid rgba(56,189,248,.28);border-radius:12px;background:linear-gradient(135deg,#0b1a2bF5,#07111ff5);color:#eaf5ff;font:700 13px/1 inherit;box-shadow:0 7px 24px #0004;cursor:pointer;backdrop-filter:blur(12px)}
+#ryuzaSearchTab .rz-search-icon{font-size:17px;color:#53c4ff;line-height:1}
+#ryuzaSearchPanel{position:fixed;pointer-events:auto;z-index:2147483002;top:64px;left:calc(var(--rz-side-width) + 12px);width:min(420px,calc(100vw - var(--rz-side-width) - 24px));padding:12px;border:1px solid #ffffff20;border-radius:16px;background:rgba(7,17,31,.97);box-shadow:0 18px 55px #0008;backdrop-filter:blur(18px);display:none;color:#eef6ff}
+#ryuzaSearchPanel.open{display:block}
+#ryuzaSearchPanel .rz-search-panel-head{display:flex;align-items:center;justify-content:space-between;gap:10px;margin:0 0 9px;padding:0 2px 8px;border-bottom:1px solid #ffffff14;font-size:13px;font-weight:800}
+#ryuzaSearchClose{width:28px;height:28px;border:1px solid #ffffff20;border-radius:8px;background:#ffffff0a;color:#dbeafe;font-size:19px;line-height:1;cursor:pointer}
+#ryuzaSearchPanel .search{position:static!important;top:auto!important;width:100%!important;margin:0!important;padding:0!important;background:transparent!important;box-shadow:none!important;border:0!important}
+#ryuzaSearchPanel .search .wrap{width:100%!important}
+#ryuzaSearchPanel #q{width:100%!important;box-sizing:border-box!important}
+#ryuzaSearchPanel .count{margin:7px 2px 0!important}
+#ryuzaSearchPlaceholder{display:none!important}
+#ryuzaSearchMoved:empty{display:none!important}
+@media(max-width:999px){#ryuzaSearchTab{left:62px;top:12px;min-height:42px;padding:0 12px}#ryuzaSearchPanel{left:10px;right:10px;top:62px;width:auto;max-width:500px;margin:0 auto}}
+@media(min-width:1000px){#ryuzaSearchTab{left:calc(var(--rz-side-width) + 12px)}}
+</style>
+<script id="ryuza-search-tab-separate-js">
+(function(){
+ const init=()=>{
+  if(document.getElementById('ryuzaSearchTab'))return;
+  const search=document.querySelector('.search:has(#q)')||document.querySelector('.search');if(!search)return;
+  const placeholder=document.createElement('div');placeholder.id='ryuzaSearchPlaceholder';search.parentNode.insertBefore(placeholder,search);
+  const tab=document.createElement('button');tab.id='ryuzaSearchTab';tab.type='button';tab.setAttribute('aria-expanded','false');tab.setAttribute('aria-controls','ryuzaSearchPanel');tab.innerHTML='<span class="rz-search-icon">⌕</span><span>Pencarian Skin</span>';
+  const panel=document.createElement('section');panel.id='ryuzaSearchPanel';panel.setAttribute('aria-label','Pencarian skin');panel.innerHTML='<div class="rz-search-panel-head"><span>🔎 Cari Skin</span><button type="button" id="ryuzaSearchClose" aria-label="Tutup pencarian">×</button></div>';
+  document.body.append(tab,panel);panel.appendChild(search);
+  function open(){panel.classList.add('open');tab.setAttribute('aria-expanded','true');const q=document.getElementById('q');if(q)setTimeout(()=>q.focus({preventScroll:true}),30)}
+  function close(){panel.classList.remove('open');tab.setAttribute('aria-expanded','false')}
+  tab.addEventListener('click',()=>panel.classList.contains('open')?close():open());panel.querySelector('#ryuzaSearchClose').addEventListener('click',close);
+  document.addEventListener('keydown',e=>{if(e.key==='Escape')close()});
+  // Redirect the existing sidebar search action to this dedicated tab.
+  document.querySelectorAll('#ryuzaSideNav [data-side-action="search"]').forEach(b=>{b.addEventListener('click',()=>{closeSide();open()})});
+  function closeSide(){document.body.classList.remove('rz-side-open');const t=document.getElementById('ryuzaSideToggle');if(t)t.setAttribute('aria-expanded','false')}
+ };
+ if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init,{once:true});else init();
 })();
 </script>
 
@@ -5685,16 +5860,78 @@ apply(fallback);if(document.readyState==='loading')document.addEventListener('DO
 </style>
 
 
-<style id="ryuza-sidebar-no-duplicate-navigation">
-/* Menu yang sudah tersedia di sidebar tidak ditampilkan lagi pada area halaman. */
-.kaiji-nav .kaiji-community > button,
-.kaiji-nav > a.donate,
-.kaiji-nav > a.request,
-#ryuzaBottomNav { display:none !important; }
-/* Komunitas tetap dapat dibuka dari tombol sidebar. */
-.kaiji-community.open .kaiji-community-menu { display:grid !important; }
-@media (min-width:761px) { .kaiji-community-menu { position:fixed !important; top:140px !important; left:calc(var(--rz-side-width, 228px) + 18px) !important; } }
+<style id="ryuza-sidebar-unified-ui-final">
+/* Samakan seluruh menu pindahan dengan tombol Kategori di sidebar. */
+#ryuzaSideNav .rz-side-moved{width:100%;margin:0!important;padding:0!important;flex-shrink:0;box-sizing:border-box}
+#ryuzaSideNav .rz-side-moved>a,#ryuzaSideNav .rz-side-moved>button{appearance:none!important;display:flex!important;align-items:center!important;gap:12px!important;width:100%!important;min-width:0!important;min-height:43px!important;padding:10px 12px!important;margin:0!important;border:1px solid transparent!important;border-radius:11px!important;background:transparent!important;color:#aebed1!important;font-family:inherit!important;font-size:13px!important;font-weight:650!important;line-height:1.35!important;text-align:left!important;text-decoration:none!important;white-space:normal!important;box-shadow:none!important;box-sizing:border-box!important;cursor:pointer!important;transition:background .16s,border-color .16s,color .16s!important}
+#ryuzaSideNav .rz-side-moved>a:hover,#ryuzaSideNav .rz-side-moved>button:hover{background:#ffffff0b!important;color:#fff!important;border-color:#168cff35!important}
+#ryuzaSideNav .rz-side-request-moved .download-tool{font-size:13px!important;font-weight:650!important;justify-content:flex-start!important}
+#ryuzaSideNav .rz-side-request-moved .badge{margin-left:auto!important;flex-shrink:0}
+#ryuzaSideNav .rz-side-label{padding:8px 11px 5px!important;color:#68809d!important;font-size:10px!important;font-weight:800!important;letter-spacing:1.5px!important}
+#ryuzaSideNav .rz-side-label-gap{margin-top:10px!important}
+@media(max-width:999px){#ryuzaSideNav{padding-top:18px!important}}
 </style>
-<script id="ryuza-sidebar-community-popup-fix">
-(()=>{const side=document.querySelector('#ryuzaSideNav [data-side-action="community"]');const wrap=document.querySelector('.kaiji-community');const menu=document.getElementById('kaijiCommunityMenu');if(!side||!wrap||!menu)return;side.addEventListener('click',()=>{const open=wrap.classList.toggle('open');const b=document.getElementById('kaijiCommunityToggle');b?.setAttribute('aria-expanded',String(open));});document.addEventListener('click',e=>{if(!e.target.closest('#ryuzaSideNav [data-side-action="community"]')&&!e.target.closest('#kaijiCommunityMenu')){wrap.classList.remove('open');document.getElementById('kaijiCommunityToggle')?.setAttribute('aria-expanded','false');}});})();
+
+
+<!-- RYUZA SEARCH TAB POLISH V2 -->
+<style id="ryuza-search-tab-polished-v2">
+#ryuzaSearchTab{
+  position:fixed!important;top:12px!important;left:calc(var(--rz-side-width, 260px) + 14px)!important;
+  display:inline-flex!important;align-items:center!important;justify-content:center!important;gap:9px!important;
+  min-width:154px!important;min-height:44px!important;padding:0 15px!important;box-sizing:border-box!important;
+  border:1px solid rgba(100,190,255,.28)!important;border-radius:14px!important;
+  background:linear-gradient(135deg,rgba(14,31,52,.97),rgba(8,17,32,.97))!important;
+  color:#eaf6ff!important;font:700 12px/1.2 system-ui,sans-serif!important;letter-spacing:.15px!important;
+  box-shadow:0 8px 25px rgba(0,0,0,.24),inset 0 1px rgba(255,255,255,.06)!important;
+  -webkit-backdrop-filter:blur(16px)!important;backdrop-filter:blur(16px)!important;
+  cursor:pointer!important;transition:border-color .18s,background .18s,transform .12s!important;
+}
+#ryuzaSearchTab:hover{border-color:rgba(56,189,248,.58)!important;background:linear-gradient(135deg,rgba(17,43,69,.98),rgba(10,23,42,.98))!important}
+#ryuzaSearchTab:active{transform:scale(.98)!important}
+#ryuzaSearchTab .rz-search-icon{display:grid!important;place-items:center!important;width:25px!important;height:25px!important;flex:0 0 25px!important;border:1px solid rgba(56,189,248,.22)!important;border-radius:8px!important;background:rgba(56,189,248,.11)!important;color:#67d3ff!important;font-size:18px!important;line-height:1!important}
+#ryuzaSearchPanel{
+  position:fixed!important;top:66px!important;left:calc(var(--rz-side-width, 260px) + 14px)!important;
+  right:auto!important;width:min(410px,calc(100vw - var(--rz-side-width, 260px) - 28px))!important;
+  max-height:calc(100dvh - 84px)!important;overflow-y:auto!important;overscroll-behavior:contain!important;
+  box-sizing:border-box!important;padding:15px!important;border:1px solid rgba(125,185,255,.22)!important;
+  border-radius:18px!important;background:linear-gradient(145deg,rgba(10,23,40,.985),rgba(8,14,28,.985))!important;
+  box-shadow:0 22px 65px rgba(0,0,0,.45),inset 0 1px rgba(255,255,255,.045)!important;
+  -webkit-backdrop-filter:blur(22px)!important;backdrop-filter:blur(22px)!important;
+}
+#ryuzaSearchPanel:not(.open){display:none!important}
+#ryuzaSearchPanel.open{display:block!important;animation:rzSearchPanelIn .16s ease-out both!important}
+#ryuzaSearchPanel .rz-search-panel-head{display:flex!important;align-items:center!important;justify-content:space-between!important;gap:12px!important;margin:0 0 13px!important;padding:0 0 11px!important;border-bottom:1px solid rgba(148,163,184,.14)!important;color:#e7f3ff!important;font:750 13px/1.3 system-ui,sans-serif!important}
+#ryuzaSearchClose{display:grid!important;place-items:center!important;flex:0 0 31px!important;width:31px!important;height:31px!important;padding:0!important;border:1px solid rgba(148,163,184,.2)!important;border-radius:10px!important;background:rgba(255,255,255,.055)!important;color:#d9eaff!important;font:400 21px/1 system-ui,sans-serif!important;cursor:pointer!important}
+#ryuzaSearchClose:hover{background:rgba(255,255,255,.12)!important}
+#ryuzaSearchPanel .search{margin:0!important;padding:0!important;border:0!important;border-radius:0!important;background:transparent!important;box-shadow:none!important;overflow:visible!important}
+#ryuzaSearchPanel .search:before{margin:0 0 9px 2px!important;font-size:9px!important;letter-spacing:1.3px!important}
+#ryuzaSearchPanel .search .wrap{min-height:49px!important;padding:6px 7px 6px 9px!important;gap:8px!important;border-radius:13px!important}
+#ryuzaSearchPanel .search .icon{flex-basis:31px!important;width:31px!important;height:31px!important;border-radius:9px!important;font-size:15px!important}
+#ryuzaSearchPanel .search .wrap input,#ryuzaSearchPanel #q{min-height:36px!important;font-size:13px!important}
+#ryuzaSearchPanel .search .clear,#ryuzaSearchPanel #x{flex-basis:31px!important;width:31px!important;height:31px!important;border-radius:9px!important}
+#ryuzaSearchPanel .count{margin:9px 2px 0!important;color:#93a9c4!important;font-size:11px!important;line-height:1.4!important}
+#ryuzaSearchTab:focus-visible,#ryuzaSearchClose:focus-visible{outline:2px solid #38bdf8!important;outline-offset:3px!important}
+@keyframes rzSearchPanelIn{from{opacity:0;transform:translateY(-5px)}to{opacity:1;transform:translateY(0)}}
+@media(max-width:999px){
+ #ryuzaSearchTab{left:70px!important;top:10px!important;min-width:0!important;min-height:40px!important;padding:0 12px!important;border-radius:12px!important;gap:7px!important}
+ #ryuzaSearchPanel{left:10px!important;right:10px!important;top:59px!important;width:auto!important;max-width:480px!important;max-height:calc(100dvh - 72px)!important;margin:0 auto!important;padding:13px!important}
+}
+@media(max-width:380px){#ryuzaSearchTab{left:64px!important;min-height:38px!important;padding:0 10px!important;font-size:11px!important}#ryuzaSearchTab .rz-search-icon{width:22px!important;height:22px!important;flex-basis:22px!important}}
+@media(prefers-reduced-motion:reduce){#ryuzaSearchTab,#ryuzaSearchPanel.open{animation:none!important;transition:none!important}}
+</style>
+<script id="ryuza-search-tab-accessibility-fix-v2">
+(function(){
+ function wire(){
+  const tab=document.getElementById('ryuzaSearchTab'), panel=document.getElementById('ryuzaSearchPanel');
+  if(!tab||!panel||tab.dataset.rzPolished==='1')return;
+  tab.dataset.rzPolished='1';
+  const closeBtn=document.getElementById('ryuzaSearchClose');
+  // The main script already owns the tab click handler; do not add a second toggle handler.
+  function closePanel(){panel.classList.remove('open');tab.setAttribute('aria-expanded','false')}
+  if(closeBtn)closeBtn.addEventListener('click',closePanel);
+  document.addEventListener('keydown',function(e){if(e.key==='Escape')closePanel()});
+  document.addEventListener('pointerdown',function(e){if(panel.classList.contains('open')&&!panel.contains(e.target)&&!tab.contains(e.target))closePanel()});
+ }
+ if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',wire,{once:true});else wire();
+})();
 </script>
