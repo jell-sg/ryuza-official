@@ -212,8 +212,6 @@ input{
 </style>
 <style>
 .new-upload-badge{display:inline-block;margin-left:7px;padding:4px 8px;border-radius:999px;background:#16a34a;color:#fff;font-size:10px;font-weight:800;vertical-align:middle;box-shadow:0 2px 8px rgba(22,163,74,.3)}
-.upload-notice{position:fixed;right:20px;top:20px;z-index:99999;max-width:340px;padding:13px 16px;border-radius:12px;background:#101827;color:#fff;border:1px solid #2f4059;box-shadow:0 10px 30px rgba(0,0,0,.35);font-size:14px;font-weight:700;animation:uploadNoticeIn .45s ease,uploadNoticeOut .5s ease 5.5s forwards}
-.upload-notice small{display:block;margin-top:4px;color:#aab7c8;font-weight:500;font-size:12px}
 @keyframes uploadNoticeIn{from{opacity:0;transform:translateY(-15px)}to{opacity:1;transform:translateY(0)}}
 @keyframes uploadNoticeOut{to{opacity:0;transform:translateY(-15px);pointer-events:none}}
 </style>
@@ -2017,7 +2015,6 @@ html.ryuza-chrome-block #ryuzaChromeGate{display:flex!important}
 <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
 <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
 
-<div class="upload-notice" id="uploadNotice">🆕 Paquito KOF Revamp baru saja di-upload!<small>No Password • 8 pilihan Replace tersedia</small></div>
 <div aria-labelledby="popupTitle" aria-modal="true" class="popup-overlay" id="ryuzaPopup" role="dialog">
   <div class="popup-box subscribe-gate">
     <div class="subscribe-badge">DUKUNG RYUZA OFFICIAL</div>
@@ -2926,7 +2923,7 @@ document.querySelectorAll('.replace-dropdown').forEach(function(box){
     catch(e){ try{ app=firebase.initializeApp(CFG,'ryuza-skin-manager'); }catch(err){ console.error('[Ryuza RTDB] init gagal',err); return; } }
     ref=app.database().ref('siteConfig/skins');
   }
-  // Cache hanya dipakai sebagai cadangan jika Firebase gagal; jangan tampilkan data cache lama sebelum data terbaru diterima.
+  // Cache-first: tampilkan data terakhir dengan segera, lalu Firebase memperbarui otomatis saat koneksi siap.
   const SKIN_CACHE_KEY='ryuza_skins_cache_v2';
   function readSkinCache(){try{const x=JSON.parse(localStorage.getItem(SKIN_CACHE_KEY)||'null');return x&&typeof x==='object'&&!Array.isArray(x)?x:null}catch(_){return null}}
   function writeSkinCache(data){try{localStorage.setItem(SKIN_CACHE_KEY,JSON.stringify(data))}catch(_) {}}
@@ -3016,26 +3013,6 @@ document.querySelectorAll('.replace-dropdown').forEach(function(box){
         }else if(badge)badge.remove();
       });
     }
-    /* Notifikasi hanya untuk skin yang muncul setelah kunjungan pertama,
-       supaya pengunjung tidak mendapat spam saat pertama kali membuka website. */
-    try{
-      const ids=Object.keys(data||{}).filter(id=>data[id]&&typeof data[id]==='object');
-      const key='ryuza_seen_skin_ids_v1';
-      const previous=JSON.parse(localStorage.getItem(key)||'null');
-      if(Array.isArray(previous)){
-        const fresh=ids.filter(id=>!previous.includes(id));
-        if(fresh.length){
-          const names=fresh.slice(0,3).map(id=>cleanTitle(data[id].title||id));
-          const notice=document.createElement('div');
-          notice.className='upload-notice';
-          notice.innerHTML='🆕 Skin baru ditambahkan!<small>'+esc(names.join(', '))+(fresh.length>3?' dan '+(fresh.length-3)+' skin lainnya':'')+'</small>';
-          document.querySelectorAll('.upload-notice[data-ryuza-live="1"]').forEach(n=>n.remove());
-          notice.dataset.ryuzaLive='1';document.body.appendChild(notice);
-          setTimeout(()=>notice.remove(),6200);
-        }
-      }
-      localStorage.setItem(key,JSON.stringify(ids));
-    }catch(e){}
     window.dispatchEvent(new CustomEvent('ryuza:skins-updated',{detail:{count:changed}}));
     if(typeof window.search==='function')window.search();
     console.log('[Ryuza RTDB] Skin tersinkron:',changed);
@@ -3045,17 +3022,14 @@ document.querySelectorAll('.replace-dropdown').forEach(function(box){
   else {
     const cached=readSkinCache();
     let ready=false;
-    // Jika Firebase benar-benar tidak bisa dijangkau, tampilkan cache sebagai cadangan setelah 8 detik.
-    const fallbackTimer=setTimeout(()=>{
-      if(ready)return;
-      if(cached&&Object.keys(cached).length){
-        apply(cached);
-        window.dispatchEvent(new CustomEvent('ryuza:skins-data-ready',{detail:{skins:cached,source:'cache-fallback'}}));
-        markReady();
-      }
-    },8000);
+    // Render cache seketika (jika ada); jika tidak ada, tampilkan HTML yang tersedia sambil Firebase memuat.
+    if(cached&&Object.keys(cached).length){
+      apply(cached);
+      window.dispatchEvent(new CustomEvent('ryuza:skins-data-ready',{detail:{skins:cached,source:'cache'} }));
+    }
+    markReady();
     ref.on('value',snap=>{
-      ready=true;clearTimeout(fallbackTimer);
+      ready=true;
       const data=snap.val()||{};
       writeSkinCache(data);apply(data);
       window.dispatchEvent(new CustomEvent('ryuza:skins-data-ready',{detail:{skins:data,source:'firebase'}}));
@@ -3063,7 +3037,11 @@ document.querySelectorAll('.replace-dropdown').forEach(function(box){
     },err=>{
       console.error('[Ryuza RTDB] gagal membaca siteConfig/skins:',err);
       const wrap=skinWrap();if(wrap)wrap.dataset.ryuzaLiveError='1';
-      if(!ready&&cached&&Object.keys(cached).length){apply(cached);window.dispatchEvent(new CustomEvent('ryuza:skins-data-ready',{detail:{skins:cached,source:'cache-fallback'}}));markReady()}
+      if(!ready&&cached&&Object.keys(cached).length){
+        apply(cached);
+        window.dispatchEvent(new CustomEvent('ryuza:skins-data-ready',{detail:{skins:cached,source:'cache-fallback'}}));
+        markReady();
+      }
     });
   }
 })();
@@ -3071,8 +3049,8 @@ document.querySelectorAll('.replace-dropdown').forEach(function(box){
 
 
 <style id="ryuza-no-stale-skins">
-/* Jangan tampilkan card bawaan HTML (mis. Badang Saint Seiya) sebelum data terbaru Firebase siap. */
-#list{visibility:hidden!important;opacity:0!important;transition:none!important}
+/* Tampilan katalog tidak menunggu Firebase; cache/HTML muncul segera lalu data live menyelaraskan otomatis. */
+#list{visibility:visible!important;opacity:1!important;transition:none!important}
 #list.ryuza-live-skins-ready{visibility:visible!important;opacity:1!important}
 #list.ryuza-live-skins-ready:empty{display:none!important}
 #ryuzaSkinSyncWait{display:flex;align-items:center;justify-content:center;gap:9px;min-height:70px;margin:12px 0;padding:14px;border:1px solid rgba(255,55,115,.22);border-radius:14px;background:rgba(12,15,26,.9);color:#c7ccda;font:600 13px/1.4 system-ui,sans-serif}
