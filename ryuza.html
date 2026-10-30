@@ -1,0 +1,460 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#f5f5f7">
+<title>RYUZA Q&A</title>
+<style>
+:root{--bg:#f5f5f7;--card:rgba(255,255,255,.88);--text:#17171b;--muted:#85858d;--line:rgba(60,60,67,.12);--blue:#087cff;--blue2:#0066d6;--soft:#eaf3ff;--green:#28a66a;--red:#e34d59;--shadow:0 8px 28px rgba(25,35,55,.07);--nav:rgba(250,250,252,.82)}
+*{box-sizing:border-box}html{scroll-behavior:smooth}body{margin:0;background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,"SF Pro Display","SF Pro Text","Segoe UI",sans-serif;-webkit-font-smoothing:antialiased}button,input,textarea{font:inherit}button{cursor:pointer;-webkit-tap-highlight-color:transparent}.app{max-width:760px;margin:auto;min-height:100dvh;padding:env(safe-area-inset-top) 16px calc(100px + env(safe-area-inset-bottom))}.top{display:flex;align-items:center;justify-content:space-between;padding:16px 2px 20px}.brand{display:flex;align-items:center;gap:10px}.logo{width:40px;height:40px;border-radius:13px;background:linear-gradient(145deg,#3297ff,#075bd7);display:grid;place-items:center;color:white;font-weight:850;font-size:22px;box-shadow:0 5px 14px #087cff35}.brand b{font-size:18px;letter-spacing:-.5px}.brand small{display:block;color:var(--muted);font-size:11px;margin-top:2px}.iconbtn{border:1px solid var(--line);background:var(--card);width:42px;height:42px;border-radius:50%;font-size:18px;color:var(--text);box-shadow:0 2px 8px #00000008}.hero{padding:22px 20px 20px;border-radius:26px;background:linear-gradient(135deg,#087cff,#5b9dff);color:white;box-shadow:0 12px 28px #087cff30;position:relative;overflow:hidden}.hero:after{content:"";position:absolute;width:180px;height:180px;border:1px solid #ffffff30;border-radius:50%;right:-45px;top:-85px;box-shadow:0 0 0 22px #ffffff0d,0 0 0 44px #ffffff0a}.eyebrow{font-size:11px;letter-spacing:1.3px;text-transform:uppercase;opacity:.82;font-weight:700}.hero h1{font-size:27px;line-height:1.13;letter-spacing:-.9px;margin:10px 0 8px;max-width:420px}.hero p{font-size:13px;line-height:1.5;opacity:.88;margin:0 0 17px}.primary{border:0;background:white;color:#0868df;border-radius:14px;padding:12px 16px;font-weight:750;box-shadow:0 4px 12px #003e8c20}.sectionhead{display:flex;align-items:center;justify-content:space-between;margin:25px 2px 12px}.sectionhead h2{font-size:19px;letter-spacing:-.5px;margin:0}.muted{color:var(--muted)}.search{display:flex;align-items:center;gap:9px;background:#e9e9ed;border-radius:14px;padding:0 13px;height:46px;margin-top:17px}.search span{font-size:17px;color:#777}.search input{border:0;outline:0;background:transparent;width:100%;font-size:15px;color:var(--text)}.filters{display:flex;gap:8px;overflow:auto;padding:13px 0 3px;scrollbar-width:none}.filters::-webkit-scrollbar{display:none}.chip{border:1px solid var(--line);background:var(--card);padding:8px 14px;border-radius:30px;color:#666;font-size:12px;white-space:nowrap}.chip.active{background:#17171b;color:#fff;border-color:#17171b}.stats{display:flex;gap:9px;margin-top:17px}.stat{background:#ffffff20;border:1px solid #ffffff25;border-radius:13px;padding:9px 12px;min-width:90px}.stat b{display:block;font-size:17px}.stat small{font-size:10px;opacity:.8}.question{background:var(--card);border:1px solid #ffffff;border-radius:20px;padding:16px;margin:10px 0;box-shadow:var(--shadow);backdrop-filter:blur(16px)}.qtop{display:flex;align-items:center;justify-content:space-between;gap:8px}.person{display:flex;align-items:center;gap:9px;min-width:0}.avatar{width:35px;height:35px;flex:none;border-radius:50%;display:grid;place-items:center;background:#e6f1ff;color:#0874e8;font-weight:800;font-size:13px}.person b{font-size:13px;display:block;max-width:210px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.person small{font-size:11px;color:var(--muted)}.status{font-size:10px;padding:5px 9px;border-radius:20px;background:#e9f7ef;color:#18844e;white-space:nowrap}.status.open{background:#fff4df;color:#a56a00}.qtitle{font-size:16px;font-weight:750;letter-spacing:-.25px;line-height:1.35;margin:14px 0 7px;overflow-wrap:anywhere}.qbody{font-size:13px;line-height:1.55;color:#666;white-space:pre-wrap;overflow-wrap:anywhere}.qfoot{display:flex;align-items:center;justify-content:space-between;border-top:1px solid var(--line);margin-top:14px;padding-top:12px}.qfoot button{border:0;background:transparent;color:#0875e8;font-size:12px;font-weight:700;padding:6px 3px}.count{font-size:11px;color:var(--muted)}.bottomnav{position:fixed;z-index:20;bottom:0;left:0;right:0;padding:8px 18px calc(8px + env(safe-area-inset-bottom));background:var(--nav);backdrop-filter:blur(22px);border-top:1px solid var(--line)}.navinner{max-width:520px;margin:auto;display:flex;justify-content:space-around}.navitem{border:0;background:none;color:#8b8b93;display:flex;flex-direction:column;align-items:center;gap:4px;font-size:10px;min-width:65px;padding:3px 10px}.navitem span{font-size:20px;line-height:22px}.navitem.active{color:var(--blue);font-weight:750}.fab{position:fixed;right:max(22px,calc((100vw - 720px)/2));bottom:91px;z-index:10;border:0;border-radius:50px;background:var(--blue);color:white;padding:14px 19px;font-weight:750;box-shadow:0 8px 22px #087cff55}.empty{text-align:center;padding:38px 18px;color:var(--muted)}.empty .emoji{font-size:36px;margin-bottom:10px}.empty b{display:block;color:var(--text);margin-bottom:5px}.page{display:none}.page.active{display:block}.profilecard{background:var(--card);border:1px solid white;border-radius:22px;padding:22px;text-align:center;box-shadow:var(--shadow)}.bigavatar{width:68px;height:68px;border-radius:50%;background:#e6f1ff;color:#0874e8;display:grid;place-items:center;font-size:25px;font-weight:800;margin:0 auto 10px}.profilecard h2{margin:0;font-size:20px}.profilecard p{margin:5px 0;color:var(--muted);font-size:12px}.secondary{border:1px solid var(--line);background:#f1f1f5;color:var(--text);border-radius:13px;padding:11px 14px;font-weight:650}.modalback{position:fixed;inset:0;background:#0006;z-index:40;display:none;align-items:flex-end;justify-content:center;padding:0}.modalback.show{display:flex}.sheet{width:100%;max-width:760px;max-height:90dvh;overflow:auto;background:#f8f8fa;border-radius:25px 25px 0 0;padding:10px 18px calc(22px + env(safe-area-inset-bottom));animation:up .22s ease}.handle{width:38px;height:5px;border-radius:9px;background:#d0d0d5;margin:2px auto 17px}.sheethead{display:flex;align-items:center;justify-content:space-between;margin-bottom:17px}.sheethead h3{margin:0;font-size:19px}.close{border:0;background:#e8e8ed;border-radius:50%;width:30px;height:30px;font-size:17px}.field{margin:13px 0}.field label{display:block;font-size:12px;font-weight:700;color:#666;margin:0 0 7px 3px}.field input,.field textarea{width:100%;border:1px solid #e1e1e7;background:white;border-radius:14px;padding:13px 14px;outline:none;font-size:14px;color:var(--text)}.field textarea{min-height:105px;resize:vertical}.field input:focus,.field textarea:focus{border-color:#6eafff;box-shadow:0 0 0 3px #087cff18}.wide{width:100%;border:0;border-radius:14px;background:var(--blue);color:white;padding:14px;font-weight:750;margin-top:8px}.wide:disabled{opacity:.5}.answerbox{background:#fff;border:1px solid var(--line);border-radius:16px;padding:13px;margin:10px 0}.answerbox p{font-size:13px;line-height:1.5;margin:9px 0 0;white-space:pre-wrap}.answerbox small{color:var(--muted)}.detailtitle{font-size:20px;font-weight:800;line-height:1.3;margin:17px 0 8px}.detailbody{font-size:14px;line-height:1.6;color:#62626a;white-space:pre-wrap}.toast{position:fixed;z-index:80;bottom:100px;left:50%;transform:translateX(-50%);background:#222;color:#fff;border-radius:30px;padding:11px 17px;font-size:12px;display:none;max-width:90%;text-align:center}.toast.show{display:block;animation:fade .2s}@keyframes up{from{transform:translateY(30px);opacity:.5}to{transform:translateY(0);opacity:1}}@keyframes fade{from{opacity:0}to{opacity:1}}.adminlabel{display:inline-flex;align-items:center;gap:4px;font-size:10px;background:#e7f0ff;color:#1769d2;border:1px solid #c9ddff;border-radius:20px;padding:4px 8px;margin-left:5px;font-weight:800;vertical-align:middle}.memberlabel{display:inline-flex;align-items:center;font-size:10px;background:#f0f0f3;color:#777;border-radius:20px;padding:4px 8px;margin-left:5px;font-weight:750;vertical-align:middle}.adminlogin{margin-top:12px;width:100%}
+@media(min-width:650px){.app{padding-top:25px}.hero{padding:30px}.hero h1{font-size:34px}.modalback{align-items:center;padding:20px}.sheet{border-radius:25px;max-height:85dvh}.bottomnav{bottom:14px;left:50%;right:auto;transform:translateX(-50%);width:min(520px,calc(100% - 32px));border:1px solid var(--line);border-radius:22px;box-shadow:0 8px 30px #0002}.fab{bottom:105px}}
+@media(prefers-color-scheme:dark){body.auto-dark{--bg:#000;--card:rgba(28,28,30,.92);--text:#f5f5f7;--muted:#98989f;--line:rgba(84,84,88,.55);--soft:#182b43;--shadow:0 8px 28px #0005;--nav:rgba(28,28,30,.82)}body.auto-dark .search{background:#2c2c2e}body.auto-dark .chip{color:#bbb}body.auto-dark .chip.active{background:#f5f5f7;color:#17171b}body.auto-dark .qbody,body.auto-dark .detailbody{color:#aaa}body.auto-dark .sheet{background:#1c1c1e}body.auto-dark .field input,body.auto-dark .field textarea,body.auto-dark .answerbox{background:#2c2c2e;color:#fff;border-color:#444}body.auto-dark .secondary{background:#333;color:#fff}}
+</style>
+</head>
+<body>
+<div class="app">
+  <header class="top">
+    <div class="brand"><div class="logo">R</div><div><b>RYUZA Q&A</b><small>Ruang diskusi komunitas</small></div></div>
+    <button class="iconbtn" id="themeBtn" aria-label="Ganti tema">◐</button>
+  </header>
+
+  <main id="homePage" class="page active">
+    <section class="hero">
+      <div class="eyebrow">COMMUNITY • ASK • ANSWER</div>
+      <h1>Tempat berbagi ilmu & menemukan jawaban.</h1>
+      <p>Tanyakan apa saja. Komunitas Ryuza siap membantu kamu.</p>
+      <button class="primary" onclick="openAsk()">＋ Buat pertanyaan</button>
+      <div class="stats"><div class="stat"><b id="qStat">0</b><small>Pertanyaan</small></div><div class="stat"><b id="aStat">0</b><small>Jawaban</small></div><div class="stat"><b id="uStat">—</b><small>Status</small></div></div>
+    </section>
+    <div class="search"><span>⌕</span><input id="searchInput" placeholder="Cari pertanyaan..." autocomplete="off"></div>
+    <div class="filters">
+      <button class="chip active" data-filter="all">Semua</button>
+      <button class="chip" data-filter="open">Belum dijawab</button>
+      <button class="chip" data-filter="answered">Sudah dijawab</button>
+      <button class="chip" data-filter="mine">Pertanyaan saya</button>
+    </div>
+    <div class="sectionhead"><h2>Diskusi terbaru</h2><span class="muted" id="resultCount" style="font-size:11px">Memuat...</span></div>
+    <div id="questionList"><div class="empty"><div class="emoji">☁️</div><b>Menghubungkan ke Firebase</b><span>Mohon tunggu sebentar...</span></div></div>
+  </main>
+
+  <main id="activityPage" class="page">
+    <div class="sectionhead"><h2>Aktivitas saya</h2></div>
+    <p class="muted" style="font-size:13px;line-height:1.5">Pertanyaan yang kamu buat akan muncul di sini.</p>
+    <div id="myList"></div>
+  </main>
+
+  <main id="profilePage" class="page">
+    <div class="sectionhead"><h2>Profil</h2></div>
+    <div class="profilecard"><div class="bigavatar" id="profileAvatar">?</div><h2 id="profileName">Pengunjung</h2><p id="profileMeta">Login nama saja</p><button class="secondary" onclick="changeName()">Ubah nama</button><div id="adminLoginArea"></div></div>
+    <div class="sectionhead"><h2>Tentang</h2></div>
+    <div class="question"><b>RYUZA Q&A</b><p class="muted" style="font-size:13px;line-height:1.5">Forum tanya jawab publik untuk komunitas. Semua pengguna yang login dapat bertanya dan membantu menjawab.</p><span class="muted" style="font-size:11px">Versi 1.0 • Firebase realtime</span></div>
+    <div id="adminTools"></div>
+  </main>
+</div>
+
+<button class="fab" onclick="openAsk()">＋ Tanya</button>
+<nav class="bottomnav"><div class="navinner">
+  <button class="navitem active" data-page="homePage"><span>⌂</span>Beranda</button>
+  <button class="navitem" data-page="activityPage"><span>▤</span>Aktivitas</button>
+  <button class="navitem" data-page="profilePage"><span>◉</span>Profil</button>
+</div></nav>
+
+<div class="modalback" id="nameModal"><div class="sheet"><div class="handle"></div><div class="sheethead"><h3>Login Member</h3></div><p class="muted" style="font-size:13px;line-height:1.5">Login dulu dengan nama untuk membuat pertanyaan dan menjawab diskusi. Kamu tetap bisa melihat pertanyaan publik tanpa login.</p><div class="field"><label>Nama pengguna</label><input id="nameInput" maxlength="24" placeholder="Contoh: RyuzaUser"></div><button class="wide" id="saveNameBtn">Login sebagai Member</button><p class="muted" style="font-size:10px;text-align:center">Login tanpa email dan password.</p></div></div>
+
+<div class="modalback" id="adminLoginModal"><div class="sheet"><div class="handle"></div><div class="sheethead"><h3>Login Admin</h3><button class="close" onclick="closeModal('adminLoginModal')">×</button></div><p class="muted" style="font-size:13px;line-height:1.5">Masuk menggunakan email dan password akun admin Firebase.</p><div class="field"><label>Email admin</label><input id="adminEmail" type="email" autocomplete="username" placeholder="admin@email.com"></div><div class="field"><label>Password</label><input id="adminPassword" type="password" autocomplete="current-password" placeholder="Password admin"></div><button class="wide" id="adminLoginBtn">Masuk sebagai Admin</button></div></div>
+<div class="modalback" id="askModal"><div class="sheet"><div class="handle"></div><div class="sheethead"><h3>Buat pertanyaan</h3><button class="close" onclick="closeModal('askModal')">×</button></div><div class="field"><label>Judul pertanyaan</label><input id="askTitle" maxlength="120" placeholder="Apa yang ingin kamu tanyakan?"></div><div class="field"><label>Detail (opsional)</label><textarea id="askBody" maxlength="2500" placeholder="Jelaskan pertanyaanmu lebih lengkap..."></textarea></div><button class="wide" id="postQuestionBtn">Publikasikan pertanyaan</button></div></div>
+
+<div class="modalback" id="detailModal"><div class="sheet"><div class="handle"></div><div class="sheethead"><h3>Diskusi</h3><button class="close" onclick="closeDetail()">×</button></div><div id="detailContent"></div><div class="sectionhead"><h2>Jawaban komunitas</h2><span class="muted" id="answerCount"></span></div><div id="answerList"></div><div class="field"><label>Tulis jawabanmu</label><textarea id="answerInput" maxlength="2500" placeholder="Bantu jawab pertanyaan ini..."></textarea></div><button class="wide" id="sendAnswerBtn">Kirim jawaban</button></div></div>
+
+<div class="toast" id="toast"></div>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js"></script>
+<script>
+/* Firebase config project skinml-8871f */
+const firebaseConfig = {
+  apiKey: "AIzaSyBI4w2wOR94NQG3uuPbJzRIaomxKJP1ts8",
+  authDomain: "skinml-8871f.firebaseapp.com",
+  databaseURL: "https://skinml-8871f.firebaseio.com",
+  projectId: "skinml-8871f",
+  storageBucket: "skinml-8871f.appspot.com",
+  messagingSenderId: "66896963430",
+  appId: "1:66896963430:web:5e40af3da609e4447a8aa7",
+  measurementId: "G-96DQQKN15S"
+};
+
+/* Harus berisi Firebase Authentication UID asli, bukan nama tampilan. */
+const ADMIN_UIDS = ["9SeBQEIngxarlC5THvz61k6iO8V2"]; // UID admin Firebase
+
+let auth = null, db = null, currentUser = null, displayName = "";
+let allQuestions = [], currentFilter = "all", selectedQuestion = null;
+let questionRef = null, answerRef = null, answersCache = {};
+const $ = id => document.getElementById(id);
+const configured = !!(firebaseConfig.apiKey && firebaseConfig.projectId && firebaseConfig.databaseURL);
+
+function toast(msg) {
+  const t = $("toast");
+  if (!t) return;
+  t.textContent = msg;
+  t.classList.add("show");
+  clearTimeout(toast.timer);
+  toast.timer = setTimeout(() => t.classList.remove("show"), 2800);
+}
+function esc(s = "") {
+  return String(s).replace(/[&<>"']/g, c => ({
+    "&":"&amp;", "<":"&lt;", ">":"&gt;", '"':"&quot;", "'":"&#39;"
+  }[c]));
+}
+function initials(n = "U") { return String(n).trim().slice(0, 1).toUpperCase() || "U"; }
+function timeAgo(ts) {
+  if (!ts) return "Baru saja";
+  const d = new Date(typeof ts === "number" ? ts : ts);
+  if (Number.isNaN(d.getTime())) return "Baru saja";
+  const m = Math.max(0, Math.floor((Date.now() - d.getTime()) / 60000));
+  if (m < 1) return "Baru saja";
+  if (m < 60) return m + " menit lalu";
+  if (m < 1440) return Math.floor(m / 60) + " jam lalu";
+  return Math.floor(m / 1440) + " hari lalu";
+}
+function isAdmin() {
+  return !!currentUser && !currentUser.isAnonymous && ADMIN_UIDS.includes(currentUser.uid);
+}
+function roleBadge(uid) {
+  return uid && ADMIN_UIDS.includes(uid) ? '<span class="adminlabel">✦ ADMIN</span>' : '<span class="memberlabel">MEMBER</span>';
+}
+function showModal(id) { $(id)?.classList.add("show"); }
+function closeModal(id) { $(id)?.classList.remove("show"); }
+
+function setProfile() {
+  const n = displayName || "Pengunjung";
+  $("profileName").textContent = n;
+  $("profileAvatar").textContent = initials(n);
+  $("profileMeta").textContent = isAdmin() ? "Administrator • Login aktif" : "Anggota komunitas • Login aktif";
+  $("uStat").textContent = "Online";
+  $("adminTools").innerHTML = isAdmin()
+    ? '<div class="sectionhead"><h2>Admin</h2><span class="adminlabel">✦ ADMIN</span></div><div class="question"><b>Mode administrator aktif</b><p class="muted" style="font-size:12px">Kamu dapat memoderasi pertanyaan dan jawaban.</p><button class="secondary" onclick="adminLogout()">Keluar dari akun admin</button></div>'
+    : '<button class="secondary adminlogin" onclick="showModal(\'adminLoginModal\')">🔐 Login Admin</button>';
+}
+function switchPage(id) {
+  document.querySelectorAll(".page").forEach(p => p.classList.remove("active"));
+  $(id)?.classList.add("active");
+  document.querySelectorAll(".navitem").forEach(b => b.classList.toggle("active", b.dataset.page === id));
+  const fab = document.querySelector(".fab");
+  if (fab) fab.style.display = id === "profilePage" ? "none" : "block";
+  if (id === "activityPage") renderMyQuestions();
+}
+document.querySelectorAll(".navitem").forEach(b =>
+  b.addEventListener("click", () => switchPage(b.dataset.page))
+);
+document.querySelectorAll(".chip").forEach(b => b.addEventListener("click", () => {
+  document.querySelectorAll(".chip").forEach(x => x.classList.remove("active"));
+  b.classList.add("active");
+  currentFilter = b.dataset.filter;
+  renderQuestions();
+}));
+$("searchInput")?.addEventListener("input", renderQuestions);
+$("themeBtn")?.addEventListener("click", () => {
+  document.body.classList.toggle("auto-dark");
+  toast(document.body.classList.contains("auto-dark") ? "Mode gelap aktif" : "Mode terang aktif");
+});
+
+function openAsk() {
+  if (!currentUser) return toast("Menghubungkan ke Firebase. Coba lagi sebentar.");
+  if (!displayName) {
+    pendingAskAfterLogin = true;
+    $("nameInput").value = "";
+    showModal("nameModal");
+    return;
+  }
+  pendingAskAfterLogin = false;
+  $("askTitle").value = "";
+  $("askBody").value = "";
+  showModal("askModal");
+}
+function renderQuestions() {
+  let list = allQuestions.slice();
+  const term = ($("searchInput")?.value || "").trim().toLowerCase();
+  if (term) list = list.filter(q =>
+    ((q.title || "") + " " + (q.body || "") + " " + (q.authorName || "")).toLowerCase().includes(term)
+  );
+  if (currentFilter === "open") list = list.filter(q => Number(q.answerCount || 0) === 0);
+  if (currentFilter === "answered") list = list.filter(q => Number(q.answerCount || 0) > 0);
+  if (currentFilter === "mine") list = list.filter(q => q.authorId === currentUser?.uid);
+
+  $("resultCount").textContent = list.length + " diskusi";
+  $("qStat").textContent = allQuestions.length;
+  $("aStat").textContent = allQuestions.reduce((n, q) => n + Number(q.answerCount || 0), 0);
+
+  if (!list.length) {
+    $("questionList").innerHTML = '<div class="empty"><div class="emoji">💬</div><b>Belum ada diskusi</b><span>Jadilah yang pertama memulai percakapan.</span></div>';
+    return;
+  }
+  $("questionList").innerHTML = list.map(q => `
+    <article class="question">
+      <div class="qtop">
+        <div class="person"><div class="avatar">${esc(initials(q.authorName))}</div>
+          <div><b>${esc(q.authorName || "Pengguna")}${roleBadge(q.authorId)}</b>
+          <small>${timeAgo(q.createdAt)}</small></div>
+        </div>
+        <span class="status ${Number(q.answerCount || 0) === 0 ? "open" : ""}">${Number(q.answerCount || 0) === 0 ? "Belum dijawab" : Number(q.answerCount || 0) + " jawaban"}</span>
+      </div>
+      <div class="qtitle">${esc(q.title || "Tanpa judul")}</div>
+      ${q.body ? `<div class="qbody">${esc(q.body.length > 170 ? q.body.slice(0,170) + "…" : q.body)}</div>` : ""}
+      <div class="qfoot"><span class="count">Diskusi publik</span></div>
+      <div style="display:flex;gap:8px;margin-top:12px;align-items:center">
+        <button type="button" class="wide" style="flex:1;padding:12px 14px" onclick="openDetail('${esc(q.id)}')">Buka pertanyaan &amp; jawab →</button>
+        ${isAdmin() ? `<button type="button" class="secondary" style="padding:10px 12px;color:#d33;border:1px solid #f2b8b8" onclick="deleteQuestion('${esc(q.id)}')">Hapus</button>` : ""}
+      </div>
+    </article>`).join("");
+}
+function renderMyQuestions() {
+  const mine = allQuestions.filter(q => q.authorId === currentUser?.uid);
+  $("myList").innerHTML = mine.length ? mine.map(q => `
+    <div class="question"><b>${esc(q.title)}</b>
+      <p class="muted" style="font-size:11px">${timeAgo(q.createdAt)} • ${Number(q.answerCount || 0)} jawaban</p>
+      <div class="qfoot"><span class="count">Pertanyaan saya</span><button type="button" onclick="openDetail('${esc(q.id)}')">Buka →</button></div>
+    </div>`).join("") :
+    '<div class="empty"><div class="emoji">📝</div><b>Belum ada pertanyaan</b><span>Pertanyaan yang kamu buat akan muncul di sini.</span></div>';
+}
+async function saveUserName() {
+  if (!currentUser) return toast("Login belum siap. Coba lagi sebentar.");
+  const n = $("nameInput").value.trim().replace(/\s+/g, " ");
+  if (n.length < 2) return toast("Nama minimal 2 karakter");
+  if (n.length > 24) return toast("Nama maksimal 24 karakter");
+  const btn = $("saveNameBtn");
+  btn.disabled = true;
+  try {
+    await db.ref("users/" + currentUser.uid).update({ displayName: n, updatedAt: Date.now() });
+    displayName = n;
+    localStorage.setItem("ryuza_qa_name", n);
+    closeModal("nameModal");
+    setProfile();
+    toast("Login member berhasil, " + n);
+    if (pendingAskAfterLogin) {
+      pendingAskAfterLogin = false;
+      $("askTitle").value = "";
+      $("askBody").value = "";
+      showModal("askModal");
+    }
+  } catch (e) {
+    console.error("Simpan nama:", e);
+    toast("Gagal menyimpan nama: " + (e.message || e.code || "periksa Rules"));
+  } finally { btn.disabled = false; }
+}
+$("saveNameBtn")?.addEventListener("click", saveUserName);
+function changeName() {
+  $("nameInput").value = displayName;
+  showModal("nameModal");
+}
+$("postQuestionBtn")?.addEventListener("click", async () => {
+  if (!currentUser) return toast("Koneksi Firebase belum siap.");
+  if (!displayName) { closeModal("askModal"); pendingAskAfterLogin = true; showModal("nameModal"); return; }
+  const title = $("askTitle").value.trim(), body = $("askBody").value.trim();
+  if (title.length < 5) return toast("Judul minimal 5 karakter");
+  const btn = $("postQuestionBtn");
+  btn.disabled = true;
+  try {
+    const ref = db.ref("questions").push();
+    await ref.set({
+      title, body, authorId: currentUser.uid, authorName: displayName,
+      answerCount: 0, createdAt: Date.now()
+    });
+    closeModal("askModal");
+    toast("Pertanyaan berhasil dipublikasikan");
+    switchPage("homePage");
+  } catch (e) {
+    console.error("Kirim pertanyaan:", e);
+    toast("Gagal mengirim: " + (e.message || e.code || "periksa Realtime Database Rules"));
+  } finally { btn.disabled = false; }
+});
+
+function openDetail(id) {
+  selectedQuestion = allQuestions.find(q => q.id === id);
+  if (!selectedQuestion) return;
+  const q = selectedQuestion;
+  $("detailContent").innerHTML = `
+    <div class="person"><div class="avatar">${esc(initials(q.authorName))}</div>
+      <div><b>${esc(q.authorName || "Pengguna")}${roleBadge(q.authorId)}</b><small>${timeAgo(q.createdAt)}</small></div>
+    </div>
+    <div class="detailtitle">${esc(q.title || "")}</div>
+    <div class="detailbody">${esc(q.body || "Tidak ada detail tambahan.")}</div>
+    ${isAdmin() ? `<button class="secondary" style="margin-top:12px;color:#d33" onclick="deleteQuestion('${esc(q.id)}')">Hapus pertanyaan (admin)</button>` : ""}`;
+  $("answerInput").value = "";
+  $("answerList").innerHTML = '<div class="empty">Memuat jawaban...</div>';
+  $("answerCount").textContent = "";
+  showModal("detailModal");
+
+  if (answerRef) answerRef.off();
+  answerRef = db.ref("questions/" + id + "/answers");
+  answerRef.on("value", snap => {
+    const data = snap.val() || {};
+    const arr = Object.entries(data).map(([aid, a]) => ({ id: aid, ...a }))
+      .sort((a, b) => Number(a.createdAt || 0) - Number(b.createdAt || 0));
+    answersCache[id] = arr;
+    $("answerCount").textContent = arr.length + " jawaban";
+    $("answerList").innerHTML = arr.length ? arr.map(a => `
+      <div class="answerbox">
+        <div class="qtop"><div class="person"><div class="avatar">${esc(initials(a.authorName))}</div>
+          <div><b>${esc(a.authorName || "Pengguna")}${roleBadge(a.authorId)}</b><small>${timeAgo(a.createdAt)}</small></div></div>
+          ${isAdmin() ? `<button type="button" class="secondary" style="padding:6px 9px;color:#d33;font-size:11px" onclick="deleteAnswer('${esc(id)}','${esc(a.id)}')">Hapus</button>` : ""}
+        </div><p>${esc(a.body || "")}</p>
+      </div>`).join("") :
+      '<div class="empty"><div class="emoji">💡</div><b>Belum ada jawaban</b><span>Kamu bisa menjadi orang pertama yang membantu.</span></div>';
+  }, e => {
+    console.error("Muat jawaban:", e);
+    $("answerList").innerHTML = '<div class="empty">Tidak dapat memuat jawaban. Periksa Rules.</div>';
+  });
+}
+function closeDetail() {
+  closeModal("detailModal");
+  if (answerRef) { answerRef.off(); answerRef = null; }
+  selectedQuestion = null;
+}
+$("sendAnswerBtn")?.addEventListener("click", async () => {
+  if (!currentUser || !displayName) return toast("Login nama belum siap");
+  if (!selectedQuestion) return;
+  const body = $("answerInput").value.trim();
+  if (body.length < 2) return toast("Tulis jawaban terlebih dahulu");
+  const btn = $("sendAnswerBtn");
+  btn.disabled = true;
+  try {
+    const qid = selectedQuestion.id;
+    const answer = db.ref("questions/" + qid + "/answers").push();
+    const updates = {};
+    updates["questions/" + qid + "/answers/" + answer.key] = {
+      body, authorId: currentUser.uid, authorName: displayName, createdAt: Date.now()
+    };
+    updates["questions/" + qid + "/answerCount"] = Number(selectedQuestion.answerCount || 0) + 1;
+    await db.ref().update(updates);
+    $("answerInput").value = "";
+    toast("Jawaban berhasil dikirim");
+  } catch (e) {
+    console.error("Kirim jawaban:", e);
+    toast("Gagal mengirim jawaban: " + (e.message || e.code || "periksa Rules"));
+  } finally { btn.disabled = false; }
+});
+async function deleteQuestion(id) {
+  if (!isAdmin() || !confirm("Hapus pertanyaan ini beserta semua jawabannya?")) return;
+  try {
+    await db.ref("questions/" + id).remove();
+    closeDetail();
+    toast("Pertanyaan dihapus");
+  } catch (e) {
+    console.error("Hapus pertanyaan:", e);
+    toast("Gagal menghapus pertanyaan: " + (e.message || e.code));
+  }
+}
+async function deleteAnswer(qid, aid) {
+  if (!isAdmin() || !confirm("Hapus jawaban ini?")) return;
+  try {
+    const updates = {};
+    updates["questions/" + qid + "/answers/" + aid] = null;
+    const count = Math.max(0, Number(selectedQuestion?.answerCount || 0) - 1);
+    updates["questions/" + qid + "/answerCount"] = count;
+    await db.ref().update(updates);
+    if (selectedQuestion) selectedQuestion.answerCount = count;
+    toast("Jawaban dihapus");
+  } catch (e) {
+    console.error("Hapus jawaban:", e);
+    toast("Gagal menghapus jawaban: " + (e.message || e.code));
+  }
+}
+
+async function adminLogin() {
+  const email = $("adminEmail").value.trim();
+  const password = $("adminPassword").value;
+  if (!email || !password) return toast("Isi email dan password admin");
+  const btn = $("adminLoginBtn"); btn.disabled = true;
+  try {
+    const credential = await auth.signInWithEmailAndPassword(email, password);
+    if (!ADMIN_UIDS.includes(credential.user.uid)) {
+      await auth.signOut();
+      toast("Akun ini belum terdaftar sebagai admin. Periksa UID admin di HTML.");
+      return;
+    }
+    closeModal("adminLoginModal");
+    toast("Login admin berhasil");
+  } catch (e) {
+    console.error("Login admin:", e);
+    toast("Login admin gagal: " + (e.message || e.code));
+  } finally { btn.disabled = false; }
+}
+$("adminLoginBtn")?.addEventListener("click", adminLogin);
+async function adminLogout() {
+  if (!confirm("Keluar dari akun admin?")) return;
+  try { await auth.signOut(); await auth.signInAnonymously(); }
+  catch (e) { toast("Gagal keluar: " + (e.message || e.code)); }
+}
+
+function startApp() {
+  if (!configured) {
+    $("questionList").innerHTML = '<div class="empty"><b>Firebase belum dihubungkan</b></div>';
+    return;
+  }
+  if (!window.firebase || !firebase.database) {
+    $("questionList").innerHTML = '<div class="empty"><b>Firebase SDK gagal dimuat</b><span>Periksa koneksi internet lalu muat ulang.</span></div>';
+    return;
+  }
+  try {
+    if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
+    auth = firebase.auth();
+    db = firebase.database();
+    auth.onAuthStateChanged(async user => {
+      currentUser = user;
+      if (!user) {
+        try { await auth.signInAnonymously(); }
+        catch (e) {
+          console.error("Login anonim:", e);
+          toast("Login Firebase gagal: " + (e.message || e.code));
+        }
+        return;
+      }
+      const saved = localStorage.getItem("ryuza_qa_name") || "";
+      try {
+        const snap = user.isAnonymous ? await db.ref("users/" + user.uid + "/displayName").once("value") : { val: () => "Admin Ryuza" };
+        displayName = snap.val() || (isAdmin() ? "Admin Ryuza" : saved);
+      } catch (e) {
+        console.error("Ambil profil:", e);
+        displayName = saved;
+      }
+      if (!displayName && !isAdmin()) {
+        $("nameInput").value = "";
+        showModal("nameModal");
+      } else {
+        setProfile();
+      }
+      if (questionRef) questionRef.off();
+      questionRef = db.ref("questions");
+      questionRef.on("value", snap => {
+        const data = snap.val() || {};
+        allQuestions = Object.entries(data).map(([id, q]) => ({ id, ...q }))
+          .sort((a, b) => Number(b.createdAt || 0) - Number(a.createdAt || 0))
+          .slice(0, 100);
+        renderQuestions();
+        if ($("activityPage").classList.contains("active")) renderMyQuestions();
+        if (selectedQuestion) {
+          const updated = allQuestions.find(q => q.id === selectedQuestion.id);
+          if (updated) selectedQuestion = updated;
+        }
+      }, e => {
+        console.error("Muat pertanyaan:", e);
+        $("questionList").innerHTML = '<div class="empty"><b>Gagal memuat data</b><span>' + esc(e.message || e.code || "Periksa Realtime Database Rules") + '</span></div>';
+      });
+    });
+  } catch (e) {
+    console.error("Inisialisasi Firebase:", e);
+    toast("Firebase tidak bisa dimulai: " + (e.message || e.code));
+  }
+}
+
+document.querySelectorAll(".modalback").forEach(m => m.addEventListener("click", e => {
+  if (e.target === m && m.id !== "nameModal") {
+    if (m.id === "detailModal") closeDetail();
+    else m.classList.remove("show");
+  }
+}));
+startApp();
+</script>
+</body>
+</html>
