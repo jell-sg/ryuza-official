@@ -7,7 +7,7 @@
 <title>RYUZA Q&A</title>
 <style>
 :root{--bg:#f5f5f7;--card:rgba(255,255,255,.88);--text:#17171b;--muted:#85858d;--line:rgba(60,60,67,.12);--blue:#087cff;--blue2:#0066d6;--soft:#eaf3ff;--green:#28a66a;--red:#e34d59;--shadow:0 8px 28px rgba(25,35,55,.07);--nav:rgba(250,250,252,.82)}
-*{box-sizing:border-box}html{scroll-behavior:smooth}body{margin:0;background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,"SF Pro Display","SF Pro Text","Segoe UI",sans-serif;-webkit-font-smoothing:antialiased}button,input,textarea{font:inherit}button{cursor:pointer;-webkit-tap-highlight-color:transparent}.app{max-width:760px;margin:auto;min-height:100dvh;padding:env(safe-area-inset-top) 16px calc(100px + env(safe-area-inset-bottom))}.top{display:flex;align-items:center;justify-content:space-between;padding:16px 2px 20px}.brand{display:flex;align-items:center;gap:10px}.logo{width:40px;height:40px;border-radius:13px;background:linear-gradient(145deg,#3297ff,#075bd7);display:grid;place-items:center;color:white;font-weight:850;font-size:22px;box-shadow:0 5px 14px #087cff35}.brand b{font-size:18px;letter-spacing:-.5px}.brand small{display:block;color:var(--muted);font-size:11px;margin-top:2px}.iconbtn{border:1px solid var(--line);background:var(--card);width:42px;height:42px;border-radius:50%;font-size:18px;color:var(--text);box-shadow:0 2px 8px #00000008}.hero{padding:22px 20px 20px;border-radius:26px;background:linear-gradient(135deg,#087cff,#5b9dff);color:white;box-shadow:0 12px 28px #087cff30;position:relative;overflow:hidden}.hero:after{content:"";position:absolute;width:180px;height:180px;border:1px solid #ffffff30;border-radius:50%;right:-45px;top:-85px;box-shadow:0 0 0 22px #ffffff0d,0 0 0 44px #ffffff0a}.eyebrow{font-size:11px;letter-spacing:1.3px;text-transform:uppercase;opacity:.82;font-weight:700}.hero h1{font-size:27px;line-height:1.13;letter-spacing:-.9px;margin:10px 0 8px;max-width:420px}.hero p{font-size:13px;line-height:1.5;opacity:.88;margin:0 0 17px}.primary{border:0;background:white;color:#0868df;border-radius:14px;padding:12px 16px;font-weight:750;box-shadow:0 4px 12px #003e8c20}.sectionhead{display:flex;align-items:center;justify-content:space-between;margin:25px 2px 12px}.sectionhead h2{font-size:19px;letter-spacing:-.5px;margin:0}.muted{color:var(--muted)}.search{display:flex;align-items:center;gap:9px;background:#e9e9ed;border-radius:14px;padding:0 13px;height:46px;margin-top:17px}.search span{font-size:17px;color:#777}.search input{border:0;outline:0;background:transparent;width:100%;font-size:15px;color:var(--text)}.filters{display:flex;gap:8px;overflow:auto;padding:13px 0 3px;scrollbar-width:none}.filters::-webkit-scrollbar{display:none}.chip{border:1px solid var(--line);background:var(--card);padding:8px 14px;border-radius:30px;color:#666;font-size:12px;white-space:nowrap}.chip.active{background:#17171b;color:#fff;border-color:#17171b}.stats{display:flex;gap:9px;margin-top:17px}.stat{background:#ffffff20;border:1px solid #ffffff25;border-radius:13px;padding:9px 12px;min-width:90px}.stat b{display:block;font-size:17px}.stat small{font-size:10px;opacity:.8}.question{background:var(--card);border:1px solid #ffffff;border-radius:20px;padding:16px;margin:10px 0;box-shadow:var(--shadow);backdrop-filter:blur(16px)}.qtop{display:flex;align-items:center;justify-content:space-between;gap:8px}.person{display:flex;align-items:center;gap:9px;min-width:0}.avatar{width:35px;height:35px;flex:none;border-radius:50%;display:grid;place-items:center;background:#e6f1ff;color:#0874e8;font-weight:800;font-size:13px}.person b{font-size:13px;display:block;max-width:210px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.person small{font-size:11px;color:var(--muted)}.status{font-size:10px;padding:5px 9px;border-radius:20px;background:#e9f7ef;color:#18844e;white-space:nowrap}.status.open{background:#fff4df;color:#a56a00}.qtitle{font-size:16px;font-weight:750;letter-spacing:-.25px;line-height:1.35;margin:14px 0 7px;overflow-wrap:anywhere}.qbody{font-size:13px;line-height:1.55;color:#666;white-space:pre-wrap;overflow-wrap:anywhere}.qfoot{display:flex;align-items:center;justify-content:space-between;border-top:1px solid var(--line);margin-top:14px;padding-top:12px}.qfoot button{border:0;background:transparent;color:#0875e8;font-size:12px;font-weight:700;padding:6px 3px}.count{font-size:11px;color:var(--muted)}.bottomnav{position:fixed;z-index:20;bottom:0;left:0;right:0;padding:8px 18px calc(8px + env(safe-area-inset-bottom));background:var(--nav);backdrop-filter:blur(22px);border-top:1px solid var(--line)}.navinner{max-width:520px;margin:auto;display:flex;justify-content:space-around}.navitem{border:0;background:none;color:#8b8b93;display:flex;flex-direction:column;align-items:center;gap:4px;font-size:10px;min-width:65px;padding:3px 10px}.navitem span{font-size:20px;line-height:22px}.navitem.active{color:var(--blue);font-weight:750}.fab{position:fixed;right:max(22px,calc((100vw - 720px)/2));bottom:91px;z-index:10;border:0;border-radius:50px;background:var(--blue);color:white;padding:14px 19px;font-weight:750;box-shadow:0 8px 22px #087cff55}.empty{text-align:center;padding:38px 18px;color:var(--muted)}.empty .emoji{font-size:36px;margin-bottom:10px}.empty b{display:block;color:var(--text);margin-bottom:5px}.page{display:none}.page.active{display:block}.profilecard{background:var(--card);border:1px solid white;border-radius:22px;padding:22px;text-align:center;box-shadow:var(--shadow)}.bigavatar{width:68px;height:68px;border-radius:50%;background:#e6f1ff;color:#0874e8;display:grid;place-items:center;font-size:25px;font-weight:800;margin:0 auto 10px}.profilecard h2{margin:0;font-size:20px}.profilecard p{margin:5px 0;color:var(--muted);font-size:12px}.secondary{border:1px solid var(--line);background:#f1f1f5;color:var(--text);border-radius:13px;padding:11px 14px;font-weight:650}.modalback{position:fixed;inset:0;background:#0006;z-index:40;display:none;align-items:flex-end;justify-content:center;padding:0}.modalback.show{display:flex}.sheet{width:100%;max-width:760px;max-height:90dvh;overflow:auto;background:#f8f8fa;border-radius:25px 25px 0 0;padding:10px 18px calc(22px + env(safe-area-inset-bottom));animation:up .22s ease}.handle{width:38px;height:5px;border-radius:9px;background:#d0d0d5;margin:2px auto 17px}.sheethead{display:flex;align-items:center;justify-content:space-between;margin-bottom:17px}.sheethead h3{margin:0;font-size:19px}.close{border:0;background:#e8e8ed;border-radius:50%;width:30px;height:30px;font-size:17px}.field{margin:13px 0}.field label{display:block;font-size:12px;font-weight:700;color:#666;margin:0 0 7px 3px}.field input,.field textarea{width:100%;border:1px solid #e1e1e7;background:white;border-radius:14px;padding:13px 14px;outline:none;font-size:14px;color:var(--text)}.field textarea{min-height:105px;resize:vertical}.field input:focus,.field textarea:focus{border-color:#6eafff;box-shadow:0 0 0 3px #087cff18}.wide{width:100%;border:0;border-radius:14px;background:var(--blue);color:white;padding:14px;font-weight:750;margin-top:8px}.wide:disabled{opacity:.5}.answerbox{background:#fff;border:1px solid var(--line);border-radius:16px;padding:13px;margin:10px 0}.answerbox p{font-size:13px;line-height:1.5;margin:9px 0 0;white-space:pre-wrap}.answerbox small{color:var(--muted)}.detailtitle{font-size:20px;font-weight:800;line-height:1.3;margin:17px 0 8px}.detailbody{font-size:14px;line-height:1.6;color:#62626a;white-space:pre-wrap}.toast{position:fixed;z-index:80;bottom:100px;left:50%;transform:translateX(-50%);background:#222;color:#fff;border-radius:30px;padding:11px 17px;font-size:12px;display:none;max-width:90%;text-align:center}.toast.show{display:block;animation:fade .2s}@keyframes up{from{transform:translateY(30px);opacity:.5}to{transform:translateY(0);opacity:1}}@keyframes fade{from{opacity:0}to{opacity:1}}.adminlabel{display:inline-flex;align-items:center;gap:4px;font-size:10px;background:#e7f0ff;color:#1769d2;border:1px solid #c9ddff;border-radius:20px;padding:4px 8px;margin-left:5px;font-weight:800;vertical-align:middle}.memberlabel{display:inline-flex;align-items:center;font-size:10px;background:#f0f0f3;color:#777;border-radius:20px;padding:4px 8px;margin-left:5px;font-weight:750;vertical-align:middle}.adminlogin{margin-top:12px;width:100%}
+*{box-sizing:border-box}html{scroll-behavior:smooth}body{margin:0;background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,"SF Pro Display","SF Pro Text","Segoe UI",sans-serif;-webkit-font-smoothing:antialiased}button,input,textarea{font:inherit}button{cursor:pointer;-webkit-tap-highlight-color:transparent}.app{max-width:760px;margin:auto;min-height:100dvh;padding:env(safe-area-inset-top) 16px calc(100px + env(safe-area-inset-bottom))}.top{display:flex;align-items:center;justify-content:space-between;padding:16px 2px 20px}.brand{display:flex;align-items:center;gap:10px}.logo{width:40px;height:40px;border-radius:13px;background:linear-gradient(145deg,#3297ff,#075bd7);display:grid;place-items:center;color:white;font-weight:850;font-size:22px;box-shadow:0 5px 14px #087cff35}.brand b{font-size:18px;letter-spacing:-.5px}.brand small{display:block;color:var(--muted);font-size:11px;margin-top:2px}.iconbtn{border:1px solid var(--line);background:var(--card);width:42px;height:42px;border-radius:50%;font-size:18px;color:var(--text);box-shadow:0 2px 8px #00000008}.hero{padding:22px 20px 20px;border-radius:26px;background:linear-gradient(135deg,#087cff,#5b9dff);color:white;box-shadow:0 12px 28px #087cff30;position:relative;overflow:hidden}.hero:after{content:"";position:absolute;width:180px;height:180px;border:1px solid #ffffff30;border-radius:50%;right:-45px;top:-85px;box-shadow:0 0 0 22px #ffffff0d,0 0 0 44px #ffffff0a}.eyebrow{font-size:11px;letter-spacing:1.3px;text-transform:uppercase;opacity:.82;font-weight:700}.hero h1{font-size:27px;line-height:1.13;letter-spacing:-.9px;margin:10px 0 8px;max-width:420px}.hero p{font-size:13px;line-height:1.5;opacity:.88;margin:0 0 17px}.primary{border:0;background:white;color:#0868df;border-radius:14px;padding:12px 16px;font-weight:750;box-shadow:0 4px 12px #003e8c20}.sectionhead{display:flex;align-items:center;justify-content:space-between;margin:25px 2px 12px}.sectionhead h2{font-size:19px;letter-spacing:-.5px;margin:0}.muted{color:var(--muted)}.search{display:flex;align-items:center;gap:9px;background:#e9e9ed;border-radius:14px;padding:0 13px;height:46px;margin-top:17px}.search span{font-size:17px;color:#777}.search input{border:0;outline:0;background:transparent;width:100%;font-size:15px;color:var(--text)}.filters{display:flex;gap:8px;overflow:auto;padding:13px 0 3px;scrollbar-width:none}.filters::-webkit-scrollbar{display:none}.chip{border:1px solid var(--line);background:var(--card);padding:8px 14px;border-radius:30px;color:#666;font-size:12px;white-space:nowrap}.chip.active{background:#17171b;color:#fff;border-color:#17171b}.stats{display:flex;gap:9px;margin-top:17px}.stat{background:#ffffff20;border:1px solid #ffffff25;border-radius:13px;padding:9px 12px;min-width:90px}.stat b{display:block;font-size:17px}.stat small{font-size:10px;opacity:.8}.question{background:var(--card);border:1px solid #ffffff;border-radius:20px;padding:16px;margin:10px 0;box-shadow:var(--shadow);backdrop-filter:blur(16px)}.qtop{display:flex;align-items:center;justify-content:space-between;gap:8px}.person{display:flex;align-items:center;gap:9px;min-width:0}.avatar{width:35px;height:35px;flex:none;border-radius:50%;display:grid;place-items:center;background:#e6f1ff;color:#0874e8;font-weight:800;font-size:13px}.person b{font-size:13px;display:block;max-width:210px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.person small{font-size:11px;color:var(--muted)}.status{font-size:10px;padding:5px 9px;border-radius:20px;background:#e9f7ef;color:#18844e;white-space:nowrap}.status.open{background:#fff4df;color:#a56a00}.qtitle{font-size:16px;font-weight:750;letter-spacing:-.25px;line-height:1.35;margin:14px 0 7px;overflow-wrap:anywhere}.qbody{font-size:13px;line-height:1.55;color:#666;white-space:pre-wrap;overflow-wrap:anywhere}.qfoot{display:flex;align-items:center;justify-content:space-between;border-top:1px solid var(--line);margin-top:14px;padding-top:12px}.qfoot button{border:0;background:transparent;color:#0875e8;font-size:12px;font-weight:700;padding:6px 3px}.count{font-size:11px;color:var(--muted)}.bottomnav{position:fixed;z-index:20;bottom:0;left:0;right:0;padding:8px 18px calc(8px + env(safe-area-inset-bottom));background:var(--nav);backdrop-filter:blur(22px);border-top:1px solid var(--line)}.navinner{max-width:520px;margin:auto;display:flex;justify-content:space-around}.navitem{border:0;background:none;color:#8b8b93;display:flex;flex-direction:column;align-items:center;gap:4px;font-size:10px;min-width:65px;padding:3px 10px}.navitem span{font-size:20px;line-height:22px}.navitem.active{color:var(--blue);font-weight:750}.fab{position:fixed;right:max(22px,calc((100vw - 720px)/2));bottom:91px;z-index:10;border:0;border-radius:50px;background:var(--blue);color:white;padding:14px 19px;font-weight:750;box-shadow:0 8px 22px #087cff55}.empty{text-align:center;padding:38px 18px;color:var(--muted)}.empty .emoji{font-size:36px;margin-bottom:10px}.empty b{display:block;color:var(--text);margin-bottom:5px}.page{display:none}.page.active{display:block}.profilecard{background:var(--card);border:1px solid white;border-radius:22px;padding:22px;text-align:center;box-shadow:var(--shadow)}.bigavatar{width:68px;height:68px;border-radius:50%;background:#e6f1ff;color:#0874e8;display:grid;place-items:center;font-size:25px;font-weight:800;margin:0 auto 10px}.profilecard h2{margin:0;font-size:20px}.profilecard p{margin:5px 0;color:var(--muted);font-size:12px}.secondary{border:1px solid var(--line);background:#f1f1f5;color:var(--text);border-radius:13px;padding:11px 14px;font-weight:650}.modalback{position:fixed;inset:0;background:#0006;z-index:40;display:none;align-items:flex-end;justify-content:center;padding:0}.modalback.show{display:flex}.sheet{width:100%;max-width:760px;max-height:90dvh;overflow:auto;background:#f8f8fa;border-radius:25px 25px 0 0;padding:10px 18px calc(22px + env(safe-area-inset-bottom));animation:up .22s ease}.handle{width:38px;height:5px;border-radius:9px;background:#d0d0d5;margin:2px auto 17px}.sheethead{display:flex;align-items:center;justify-content:space-between;margin-bottom:17px}.sheethead h3{margin:0;font-size:19px}.close{border:0;background:#e8e8ed;border-radius:50%;width:30px;height:30px;font-size:17px}.field{margin:13px 0}.field label{display:block;font-size:12px;font-weight:700;color:#666;margin:0 0 7px 3px}.field input,.field textarea{width:100%;border:1px solid #e1e1e7;background:white;border-radius:14px;padding:13px 14px;outline:none;font-size:14px;color:var(--text)}.field textarea{min-height:105px;resize:vertical}.field input:focus,.field textarea:focus{border-color:#6eafff;box-shadow:0 0 0 3px #087cff18}.wide{width:100%;border:0;border-radius:14px;background:var(--blue);color:white;padding:14px;font-weight:750;margin-top:8px}.wide:disabled{opacity:.5}.answerbox{background:#fff;border:1px solid var(--line);border-radius:16px;padding:13px;margin:10px 0}.answerbox p{font-size:13px;line-height:1.5;margin:9px 0 0;white-space:pre-wrap}.answerbox small{color:var(--muted)}.detailtitle{font-size:20px;font-weight:800;line-height:1.3;margin:17px 0 8px}.detailbody{font-size:14px;line-height:1.6;color:#62626a;white-space:pre-wrap}.toast{position:fixed;z-index:80;bottom:100px;left:50%;transform:translateX(-50%);background:#222;color:#fff;border-radius:30px;padding:11px 17px;font-size:12px;display:none;max-width:90%;text-align:center}.toast.show{display:block;animation:fade .2s}@keyframes up{from{transform:translateY(30px);opacity:.5}to{transform:translateY(0);opacity:1}}@keyframes fade{from{opacity:0}to{opacity:1}}.adminlabel{display:inline-flex;align-items:center;gap:4px;font-size:10px;background:#e7f0ff;color:#1769d2;border:1px solid #c9ddff;border-radius:20px;padding:4px 8px;margin-left:5px;font-weight:800;vertical-align:middle}.memberlabel{display:inline-flex;align-items:center;font-size:10px;background:#f0f0f3;color:#777;border-radius:20px;padding:4px 8px;margin-left:5px;font-weight:750;vertical-align:middle}.adminlogin{margin-top:12px;width:100%}.notifdot{display:inline-grid;place-items:center;min-width:17px;height:17px;padding:0 4px;border-radius:20px;background:#ed4054;color:#fff;font-size:10px;font-weight:800;margin-left:4px}.notifitem{background:var(--card);border:1px solid var(--line);border-radius:17px;padding:14px;margin:9px 0;box-shadow:var(--shadow);cursor:pointer}.notifitem.unread{border-color:#80b8ff;background:#eef6ff}.notifitem p{font-size:13px;line-height:1.45;margin:7px 0;color:#666}.replythread{margin:10px 0 0 14px;padding-left:12px;border-left:2px solid #d9e8fb}.replyitem{background:#f4f7fc;border-radius:12px;padding:10px;margin:7px 0}.replyitem b{font-size:12px}.replyitem p{font-size:12px;line-height:1.5;margin:5px 0;white-space:pre-wrap;overflow-wrap:anywhere}.replyactions{display:flex;align-items:center;gap:12px;margin-top:7px}.replyactions button{border:0;background:transparent;color:var(--blue);font-size:11px;font-weight:750;padding:3px 0}.replycomposer{margin:9px 0 8px 14px;padding:10px;background:#eef5ff;border-radius:13px}.replycomposer textarea{width:100%;min-height:66px;border:1px solid #d7e5f8;border-radius:10px;padding:10px;resize:vertical;font:inherit;font-size:12px;outline:none}.replycomposer button{border:0;background:var(--blue);color:#fff;border-radius:10px;padding:8px 12px;font-size:11px;font-weight:750;margin-top:6px}.notifhead{display:flex;align-items:center;justify-content:space-between}.notifhead button{border:0;background:transparent;color:var(--blue);font-size:12px;font-weight:700}
 @media(min-width:650px){.app{padding-top:25px}.hero{padding:30px}.hero h1{font-size:34px}.modalback{align-items:center;padding:20px}.sheet{border-radius:25px;max-height:85dvh}.bottomnav{bottom:14px;left:50%;right:auto;transform:translateX(-50%);width:min(520px,calc(100% - 32px));border:1px solid var(--line);border-radius:22px;box-shadow:0 8px 30px #0002}.fab{bottom:105px}}
 @media(prefers-color-scheme:dark){body.auto-dark{--bg:#000;--card:rgba(28,28,30,.92);--text:#f5f5f7;--muted:#98989f;--line:rgba(84,84,88,.55);--soft:#182b43;--shadow:0 8px 28px #0005;--nav:rgba(28,28,30,.82)}body.auto-dark .search{background:#2c2c2e}body.auto-dark .chip{color:#bbb}body.auto-dark .chip.active{background:#f5f5f7;color:#17171b}body.auto-dark .qbody,body.auto-dark .detailbody{color:#aaa}body.auto-dark .sheet{background:#1c1c1e}body.auto-dark .field input,body.auto-dark .field textarea,body.auto-dark .answerbox{background:#2c2c2e;color:#fff;border-color:#444}body.auto-dark .secondary{background:#333;color:#fff}}
 </style>
@@ -44,6 +44,12 @@
     <div id="myList"></div>
   </main>
 
+  <main id="notificationsPage" class="page">
+    <div class="notifhead"><div class="sectionhead"><h2>Notifikasi</h2></div><button onclick="markAllNotificationsRead()">Tandai dibaca</button></div>
+    <p class="muted" style="font-size:13px">Notifikasi saat seseorang menjawab pertanyaan atau membalas jawabanmu.</p>
+    <div id="notificationList"><div class="empty">Memuat notifikasi...</div></div>
+  </main>
+
   <main id="profilePage" class="page">
     <div class="sectionhead"><h2>Profil</h2></div>
     <div class="profilecard"><div class="bigavatar" id="profileAvatar">?</div><h2 id="profileName">Pengunjung</h2><p id="profileMeta">Login nama saja</p><button class="secondary" onclick="changeName()">Ubah nama</button><div id="adminLoginArea"></div></div>
@@ -57,6 +63,7 @@
 <nav class="bottomnav"><div class="navinner">
   <button class="navitem active" data-page="homePage"><span>⌂</span>Beranda</button>
   <button class="navitem" data-page="activityPage"><span>▤</span>Aktivitas</button>
+  <button class="navitem" data-page="notificationsPage"><span>♧</span>Notifikasi <i id="notifBadge" class="notifdot" style="display:none">0</i></button>
   <button class="navitem" data-page="profilePage"><span>◉</span>Profil</button>
 </div></nav>
 
@@ -91,6 +98,7 @@ let auth = null, db = null, currentUser = null, displayName = "";
 let allQuestions = [], currentFilter = "all", selectedQuestion = null;
 let pendingAskAfterLogin = false;
 let questionRef = null, answerRef = null, answersCache = {};
+let notificationRef = null, notificationsCache = [], activeReplyTarget = null;
 const $ = id => document.getElementById(id);
 const configured = !!(firebaseConfig.apiKey && firebaseConfig.projectId && firebaseConfig.databaseURL);
 
@@ -144,6 +152,7 @@ function switchPage(id) {
   const fab = document.querySelector(".fab");
   if (fab) fab.style.display = id === "profilePage" ? "none" : "block";
   if (id === "activityPage") renderMyQuestions();
+  if (id === "notificationsPage") renderNotifications();
 }
 document.querySelectorAll(".navitem").forEach(b =>
   b.addEventListener("click", () => switchPage(b.dataset.page))
@@ -159,6 +168,105 @@ $("themeBtn")?.addEventListener("click", () => {
   document.body.classList.toggle("auto-dark");
   toast(document.body.classList.contains("auto-dark") ? "Mode gelap aktif" : "Mode terang aktif");
 });
+
+
+function pushNotification(toUid, payload) {
+  if (!toUid || !currentUser || toUid === currentUser.uid) return Promise.resolve();
+  const ref = db.ref("notifications/" + toUid).push();
+  return ref.set({
+    ...payload,
+    fromId: currentUser.uid,
+    fromName: displayName || "Pengguna",
+    createdAt: Date.now(),
+    read: false
+  });
+}
+function renderNotifications() {
+  const unread = notificationsCache.filter(n => !n.read).length;
+  const badge = $("notifBadge");
+  if (badge) {
+    badge.textContent = unread > 99 ? "99+" : String(unread);
+    badge.style.display = unread ? "inline-grid" : "none";
+  }
+  const host = $("notificationList");
+  if (!host) return;
+  if (!notificationsCache.length) {
+    host.innerHTML = '<div class="empty"><div class="emoji">🔔</div><b>Belum ada notifikasi</b><span>Notifikasi balasan akan muncul di sini.</span></div>';
+    return;
+  }
+  host.innerHTML = notificationsCache.map(n => `
+    <div class="notifitem ${n.read ? "" : "unread"}" onclick="openNotification('${esc(n.id)}')">
+      <div class="qtop"><b>${esc(n.fromName || "Pengguna")} ${n.type === "reply" ? "membalas jawaban kamu" : "menjawab pertanyaan kamu"}</b><small class="muted">${timeAgo(n.createdAt)}</small></div>
+      <p>${esc(n.preview || "")}</p>
+      <small class="muted">Menyebut: <b>@${esc(n.toName || displayName || "kamu")}</b> · Ketuk untuk melihat diskusi</small>
+    </div>`).join("");
+}
+async function openNotification(notificationId) {
+  const n = notificationsCache.find(x => x.id === notificationId);
+  if (!n) return;
+  try { await db.ref("notifications/" + currentUser.uid + "/" + notificationId + "/read").set(true); }
+  catch (e) { console.warn("Tandai notifikasi:", e); }
+  switchPage("homePage");
+  openDetail(n.questionId);
+}
+async function markAllNotificationsRead() {
+  if (!currentUser || !notificationsCache.length) return;
+  const updates = {};
+  notificationsCache.filter(n => !n.read).forEach(n => {
+    updates["notifications/" + currentUser.uid + "/" + n.id + "/read"] = true;
+  });
+  if (!Object.keys(updates).length) return toast("Semua notifikasi sudah dibaca");
+  try { await db.ref().update(updates); toast("Semua notifikasi ditandai dibaca"); }
+  catch (e) { toast("Gagal memperbarui notifikasi: " + (e.message || e.code)); }
+}
+function startReply(qid, answerId, targetName, targetId) {
+  if (!currentUser || !displayName) return toast("Login sebagai member untuk membalas");
+  activeReplyTarget = { qid, answerId, targetName: targetName || "Pengguna", targetId: targetId || "" };
+  const host = $("replyComposer-" + answerId);
+  if (!host) return;
+  host.innerHTML = `<div class="replycomposer"><div style="font-size:11px;margin-bottom:7px;color:#526b89">Membalas <b>@${esc(activeReplyTarget.targetName)}</b></div><textarea id="replyInput-${esc(answerId)}" maxlength="1200" placeholder="Tulis balasan dan sapa @${esc(activeReplyTarget.targetName)}..."></textarea><button onclick="sendReply('${esc(qid)}','${esc(answerId)}')">Kirim balasan</button> <button style="background:#8b929c" onclick="cancelReply('${esc(answerId)}')">Batal</button></div>`;
+  document.getElementById("replyInput-" + answerId)?.focus();
+}
+function cancelReply(answerId) {
+  const host = $("replyComposer-" + answerId);
+  if (host) host.innerHTML = "";
+  activeReplyTarget = null;
+}
+async function sendReply(qid, answerId) {
+  if (!currentUser || !displayName) return toast("Login terlebih dahulu");
+  const input = $("replyInput-" + answerId);
+  const body = (input?.value || "").trim();
+  if (body.length < 2) return toast("Tulis balasan terlebih dahulu");
+  const q = allQuestions.find(x => x.id === qid);
+  const parent = (answersCache[qid] || []).find(x => x.id === answerId);
+  if (!q || !parent) return toast("Jawaban tidak ditemukan, coba buka ulang diskusi");
+  const targetReply = activeReplyTarget?.targetId
+    ? (Object.values(parent.replies || {}).find(r => r.id === activeReplyTarget.targetId) ||
+       parent.replies?.[activeReplyTarget.targetId])
+    : null;
+  const targetUid = targetReply?.authorId || parent.authorId;
+  const targetName = targetReply?.authorName || parent.authorName || "Pengguna";
+  try {
+    const replyRef = db.ref("questions/" + qid + "/answers/" + answerId + "/replies").push();
+    const updates = {};
+    updates["questions/" + qid + "/answers/" + answerId + "/replies/" + replyRef.key] = {
+      body, authorId: currentUser.uid, authorName: displayName,
+      replyToId: targetUid || "", replyToName: targetName,
+      createdAt: Date.now()
+    };
+    await db.ref().update(updates);
+    await pushNotification(targetUid, {
+      type: "reply", questionId: qid, answerId,
+      toName: targetName,
+      preview: "@" + targetName + " " + body
+    });
+    cancelReply(answerId);
+    toast("Balasan terkirim ke @" + targetName);
+  } catch (e) {
+    console.error("Kirim balasan:", e);
+    toast("Gagal mengirim balasan: " + (e.message || e.code || "periksa Rules"));
+  }
+}
 
 function openAsk() {
   if (!currentUser) return toast("Menghubungkan ke Firebase. Coba lagi sebentar.");
@@ -294,13 +402,24 @@ function openDetail(id) {
       .sort((a, b) => Number(a.createdAt || 0) - Number(b.createdAt || 0));
     answersCache[id] = arr;
     $("answerCount").textContent = arr.length + " jawaban";
-    $("answerList").innerHTML = arr.length ? arr.map(a => `
+    $("answerList").innerHTML = arr.length ? arr.map(a => {
+      const replies = Object.entries(a.replies || {}).map(([rid, r]) => ({ id: rid, ...r }))
+        .sort((x, y) => Number(x.createdAt || 0) - Number(y.createdAt || 0));
+      return `
       <div class="answerbox">
         <div class="qtop"><div class="person"><div class="avatar">${esc(initials(a.authorName))}</div>
           <div><b>${esc(a.authorName || "Pengguna")}${roleBadge(a.authorId)}</b><small>${timeAgo(a.createdAt)}</small></div></div>
           ${isAdmin() ? `<button type="button" class="secondary" style="padding:6px 9px;color:#d33;font-size:11px" onclick="deleteAnswer('${esc(id)}','${esc(a.id)}')">Hapus</button>` : ""}
         </div><p>${esc(a.body || "")}</p>
-      </div>`).join("") :
+        <div class="replyactions"><button onclick="startReply('${esc(id)}','${esc(a.id)}','${esc(a.authorName || "Pengguna")}')">↩ Balas · ${replies.length}</button></div>
+        ${replies.length ? `<div class="replythread">${replies.map(r => `
+          <div class="replyitem"><b>${esc(r.authorName || "Pengguna")}${roleBadge(r.authorId)}</b><small class="muted"> · ${timeAgo(r.createdAt)}</small>
+            <p>${r.replyToName ? `<b style="color:#0875e8">@${esc(r.replyToName)}</b> ` : ""}${esc(r.body || "")}</p>
+            <div class="replyactions"><button onclick="startReply('${esc(id)}','${esc(a.id)}','${esc(r.authorName || "Pengguna")}','${esc(r.id)}')">↩ Balas</button></div>
+          </div>`).join("")}</div>` : ""}
+        <div id="replyComposer-${esc(a.id)}"></div>
+      </div>`;
+    }).join("") :
       '<div class="empty"><div class="emoji">💡</div><b>Belum ada jawaban</b><span>Kamu bisa menjadi orang pertama yang membantu.</span></div>';
   }, e => {
     console.error("Muat jawaban:", e);
@@ -335,6 +454,11 @@ $("sendAnswerBtn")?.addEventListener("click", async () => {
     };
     updates["questions/" + qid + "/answerCount"] = Number(selectedQuestion.answerCount || 0) + 1;
     await db.ref().update(updates);
+    await pushNotification(selectedQuestion.authorId, {
+      type: "answer", questionId: qid,
+      toName: selectedQuestion.authorName || "Pengguna",
+      preview: "@" + (selectedQuestion.authorName || "Pengguna") + " " + body
+    });
     $("answerInput").value = "";
     toast("Jawaban berhasil dikirim");
   } catch (e) {
@@ -432,6 +556,18 @@ function startApp() {
       } else {
         setProfile();
       }
+      if (notificationRef) notificationRef.off();
+      notificationRef = db.ref("notifications/" + user.uid);
+      notificationRef.on("value", snap => {
+        const data = snap.val() || {};
+        notificationsCache = Object.entries(data).map(([id, n]) => ({ id, ...n }))
+          .sort((a, b) => Number(b.createdAt || 0) - Number(a.createdAt || 0));
+        renderNotifications();
+      }, e => {
+        console.error("Muat notifikasi:", e);
+        $("notificationList").innerHTML = '<div class="empty">Notifikasi tidak dapat dimuat. Periksa Rules.</div>';
+      });
+
       if (questionRef) questionRef.off();
       questionRef = db.ref("questions");
       questionRef.on("value", snap => {
