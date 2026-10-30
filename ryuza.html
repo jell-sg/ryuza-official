@@ -15,7 +15,7 @@
 <body>
 <div class="app">
   <header class="top">
-    <div class="brand"><div class="logo">R</div><div><b>RYUZA Q&A</b><small>Ruang diskusi komunitas</small></div></div>
+    <div class="brand"><div class="logo">R</div><div><b>RYUZA Q&A</b><small>Forum publik • Ryuza Community</small></div></div>
     <button class="iconbtn" id="themeBtn" aria-label="Ganti tema">◐</button>
   </header>
 
@@ -23,7 +23,7 @@
     <section class="hero">
       <div class="eyebrow">COMMUNITY • ASK • ANSWER</div>
       <h1>Tempat berbagi ilmu & menemukan jawaban.</h1>
-      <p>Tanyakan apa saja. Komunitas Ryuza siap membantu kamu.</p>
+      <p>Tanyakan apa saja. Komunitas Ryuza siap membantu kamu.</p><p style="font-size:11px;opacity:.82;margin-top:-9px">Baca diskusi secara publik • Login nama untuk bertanya & menjawab</p>
       <button class="primary" onclick="openAsk()">＋ Buat pertanyaan</button>
       <div class="stats"><div class="stat"><b id="qStat">0</b><small>Pertanyaan</small></div><div class="stat"><b id="aStat">0</b><small>Jawaban</small></div><div class="stat"><b id="uStat">—</b><small>Status</small></div></div>
     </section>
@@ -48,7 +48,7 @@
     <div class="sectionhead"><h2>Profil</h2></div>
     <div class="profilecard"><div class="bigavatar" id="profileAvatar">?</div><h2 id="profileName">Pengunjung</h2><p id="profileMeta">Login nama saja</p><button class="secondary" onclick="changeName()">Ubah nama</button><div id="adminLoginArea"></div></div>
     <div class="sectionhead"><h2>Tentang</h2></div>
-    <div class="question"><b>RYUZA Q&A</b><p class="muted" style="font-size:13px;line-height:1.5">Forum tanya jawab publik untuk komunitas. Semua pengguna yang login dapat bertanya dan membantu menjawab.</p><span class="muted" style="font-size:11px">Versi 1.0 • Firebase realtime</span></div>
+    <div class="question"><b>RYUZA Q&A</b><p class="muted" style="font-size:13px;line-height:1.5">Forum tanya jawab publik untuk komunitas. Semua orang dapat membaca diskusi. Member yang login dapat bertanya dan menjawab. Admin memiliki akses moderasi.</p><span class="muted" style="font-size:11px">Versi 1.0 • Firebase realtime</span></div>
     <div id="adminTools"></div>
   </main>
 </div>
@@ -60,7 +60,7 @@
   <button class="navitem" data-page="profilePage"><span>◉</span>Profil</button>
 </div></nav>
 
-<div class="modalback" id="nameModal"><div class="sheet"><div class="handle"></div><div class="sheethead"><h3>Login Member</h3></div><p class="muted" style="font-size:13px;line-height:1.5">Login dulu dengan nama untuk membuat pertanyaan dan menjawab diskusi. Kamu tetap bisa melihat pertanyaan publik tanpa login.</p><div class="field"><label>Nama pengguna</label><input id="nameInput" maxlength="24" placeholder="Contoh: RyuzaUser"></div><button class="wide" id="saveNameBtn">Login sebagai Member</button><p class="muted" style="font-size:10px;text-align:center">Login tanpa email dan password.</p></div></div>
+<div class="modalback" id="nameModal"><div class="sheet"><div class="handle"></div><div class="sheethead"><h3>Login Member</h3></div><p class="muted" style="font-size:13px;line-height:1.5">Login dulu dengan nama untuk membuat pertanyaan dan menjawab diskusi. Kamu tetap bisa melihat pertanyaan publik tanpa login.</p><div class="field"><label>Nama pengguna</label><input id="nameInput" maxlength="24" autocomplete="nickname" placeholder="Contoh: RyuzaUser"></div><button class="wide" id="saveNameBtn">Login sebagai Member</button><p class="muted" style="font-size:10px;text-align:center">Login tanpa email dan password.</p></div></div>
 
 <div class="modalback" id="adminLoginModal"><div class="sheet"><div class="handle"></div><div class="sheethead"><h3>Login Admin</h3><button class="close" onclick="closeModal('adminLoginModal')">×</button></div><p class="muted" style="font-size:13px;line-height:1.5">Masuk menggunakan email dan password akun admin Firebase.</p><div class="field"><label>Email admin</label><input id="adminEmail" type="email" autocomplete="username" placeholder="admin@email.com"></div><div class="field"><label>Password</label><input id="adminPassword" type="password" autocomplete="current-password" placeholder="Password admin"></div><button class="wide" id="adminLoginBtn">Masuk sebagai Admin</button></div></div>
 <div class="modalback" id="askModal"><div class="sheet"><div class="handle"></div><div class="sheethead"><h3>Buat pertanyaan</h3><button class="close" onclick="closeModal('askModal')">×</button></div><div class="field"><label>Judul pertanyaan</label><input id="askTitle" maxlength="120" placeholder="Apa yang ingin kamu tanyakan?"></div><div class="field"><label>Detail (opsional)</label><textarea id="askBody" maxlength="2500" placeholder="Jelaskan pertanyaanmu lebih lengkap..."></textarea></div><button class="wide" id="postQuestionBtn">Publikasikan pertanyaan</button></div></div>
@@ -89,6 +89,7 @@ const ADMIN_UIDS = ["9SeBQEIngxarlC5THvz61k6iO8V2"]; // UID admin Firebase
 
 let auth = null, db = null, currentUser = null, displayName = "";
 let allQuestions = [], currentFilter = "all", selectedQuestion = null;
+let pendingAskAfterLogin = false;
 let questionRef = null, answerRef = null, answersCache = {};
 const $ = id => document.getElementById(id);
 const configured = !!(firebaseConfig.apiKey && firebaseConfig.projectId && firebaseConfig.databaseURL);
@@ -312,7 +313,14 @@ function closeDetail() {
   selectedQuestion = null;
 }
 $("sendAnswerBtn")?.addEventListener("click", async () => {
-  if (!currentUser || !displayName) return toast("Login nama belum siap");
+  if (!currentUser) return toast("Menghubungkan ke akun. Coba lagi sebentar.");
+  if (!displayName) {
+    closeDetail();
+    pendingAskAfterLogin = false;
+    $("nameInput").value = "";
+    showModal("nameModal");
+    return toast("Login sebagai member terlebih dahulu untuk menjawab.");
+  }
   if (!selectedQuestion) return;
   const body = $("answerInput").value.trim();
   if (body.length < 2) return toast("Tulis jawaban terlebih dahulu");
