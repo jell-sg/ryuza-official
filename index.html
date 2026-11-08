@@ -2066,11 +2066,11 @@ html.ryuza-chrome-block #ryuzaChromeGate{display:flex!important}
 <div class="subscribe-status" id="subscribeStatus">🔒 Ikuti langkah di bawah untuk membuka akses ke website.</div>
 <div class="subscribe-actions">
 <div class="subscribe-channel-step">
-<a class="popup-action youtube-subscribe" href="https://youtube.com/@ryuzaofficialreal77?si=q3cWCpm3o_OmvV8M" id="youtubeSubscribe" rel="noopener" target="_blank">▶️ SUBSCRIBE CHANNEL YOUTUBE</a>
+<a class="popup-action youtube-subscribe" href="https://www.youtube.com/@ryuzaofficialreal77" id="youtubeSubscribe" rel="noopener" target="_blank">▶️ SUBSCRIBE CHANNEL YOUTUBE</a>
 <button class="subscribe-confirm" id="confirmSubscribe1" style="display:none" type="button">✓ SAYA SUDAH SUBSCRIBE</button>
 </div>
 <div class="subscribe-channel-step">
-<a class="popup-action youtube-subscribe youtube-subscribe-2" href="https://youtube.com/@ryuzaofficialreal77?si=q3cWCpm3o_OmvV8M" id="youtubeSubscribe2" rel="noopener" target="_blank">▶️ SUBSCRIBE CHANNEL YOUTUBE</a>
+<a class="popup-action youtube-subscribe youtube-subscribe-2" href="https://www.youtube.com/@ryuzaofficialreal77" id="youtubeSubscribe2" rel="noopener" target="_blank">▶️ SUBSCRIBE CHANNEL YOUTUBE</a>
 <button class="subscribe-confirm" id="confirmSubscribe2" style="display:none" type="button">✓ SELESAI SUBSCRIBE</button>
 </div>
 <div class="subscribe-channel-step">
@@ -2160,7 +2160,7 @@ html.ryuza-chrome-block #ryuzaChromeGate{display:flex!important}
 <button aria-expanded="false" class="community" id="kaijiCommunityToggle" type="button">♟ Komunitas <span aria-hidden="true">⌄</span></button>
 <div class="kaiji-community-menu" id="kaijiCommunityMenu">
 <a href="https://whatsapp.com/channel/0029VbAR6qO8kyyWG2te832B" rel="noopener" target="_blank">🟢 WhatsApp Channel</a>
-<a href="https://youtube.com/@rezskyyy?si=1cLSwIUwJsbxjvfO" rel="noopener" target="_blank">▶ YouTube Ryuza Official</a>
+<a href="https://www.youtube.com/@ryuzaofficialreal77" rel="noopener" target="_blank">▶ YouTube Ryuza Official</a>
 </div>
 </div>
 <button class="vip" id="openVipOrder" type="button">♛ Order VIP Script <span>⌄</span></button>
@@ -2254,7 +2254,7 @@ html.ryuza-chrome-block #ryuzaChromeGate{display:flex!important}
 <div>
 <div class="ryuza-youtube-count" id="ryuzaYoutubeCount">—<small>SUBSCRIBERS</small></div>
 </div>
-<a class="ryuza-youtube-visit" href="https://youtube.com/@rezskyyy?si=1cLSwIUwJsbxjvfO" rel="noopener noreferrer" target="_blank">SUBSCRIBE ↗</a>
+<a class="ryuza-youtube-visit" href="https://www.youtube.com/@ryuzaofficialreal77" rel="noopener noreferrer" target="_blank">SUBSCRIBE ↗</a>
 </section>
 <style id="ryuza-recal-tab-style">
 .ryuza-filter[data-mode="RECAL"]{color:#d7c8ff;border-color:#604b8f;background:linear-gradient(135deg,#211936,#33245a)}
@@ -3162,7 +3162,7 @@ document.querySelectorAll('.replace-dropdown').forEach(function(box){
     const liveBanner=document.querySelector('.ryuza-banner'); if(liveBanner) liveBanner.classList.add('ryuza-live-settings-ready');
     document.title=st.pageTitle||document.title;
     // Link wajib subscribe dibaca dari Firebase siteConfig/settings, supaya perubahan dari Admin langsung berlaku.
-    const defaultYoutube='https://youtube.com/@ryuzaofficialreal77?si=q3cWCpm3o_OmvV8M';
+    const defaultYoutube='https://www.youtube.com/@ryuzaofficialreal77';
     const configuredYoutube=defaultYoutube;
     const configuredSub=defaultYoutube;
     const addSubscribeConfirmation=(raw)=>{try{const u=new URL(raw);if(/(^|\.)youtube\.com$/i.test(u.hostname)&&!u.searchParams.has('sub_confirmation'))u.searchParams.set('sub_confirmation','1');return u.toString()}catch(e){return defaultYoutube}};
