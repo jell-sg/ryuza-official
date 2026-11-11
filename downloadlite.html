@@ -132,6 +132,20 @@ footer{text-align:center;color:#73819b;font-size:11px;padding:25px}
 .payment-cancel{border:1px solid #ffffff18;background:#ffffff0b;color:#d2d7e1}
 @media(max-width:420px){.payment-dialog{padding:16px 13px 13px}.payment-qr{width:min(100%,260px)}}
 
+
+.vip-modal{position:fixed;inset:0;z-index:10002;display:none;align-items:center;justify-content:center;padding:14px;background:rgba(3,7,16,.76);backdrop-filter:blur(14px)}
+.vip-modal.show{display:flex;animation:modalFade .2s ease}
+.vip-dialog{position:relative;width:min(100%,650px);max-height:calc(100dvh - 28px);overflow:auto;padding:24px;border:1px solid #ffffff20;border-radius:27px;background:linear-gradient(155deg,#1a2438,#0a111f);box-shadow:0 25px 90px #000a}
+.vip-close{position:absolute;right:14px;top:14px;width:36px;height:36px;border:1px solid #ffffff20;border-radius:50%;background:#ffffff12;color:#fff;font-size:22px;cursor:pointer}
+.vip-heading{padding-right:42px;margin-bottom:16px}.vip-heading h2{margin:0 0 5px;font-size:22px}.vip-heading p{margin:0;color:#9eabc2;font-size:12px}
+.vip-section{padding:15px;margin:12px 0;border:1px solid #ffffff13;border-radius:17px;background:#ffffff08}.vip-section h3{margin:0 0 10px;font-size:14px}
+.vip-benefits{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;margin:0;padding:0;list-style:none}.vip-benefits li{padding:9px 10px;border-radius:11px;background:#111d30;color:#dce5f4;font-size:12px}.vip-benefits li:before{content:"✓";color:#57e3ad;font-weight:900;margin-right:7px}
+.vip-prices{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:7px}.vip-price{display:flex;justify-content:space-between;gap:8px;padding:8px 10px;border-radius:10px;background:#101a2b;font-size:11px;color:#dce5f4}.vip-price strong{color:#ff8092;white-space:nowrap}
+.vip-top{margin:0;padding-left:21px;color:#dce5f4;font-size:12px;line-height:1.8}.vip-order-label{display:block;margin:0 0 7px;color:#dce5f4;font-size:12px;font-weight:750}.vip-order-select{margin:0!important}
+.vip-order-btn{display:flex;width:100%;min-height:49px;align-items:center;justify-content:center;margin-top:12px;border:0;border-radius:14px;background:linear-gradient(100deg,#20c879,#009e70);color:white;font:850 13px inherit;cursor:pointer}
+.vip-footnote{margin:10px 2px 0;color:#8190a8;font-size:10px;line-height:1.5}
+@media(max-width:480px){.vip-dialog{padding:19px 15px;border-radius:22px}.vip-heading h2{font-size:19px}.vip-benefits,.vip-prices{grid-template-columns:1fr}.vip-section{padding:12px}}
+
 </style>
 </head>
 <body>
@@ -163,7 +177,7 @@ footer{text-align:center;color:#73819b;font-size:11px;padding:25px}
  </div>
  <article class="community-card">
   <h3>👑 ORDER SCRIPT VIP</h3><p>Hubungi admin melalui WhatsApp untuk informasi dan pemesanan script VIP.</p>
-  <a class="community-link" href="https://wa.me/6283194327298" target="_blank" rel="noopener noreferrer">CHAT ADMIN VIP</a>
+  <button class="community-link" id="communityVipOrder" type="button" style="border:0;cursor:pointer;font:700 13px inherit">ORDER SCRIPT VIP SEKARANG</button>
   <h3 style="margin-top:22px">Keuntungan VIP</h3>
   <ol class="vip-list"><li>Aman dari banned*</li><li>No bug pink</li><li>Lebih smooth</li><li>File langsung dikirim admin</li><li>Full effect</li><li>Full UI</li><li>No watermark</li></ol>
   <p class="note">*Keterangan keamanan merupakan klaim/penawaran dari penyedia script dan bukan jaminan bebas banned. Gunakan modifikasi pihak ketiga dengan memahami risiko serta ketentuan game.</p>
@@ -216,6 +230,10 @@ footer{text-align:center;color:#73819b;font-size:11px;padding:25px}
    <span class="choice-icon">🔗</span>
    <span class="choice-copy"><strong>LEWATI LINK GRATIS</strong><small>Tetap melewati link yang tersedia untuk replace ini</small></span>
   </button>
+  <button class="download-choice" id="openVipOrder" type="button" style="background:linear-gradient(115deg,#b88725,#7950cf);box-shadow:0 10px 25px #8b65d944">
+   <span class="choice-icon">👑</span>
+   <span class="choice-copy"><strong>ORDER SCRIPT VIP</strong><small>Pilih jenis skin VIP dan lanjutkan pesanan melalui WhatsApp admin</small></span>
+  </button>
  </div>
 </div>
 
@@ -231,6 +249,34 @@ footer{text-align:center;color:#73819b;font-size:11px;padding:25px}
   <div class="payment-instruction"><strong>Setelah pembayaran:</strong> Tekan tombol WhatsApp untuk mengirim bukti pembayaran. Tim kami akan membantu proses akses file.</div>
   <button class="payment-whatsapp" id="paymentWhatsapp" type="button">● &nbsp; SUDAH BAYAR — CHAT WHATSAPP</button>
   <button class="payment-cancel" id="paymentCancel" type="button">Tutup</button>
+ </div>
+</div>
+
+<div class="vip-modal" id="vipModal" aria-hidden="true">
+ <div class="vip-dialog" role="dialog" aria-modal="true" aria-labelledby="vipTitle">
+  <button class="vip-close" id="vipClose" type="button" aria-label="Tutup">×</button>
+  <div class="vip-heading"><h2 id="vipTitle">👑 ORDER SCRIPT VIP</h2><p>Pilih paket skin VIP, lalu kirim detail pesanan langsung ke admin.</p></div>
+  <section class="vip-section"><h3>✨ KE UNTUNGAN VIP</h3>
+   <ul class="vip-benefits"><li>Aman dari banned*</li><li>No bug pink</li><li>Lebih smoth</li><li>File langsung dikirim admin</li><li>Full effect</li><li>Full UI</li><li>No watermark</li></ul>
+   <p class="vip-footnote">*Keamanan akun tidak dapat dijamin sepenuhnya. Penggunaan file modifikasi pihak ketiga tetap memiliki risiko dan dapat bertentangan dengan ketentuan game.</p>
+  </section>
+  <section class="vip-section"><h3>💎 HARGA VIP PERSKIN</h3><div class="vip-prices">
+   <div class="vip-price"><span>Starlight Tahunan</span><strong>Rp5.000</strong></div><div class="vip-price"><span>Starlight Bulanan</span><strong>Rp5.000</strong></div>
+   <div class="vip-price"><span>Luckybox</span><strong>Rp10.000</strong></div><div class="vip-price"><span>Epic</span><strong>Rp10.000</strong></div>
+   <div class="vip-price"><span>Collector</span><strong>Rp10.000</strong></div><div class="vip-price"><span>Legend</span><strong>Rp10.000</strong></div>
+   <div class="vip-price"><span>Neobeast</span><strong>Rp10.000</strong></div><div class="vip-price"><span>Kishin Densetsu</span><strong>Rp10.000</strong></div>
+   <div class="vip-price"><span>All Star</span><strong>Rp10.000</strong></div><div class="vip-price"><span>Dawning Stars</span><strong>Rp10.000</strong></div>
+   <div class="vip-price"><span>Abyss</span><strong>Rp10.000</strong></div><div class="vip-price"><span>Aspirant</span><strong>Rp10.000</strong></div>
+   <div class="vip-price"><span>Star Wars · Diskon</span><strong>Rp10.000</strong></div><div class="vip-price"><span>Colleb Skin</span><strong>Rp15.000</strong></div>
+  </div></section>
+  <section class="vip-section"><h3>🏆 TOP 5 FILE BUY</h3><ol class="vip-top"><li>YSS Collector</li><li>Ling Collector</li><li>Lancelot Dawning</li><li>Granger Collector</li><li>Julian JJK / HXH</li></ol></section>
+  <section class="vip-section">
+   <h3 style="margin:0 0 12px">📝 DETAIL ORDER</h3>
+   <label class="vip-order-label" for="vipSkinName" style="margin-top:12px">NAMA SKIN / HERO (OPSIONAL)</label>
+   <input id="vipSkinName" type="text" placeholder="Contoh: YSS Collector" style="width:100%;padding:13px;border:1px solid #ffffff20;border-radius:13px;background:#ffffff0c;color:#fff;outline:none">
+   <button class="vip-order-btn" id="vipContinue" type="button">LANJUTKAN ORDER VIA WHATSAPP →</button>
+   <p class="vip-footnote">WhatsApp admin akan terbuka dengan format pesan pesanan yang sudah terisi. Periksa kembali detailnya sebelum dikirim.</p>
+  </section>
  </div>
 </div>
 
@@ -332,6 +378,21 @@ search.addEventListener('input',()=>{searchShell.classList.toggle('has-value',!!
 searchClear.addEventListener('click',()=>{search.value='';searchShell.classList.remove('has-value');render();search.focus();});
 const searchHints=['Cari skin favorit kamu...','Cari nama hero atau skin...','Temukan skin dengan cepat...'];
 let hintIndex=0;setInterval(()=>{if(!search.value&&!search.matches(':focus')){search.style.setProperty('--hint-fade','0');search.placeholder=searchHints[hintIndex%searchHints.length];hintIndex++;}},2600);
+
+const vipModal=document.getElementById('vipModal');
+function openVipModal(){closeDownloadModal();vipModal.classList.add('show');vipModal.setAttribute('aria-hidden','false');document.getElementById('vipSkinName').focus({preventScroll:true});}
+function closeVipModal(){vipModal.classList.remove('show');vipModal.setAttribute('aria-hidden','true');}
+document.getElementById('openVipOrder').addEventListener('click',openVipModal);
+document.getElementById('communityVipOrder').addEventListener('click',openVipModal);
+document.getElementById('vipClose').addEventListener('click',closeVipModal);
+vipModal.addEventListener('click',event=>{if(event.target===vipModal)closeVipModal();});
+document.getElementById('vipContinue').addEventListener('click',()=>{
+ const skinName=document.getElementById('vipSkinName').value.trim();
+ const message=`Halo Admin Ryuza! Saya ingin memesan Script VIP.\n\nNama skin/hero: ${skinName||'Belum ditentukan'}\n\nMohon informasikan harga dan langkah pemesanannya. Terima kasih.`;
+ window.open('https://wa.me/6283194327298?text='+encodeURIComponent(message),'_blank','noopener,noreferrer');
+});
+document.addEventListener('keydown',event=>{if(event.key==='Escape'&&vipModal.classList.contains('show'))closeVipModal();});
+
 render();
 document.querySelectorAll('.nav-tab').forEach(btn=>btn.addEventListener('click',()=>{
  document.querySelectorAll('.nav-tab').forEach(b=>b.classList.toggle('active',b===btn));
