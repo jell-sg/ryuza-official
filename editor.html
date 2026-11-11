@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Ryuza Official • HTML Editor</title>
+<style>
+:root{color-scheme:dark;--bg:#080d18;--panel:#121c2e;--line:#293954;--red:#ed334d;--muted:#9eabc2;--white:#f4f6fb}
+*{box-sizing:border-box}body{margin:0;background:radial-gradient(circle at top,#1b2b49,#080d18 55%);font-family:Inter,system-ui,Arial;color:var(--white);min-height:100vh}
+header{max-width:1100px;margin:auto;padding:28px 18px 18px}h1{font-size:25px;margin:0 0 7px}header p{color:var(--muted);margin:0;font-size:13px}
+main{max-width:1100px;margin:auto;padding:0 16px 50px}.toolbar{display:flex;gap:10px;flex-wrap:wrap;margin:12px 0 18px}
+button,.filebtn{border:1px solid #ffffff20;border-radius:12px;padding:11px 15px;background:#1b2a43;color:#fff;font-weight:750;font-size:12px;cursor:pointer}
+button.primary{background:linear-gradient(110deg,#ff6178,#b3163c);border:0}button.green{background:linear-gradient(110deg,#20c879,#008d68);border:0}button.danger{background:#7f2337}button:disabled{opacity:.4;cursor:not-allowed}
+.filebtn input{display:none}.status{color:#a9bad3;font-size:12px;align-self:center}
+.importpanel{margin:0 0 15px}.tabs{display:flex;gap:8px;margin:12px 0}.tabbtn.active{background:linear-gradient(110deg,#ff6178,#b3163c);border:0}.tabpane[hidden]{display:none}.staged-list{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:9px;margin-top:12px}.staged-card{background:#0b1423;border:1px solid #2c3b54;border-radius:12px;padding:12px}.staged-card b{display:block;margin-bottom:5px}.importpanel textarea{min-height:190px;resize:vertical;line-height:1.55}.layout{display:grid;grid-template-columns:310px minmax(0,1fr);gap:15px}.panel{background:linear-gradient(155deg,#17243a,#101827);border:1px solid var(--line);border-radius:17px;padding:16px;min-width:0;box-shadow:0 12px 30px #0003}
+.panel h2{font-size:16px;margin:0 0 13px}.skin-search{margin:0 0 10px}.list{display:flex;flex-direction:column;gap:7px;max-height:68vh;overflow:auto}
+.skinrow{display:flex;align-items:center;gap:9px;text-align:left;width:100%;padding:8px;background:#0b1423;border:1px solid #263750}.skinrow.active{border-color:var(--red);background:#ed334d18}
+.skinrow img{width:43px;height:43px;object-fit:cover;border-radius:9px;background:#080d17}.skinrow span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;flex:1}
+label{display:block;font-size:11px;color:#b8c5d8;font-weight:700;margin:12px 0 6px}
+input,textarea{width:100%;border:1px solid #34445e;background:#091321;color:#fff;border-radius:10px;padding:11px 12px;font:inherit;font-size:13px;outline:none}
+input:focus,textarea:focus{border-color:#ed5368;box-shadow:0 0 0 3px #ed334d20}
+input[type=file]{padding:8px} .row{display:grid;grid-template-columns:1fr 1fr;gap:10px}.imagepreview{width:100%;max-height:210px;object-fit:contain;border-radius:12px;background:#080d17;border:1px solid #263750;margin-top:9px}
+.option{border:1px solid #2c3b54;background:#0b1423;border-radius:12px;padding:12px;margin:10px 0}.optiontop{display:flex;justify-content:space-between;align-items:center;gap:8px}.optiontop b{font-size:12px}
+.optiongrid{display:grid;grid-template-columns:1fr 1.5fr;gap:9px}.optiongrid label{margin-top:9px}
+.actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:15px}.hint{font-size:11px;color:var(--muted);line-height:1.6;margin:12px 0 0}
+.empty{color:var(--muted);font-size:13px;padding:20px;text-align:center}.badge{display:inline-block;padding:4px 8px;background:#ffffff10;border-radius:20px;color:#b9c8dd;font-size:10px}
+@media(max-width:760px){.layout{grid-template-columns:1fr}.list{max-height:240px}.row{grid-template-columns:1fr}.optiongrid{grid-template-columns:1fr}header{padding-top:22px}}
+</style></head>
+<body>
+<header><h1>🛠️ Ryuza Official HTML Editor</h1><p>Kelola skin, gambar, pilihan replace, dan link download tanpa mengubah kode manual.</p></header>
+<main>
+<div class="toolbar">
+<label class="filebtn">📂 Buka HTML asli<input id="file" type="file" accept=".html,.htm,text/html"></label>
+<button class="primary" id="addSkin" disabled>＋ Tambah Skin</button>
+<button class="green" id="export" disabled>⬇ Simpan HTML hasil edit</button>
+<span class="status" id="status">Pilih file HTML Ryuza Official terlebih dahulu.</span>
+</div>
+<section class="panel importpanel">
+<h2>⚡ Import Banyak Skin dari Teks</h2>
+<div class="tabs"><button class="tabbtn active" id="tabImport">Tempel Teks</button><button class="tabbtn" id="tabStaged">Simpan Dulu <span class="badge" id="stagedCount">0</span></button></div>
+<div id="paneImport" class="tabpane">
+<p class="hint" style="margin-top:-5px">Tempel beberapa skin sekaligus. Pisahkan setiap skin dengan baris kosong. Setiap skin dimulai dengan nama, lalu daftar Replace dan link download.</p>
+<textarea id="bulkText" placeholder="Nama Skin 1\nReplace : Default\n➠ https://link-download\n\nNama Skin 2\nReplace : Default\n➠ https://link-download"></textarea>
+<div class="actions"><button class="primary" id="importText" disabled>＋ Simpan Dulu Semua Skin</button><button id="clearText" type="button">Bersihkan Teks</button></div>
+<div class="hint" id="importHelp">Buka HTML asli terlebih dahulu sebelum mengimpor.</div>
+</div>
+<div id="paneStaged" class="tabpane" hidden>
+<p class="hint">Skin yang ditampung sementara akan muncul di sini. Periksa jumlah replace, hapus yang tidak diperlukan, lalu masukkan semuanya sekaligus ke daftar editor.</p>
+<div id="stagedList" class="staged-list"><div class="empty">Belum ada skin yang disimpan sementara.</div></div>
+<div class="actions"><button class="green" id="commitStaged" disabled>✓ Masukkan Semua ke Daftar Skin</button><button class="danger" id="clearStaged" disabled>Kosongkan Simpan Dulu</button></div>
+</div>
+</section>
+<div class="layout">
+<section class="panel"><h2>Daftar Skin <span class="badge" id="count">0</span></h2><input class="skin-search" id="skinSearch" type="search" placeholder="🔎 Cari nama skin..." autocomplete="off"><div class="list" id="list"><div class="empty">Belum ada file yang dibuka.</div></div></section>
+<section class="panel"><h2 id="formTitle">Editor Skin</h2><div id="editor"><div class="empty">Buka file HTML asli untuk mulai mengedit.</div></div></section>
+</div>
+<p class="hint">Tips: gambar bisa memakai URL langsung atau upload file gambar dari perangkat. Setelah selesai, klik <b>Simpan HTML hasil edit</b>. File hasil ekspor adalah website lengkap yang sudah diperbarui.</p>
+</main>
+<script>
+const $=id=>document.getElementById(id);
+let sourceHTML='',skins=[],selected=-1,dirty=false,stagedSkins=[];
+const aldousExample=`aldous mistbender
+🔗Download Disini :
+Replace : Default
+➠ https://sfl.gl/zQs9c
+Replace : Default 200 stack
+➠ https://sfl.gl/Bu0Gzg
+Replace : Basic
+➠ https://sfl.gl/ZpSW5
+Replace : Basic 200 Stack
+➠ https://sfl.gl/RWh1OBB
+Replace : Starlight
+➠ https://sfl.gl/fmPfE35
+Replace : M1
+➠ https://sfl.gl/kD2I
+Replace : Blazig
+➠ https://sfl.gl/7sKciZU
+Replace : Collector
+➠ https://sfl.gl/b9t4Ghg
+Replace : Transformers
+➠ https://sfl.gl/pQrx9EZp
+Replace : Elit
+➠ https://sfl.gl/7pId8E`;
+$('bulkText').value=aldousExample;
+const startMarker='const skins=',endMarker=';\nconst grid=';
+function setStatus(t){$('status').textContent=t}
+function escapeHTML(v){return String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
+function makeId(v){return String(v||'skin-baru').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'')||'skin-baru'}
+function parseSkins(src){
+ const a=src.indexOf(startMarker);if(a<0)throw Error('Data const skins tidak ditemukan di HTML ini.');
+ const from=a+startMarker.length,b=src.indexOf(endMarker,from);if(b<0)throw Error('Akhir data skin tidak ditemukan.');
+ const raw=src.slice(from,b).trim();
+ let depth=0,str=false,esc=false,end=-1;
+ for(let i=0;i<raw.length;i++){const c=raw[i];if(str){if(esc)esc=false;else if(c==='\\')esc=true;else if(c==='"')str=false;continue}
+ if(c==='"'){str=true;continue}if(c==='[')depth++;if(c===']'){depth--;if(depth===0){end=i+1;break}}}
+ if(end<0)throw Error('Format daftar skin tidak valid.');
+ const data=JSON.parse(raw.slice(0,end));
+ if(!Array.isArray(data))throw Error('Data skin bukan daftar yang valid.');
+ return data;
+}
+$('file').addEventListener('change',async e=>{
+ const f=e.target.files[0];if(!f)return;
+ try{const txt=await f.text();const data=parseSkins(txt);sourceHTML=txt;skins=data;selected=skins.length?0:-1;dirty=false;
+ $('addSkin').disabled=false;$('export').disabled=false;$('importText').disabled=false;renderList();renderEditor();setStatus(`${f.name} berhasil dibuka • ${skins.length} skin ditemukan.`)}
+ catch(err){setStatus('Gagal membuka: '+err.message);alert(err.message)}
+});
+function renderList(){
+ const query=($('skinSearch')?.value||'').trim().toLocaleLowerCase('id');
+ const matches=skins.map((s,i)=>({s,i})).filter(x=>String(x.s.title||'Skin tanpa nama').toLocaleLowerCase('id').includes(query)||String(x.s.id||'').toLocaleLowerCase('id').includes(query));
+ $('count').textContent=query?`${matches.length}/${skins.length}`:skins.length;
+ $('list').innerHTML=matches.length?matches.map(({s,i})=>`<button class="skinrow ${i===selected?'active':''}" data-i="${i}"><img src="${escapeHTML(s.image||'')}" onerror="this.style.visibility='hidden'"><span>${escapeHTML(s.title||'Skin tanpa nama')}</span></button>`).join(''):(skins.length?'<div class="empty">Skin tidak ditemukan.</div>':'<div class="empty">Belum ada skin. Klik Tambah Skin.</div>');
+ $('list').querySelectorAll('[data-i]').forEach(b=>b.onclick=()=>{selected=+b.dataset.i;renderList();renderEditor()});
+}
+$('skinSearch').addEventListener('input',renderList);
+function renderEditor(){
+ const root=$('editor');
+ if(selected<0||!skins[selected]){$('formTitle').textContent='Editor Skin';root.innerHTML='<div class="empty">Pilih atau tambahkan skin.</div>';return}
+ const s=skins[selected];if(!Array.isArray(s.options))s.options=[];
+ $('formTitle').textContent='Edit: '+(s.title||'Skin');
+ root.innerHTML=`
+ <div class="row"><div><label>Nama Skin</label><input id="title" value="${escapeHTML(s.title)}" placeholder="Contoh: Miya Legend"></div><div><label>ID Skin</label><input id="sid" value="${escapeHTML(s.id)}" placeholder="miya-legend"></div></div>
+ <label>Link gambar skin</label><input id="image" value="${escapeHTML(s.image)}" placeholder="https://.../gambar.jpg">
+ <label>Atau upload gambar dari perangkat</label><input id="imageFile" type="file" accept="image/*">
+ <img class="imagepreview" id="preview" src="${escapeHTML(s.image||'')}" onerror="this.style.display='none'">
+ <div class="actions"><button class="primary" id="addOption">＋ Tambah Replace</button><button class="danger" id="deleteSkin">Hapus Skin Ini</button></div>
+ <h2 style="margin-top:20px">Pilihan Replace <span class="badge">${s.options.length}</span></h2>
+ <div id="options"></div>`;
+ const update=(key,val)=>{s[key]=val;dirty=true;$('formTitle').textContent='Edit: '+(s.title||'Skin');renderList()};
+ $('title').oninput=e=>update('title',e.target.value);
+ $('sid').oninput=e=>update('id',e.target.value);
+ $('image').oninput=e=>{s.image=e.target.value;dirty=true;$('preview').src=s.image;$('preview').style.display='block';renderList()};
+ $('imageFile').onchange=e=>{const f=e.target.files[0];if(!f)return;const reader=new FileReader();reader.onload=()=>{$('image').value=reader.result;s.image=reader.result;$('preview').src=reader.result;$('preview').style.display='block';dirty=true;renderList();setStatus('Gambar dimasukkan ke data HTML.')};reader.readAsDataURL(f)};
+ $('addOption').onclick=()=>{s.options.push({name:'Replace Baru',url:'https://',selected:s.options.length===0});dirty=true;renderOptions()};
+ $('deleteSkin').onclick=()=>{if(!confirm('Hapus skin '+(s.title||'ini')+'?'))return;skins.splice(selected,1);selected=skins.length?Math.min(selected,skins.length-1):-1;dirty=true;renderList();renderEditor()};
+ renderOptions();
+ function renderOptions(){
+  $('options').innerHTML=s.options.map((o,i)=>`<div class="option"><div class="optiontop"><b>Replace #${i+1}</b><button class="danger" data-del="${i}">Hapus</button></div>
+  <div class="optiongrid"><div><label>Nama Replace</label><input data-name="${i}" value="${escapeHTML(o.name)}" placeholder="Default / Epic / Collector"></div><div><label>Link Download</label><input data-url="${i}" value="${escapeHTML(o.url)}" placeholder="https://..."></div></div>
+  <label style="display:flex;align-items:center;gap:8px"><input type="radio" name="defaultOption" data-default="${i}" style="width:auto" ${o.selected?'checked':''}> Jadikan pilihan default</label></div>`).join('')||'<div class="empty">Belum ada replace. Tambahkan pilihan replace.</div>';
+  $('options').querySelectorAll('[data-name]').forEach(el=>el.oninput=()=>{s.options[+el.dataset.name].name=el.value;dirty=true});
+  $('options').querySelectorAll('[data-url]').forEach(el=>el.oninput=()=>{s.options[+el.dataset.url].url=el.value;dirty=true});
+  $('options').querySelectorAll('[data-default]').forEach(el=>el.onchange=()=>{s.options.forEach((o,j)=>o.selected=j===+el.dataset.default);dirty=true;renderOptions()});
+  $('options').querySelectorAll('[data-del]').forEach(el=>el.onclick=()=>{s.options.splice(+el.dataset.del,1);if(s.options.length&&!s.options.some(o=>o.selected))s.options[0].selected=true;dirty=true;renderOptions()});
+ }
+}
+
+function parseManySkins(raw){
+ const lines=raw.split(/\r?\n/).map(x=>x.replace(/[‎‏]/g,'').trim());
+ const blocks=[];let current=null,pending='';
+ const isMeta=line=>!line||/^🔗|^download\s+disini/i.test(line)||/^➠|^->/.test(line)||/^https?:\/\//i.test(line)||/^replace\s*:/i.test(line);
+ function finish(){if(current&&current.title&&current.options.length)blocks.push(current);current=null;pending=''}
+ for(const line of lines){if(!line)continue;
+  const rm=line.match(/^replace\s*:\s*(.+)$/i);if(rm){if(!current){current={title:'',options:[]}}pending=rm[1].trim();continue}
+  const url=line.match(/https?:\/\/[^\s]+/i);if(url&&pending){if(!current)current={title:'',options:[]};current.options.push({name:pending,url:url[0].replace(/[),]+$/g,''),selected:current.options.length===0});pending='';continue}
+  if(!isMeta(line)){if(current&&current.title&&current.options.length)finish();if(!current)current={title:'',options:[]};if(!current.title)current.title=line.replace(/^nama\s*:\s*/i,'').trim();}
+ }
+ finish();return blocks;
+}
+function renderStaged(){
+ $('stagedCount').textContent=stagedSkins.length;
+ $('stagedList').innerHTML=stagedSkins.length?stagedSkins.map((s,i)=>`<div class="staged-card"><b>${escapeHTML(s.title)}</b><span class="hint">${s.options.length} pilihan replace</span><div class="hint">${s.options.map(o=>escapeHTML(o.name)).join(' • ')}</div><div class="actions"><button class="danger" data-stage-del="${i}">Hapus</button></div></div>`).join(''):'<div class="empty">Belum ada skin yang disimpan sementara.</div>';
+ $('stagedList').querySelectorAll('[data-stage-del]').forEach(b=>b.onclick=()=>{stagedSkins.splice(+b.dataset.stageDel,1);renderStaged()});
+ $('commitStaged').disabled=!stagedSkins.length;$('clearStaged').disabled=!stagedSkins.length;
+}
+function importSkinFromText(){
+ if(!sourceHTML){alert('Buka file HTML asli terlebih dahulu.');return}
+ const raw=$('bulkText').value.trim();if(!raw){alert('Tempel teks skin terlebih dahulu.');return}
+ const parsed=parseManySkins(raw);if(!parsed.length){alert('Tidak ada skin yang valid. Pastikan setiap skin memiliki nama, Replace : Nama, dan link https://...');return}
+ let added=0;
+ parsed.forEach(item=>{const id=makeId(item.title);let unique=id,n=2;while(skins.some(x=>x.id===unique)||stagedSkins.some(x=>x.id===unique))unique=id+'-'+n++;stagedSkins.push({title:item.title,id:unique,image:'',options:item.options});added++});
+ renderStaged();$('importHelp').textContent=`✓ ${added} skin masuk ke tab Simpan Dulu. Kamu bisa menempel batch berikutnya juga.`;
+ $('tabStaged').click();setStatus(`${added} skin disimpan sementara. Belum dimasukkan ke HTML.`);
+}
+$('tabImport').onclick=()=>{$('tabImport').classList.add('active');$('tabStaged').classList.remove('active');$('paneImport').hidden=false;$('paneStaged').hidden=true};
+$('tabStaged').onclick=()=>{$('tabStaged').classList.add('active');$('tabImport').classList.remove('active');$('paneStaged').hidden=false;$('paneImport').hidden=true;renderStaged()};
+$('commitStaged').onclick=()=>{if(!stagedSkins.length)return;const n=stagedSkins.length;skins.push(...stagedSkins);stagedSkins=[];selected=skins.length-1;dirty=true;renderStaged();renderList();renderEditor();setStatus(`${n} skin berhasil dimasukkan sekaligus ke daftar editor.`);$('tabImport').click()};
+$('clearStaged').onclick=()=>{if(confirm('Kosongkan semua skin yang disimpan sementara?')){stagedSkins=[];renderStaged()}};
+$('importText').onclick=importSkinFromText;
+$('clearText').onclick=()=>{$('bulkText').value='';$('importHelp').textContent='Kolom teks dibersihkan.'};
+
+$('addSkin').onclick=()=>{skins.push({title:'Skin Baru',id:'skin-baru-'+(skins.length+1),image:'',options:[{name:'Default',url:'',selected:true}]});selected=skins.length-1;dirty=true;renderList();renderEditor();setStatus('Skin baru ditambahkan.')};
+$('export').onclick=()=>{
+ if(!sourceHTML){alert('Buka file HTML asli dahulu.');return}
+ try{
+  skins.forEach((s,i)=>{s.title=String(s.title||'Skin '+(i+1));s.id=String(s.id||makeId(s.title));s.image=String(s.image||'');if(!Array.isArray(s.options))s.options=[];s.options.forEach((o,j)=>{o.name=String(o.name||'Replace '+(j+1));o.url=String(o.url||'');o.selected=!!o.selected});if(s.options.length&&!s.options.some(o=>o.selected))s.options[0].selected=true;if(s.options.filter(o=>o.selected).length>1){let found=false;s.options.forEach(o=>{if(o.selected&&!found)found=true;else if(o.selected)o.selected=false})}});
+  const a=sourceHTML.indexOf(startMarker),from=a+startMarker.length,b=sourceHTML.indexOf(endMarker,from);
+  const old=sourceHTML.slice(from,b);let depth=0,str=false,esc=false,end=-1;
+  for(let i=0;i<old.length;i++){const c=old[i];if(str){if(esc)esc=false;else if(c==='\\')esc=true;else if(c==='"')str=false;continue}if(c==='"'){str=true;continue}if(c==='[')depth++;if(c===']'&&--depth===0){end=i+1;break}}
+  if(end<0)throw Error('Tidak bisa menemukan akhir data skin.');
+  const updated=sourceHTML.slice(0,from)+JSON.stringify(skins,null,2)+sourceHTML.slice(from+end);
+  const blob=new Blob([updated],{type:'text/html;charset=utf-8'}),url=URL.createObjectURL(blob),aTag=document.createElement('a');
+  aTag.href=url;aTag.download='ryuza-official-edited.html';document.body.appendChild(aTag);aTag.click();aTag.remove();setTimeout(()=>URL.revokeObjectURL(url),1500);dirty=false;setStatus('HTML berhasil diekspor • '+skins.length+' skin.');
+ }catch(err){alert('Gagal menyimpan: '+err.message)}
+};
+window.addEventListener('beforeunload',e=>{if(dirty){e.preventDefault();e.returnValue='';}});
+</script></body></html>
