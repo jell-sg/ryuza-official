@@ -19,23 +19,11 @@ button{border:0;border-radius:11px;padding:11px 14px;background:var(--accent);co
 .meta{display:flex;align-items:center;justify-content:space-between;gap:8px;margin:12px 0 7px}.skin{font-weight:800;font-size:17px;min-width:0;overflow-wrap:anywhere}.ratio{font-size:11px;color:#c4d0e7;background:#27344b;padding:4px 7px;border-radius:99px;white-space:nowrap}
 .fulltitle{color:#bdc9dc;font-size:12px;overflow-wrap:anywhere;min-height:36px;margin:0 0 10px}
 .actions{display:flex;gap:8px;flex-wrap:wrap}.actions button{flex:1;min-width:100px;font-size:13px;padding:10px 8px}
-.bio-preview{white-space:pre-wrap;background:#0a1020;border:1px solid var(--line);border-radius:10px;padding:11px;color:#cbd7ed;font-size:12px;margin:10px 0;overflow-wrap:anywhere}.bio-label{font-size:11px;color:var(--muted);margin:10px 0 5px;font-weight:700;letter-spacing:.5px}
+.bio-select{width:100%;background:#0a1020;border:1px solid var(--line);border-radius:9px;padding:9px;color:var(--text);margin:5px 0}.bio-preview{white-space:pre-wrap;background:#0a1020;border:1px solid var(--line);border-radius:10px;padding:11px;color:#cbd7ed;font-size:12px;margin:10px 0;overflow-wrap:anywhere}.bio-label{font-size:11px;color:var(--muted);margin:10px 0 5px;font-weight:700;letter-spacing:.5px}
 .status{font-size:12px;color:var(--muted);margin-top:8px;min-height:18px}
 .empty{padding:35px;text-align:center;color:var(--muted);border:1px dashed var(--line);border-radius:14px;grid-column:1/-1}
 .note{margin-top:22px;padding:14px;border:1px solid var(--line);border-radius:12px;color:var(--muted);font-size:13px}
 @media(max-width:520px){header{padding:22px 15px 14px}.wrap{padding:0 15px 28px}.grid{grid-template-columns:1fr}}
-
-/* RYUZA STUDIO PRO additions */
-.studio{background:linear-gradient(145deg,#111a2c,#0c1220);border:1px solid #354565;border-radius:20px;padding:18px;margin:18px 0 22px;box-shadow:0 18px 45px #0005}
-.studio-head{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:14px}.studio-head h2{margin:0;font-size:21px}.studio-head p{margin:3px 0 0;color:var(--muted);font-size:12px}
-.studio-layout{display:grid;grid-template-columns:minmax(0,1.35fr) minmax(260px,.85fr);gap:16px}.live-preview{position:relative;aspect-ratio:16/9;background:#050811;border:1px solid #34425c;border-radius:14px;overflow:hidden;display:grid;place-items:center;isolation:isolate}
-.live-preview:before{content:'';position:absolute;inset:0;background:linear-gradient(90deg,#050914bb,transparent 70%),linear-gradient(0deg,#050914b8,transparent 65%);z-index:-1}
-.live-preview img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;z-index:-2;opacity:.9}
-.live-title{position:absolute;left:5%;bottom:9%;max-width:78%;font-size:clamp(18px,3.3vw,42px);font-weight:1000;line-height:1.06;letter-spacing:-1px;color:#fff;text-shadow:0 3px 0 #18213a,0 0 18px #7c9cff;overflow-wrap:anywhere}
-.live-watermark{position:absolute;right:3%;top:5%;font-size:clamp(9px,1.2vw,14px);font-weight:900;letter-spacing:1.2px;color:#fff;background:#080d1dcc;border:1px solid #ffffff55;padding:5px 9px;border-radius:99px}
-.studio-controls{display:grid;grid-template-columns:1fr 1fr;gap:9px;align-content:start}.field{display:flex;flex-direction:column;gap:5px;min-width:0}.field.wide{grid-column:1/-1}.field label{font-size:11px;color:#aebbd2;font-weight:750}.field input,.field select,.field textarea{width:100%;min-width:0;background:#080f1d;border:1px solid #33415b;border-radius:10px;padding:10px;color:#f4f7ff;font:inherit}.field input[type=color]{height:40px;padding:4px}.field input[type=range]{padding:0;accent-color:#8ba7ff}.studio-actions{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px}.studio-actions button{flex:1;min-width:120px}.hint{font-size:11px;color:var(--muted);margin-top:8px}
-.import-box{margin-top:14px;border-top:1px solid var(--line);padding-top:13px}.import-box textarea{width:100%;min-height:75px;background:#080f1d;border:1px solid #33415b;border-radius:10px;padding:10px;color:white;resize:vertical}.import-box small{color:var(--muted)}
-@media(max-width:760px){.studio-layout{grid-template-columns:1fr}.studio-controls{grid-template-columns:1fr 1fr}}
 
 </style>
 </head>
@@ -46,30 +34,7 @@ button{border:0;border-radius:11px;padding:11px 14px;background:var(--accent);co
     <input id="search" type="search" placeholder="Cari nama skin...">
     <button class="secondary" id="copyAll">Salin semua judul</button>
   </div>
-  <section class="studio" id="studio">
-    <div class="studio-head"><div><h2>✦ RYUZA STUDIO PRO</h2><p>Editor thumbnail langsung · template · efek teks · watermark · simpan otomatis</p></div><span class="ratio">YOUTUBE 4K · 3840 × 2160</span></div>
-    <div class="studio-layout">
-      <div><div class="live-preview" id="livePreview"><img id="liveImage" alt="Preview skin"><div class="live-title" id="liveTitle">RYUZA OFFICIAL</div><div class="live-watermark" id="liveWatermark">RYUZA OFFICIAL</div></div>
-        <div class="studio-actions"><button id="exportThumb">Download Thumbnail 4K JPG</button><button class="secondary" id="batchDownload">Download Semua JPG</button><button class="secondary" id="resetEditor">Reset Editor</button></div>
-        <div class="hint" id="studioStatus">Perubahan tersimpan otomatis di browser ini. Ekspor JPG bergantung pada izin gambar dari situs sumber.</div>
-      </div>
-      <div class="studio-controls">
-        <div class="field wide"><label>Pilih skin</label><select id="studioSkin"></select></div>
-        <div class="field wide"><label>Judul thumbnail</label><input id="studioText" value="RYUZA OFFICIAL"></div>
-        <div class="field"><label>Template</label><select id="studioTemplate"><option value="cinematic">Cinematic Dark</option><option value="neon">Neon Cyber</option><option value="gold">Gold Premium</option><option value="minimal">Minimal Clean</option><option value="fire">Inferno Fire</option><option value="ice">Ice Crystal</option></select></div>
-        <div class="field"><label>Resolusi download</label><select id="studioResolution"><option value="3840">4K Ultra HD · 3840×2160</option><option value="1920">Full HD · 1920×1080</option><option value="1280">HD · 1280×720</option></select></div>
-        <div class="field"><label>Font</label><select id="studioFont"><option value="Arial Black">Bold</option><option value="Georgia">Elegant</option><option value="Impact">Impact</option><option value="system-ui">Modern</option></select></div>
-        <div class="field"><label>Warna teks</label><input id="studioColor" type="color" value="#ffffff"></div>
-        <div class="field"><label>Efek teks</label><select id="studioEffect"><option value="glow">Glow</option><option value="outline">Outline</option><option value="shadow">Shadow</option><option value="none">Tanpa efek</option></select></div>
-        <div class="field"><label>Ukuran teks</label><input id="studioSize" type="range" min="18" max="72" value="42"></div>
-        <div class="field"><label>Posisi vertikal</label><input id="studioPosition" type="range" min="5" max="90" value="9"></div>
-        <div class="field wide"><label>Watermark</label><input id="studioMark" value="RYUZA OFFICIAL"></div>
-        <div class="field"><label>Posisi gambar X</label><input id="studioX" type="range" min="0" max="100" value="50"></div>
-        <div class="field"><label>Posisi gambar Y</label><input id="studioY" type="range" min="0" max="100" value="50"></div>
-      </div>
-    </div>
-    <div class="import-box"><b>＋ Import skin baru</b><p><small>Format satu baris: Nama Skin | URL Gambar | Judul (judul boleh dikosongkan). Bisa tempel banyak baris sekaligus.</small></p><textarea id="importText" placeholder="Contoh: Beatrix Prime | https://contoh.com/beatrix.jpg | UPDATED Script Skin Beatrix Prime"></textarea><div class="studio-actions"><button class="secondary" id="importSkins">Import ke daftar</button><label class="button secondary" style="display:inline-flex;align-items:center;cursor:pointer;border-radius:11px;padding:10px 14px;background:#26334a"><input id="importFile" type="file" accept=".txt,.csv" style="display:none">Pilih file TXT/CSV</label></div></div>
-  </section>
+
   <p class="count" id="count"></p>
   <section class="grid" id="grid"></section>
   <div class="note">Catatan: pratinjau memakai rasio thumbnail YouTube 16:9 (1280 × 720). Unduhan gambar kartu dikonversi ke JPG 4K (3840 × 2160), rasio 16:9, kualitas 96%. Editor juga menyediakan pilihan Full HD 1920 × 1080 dan 4K 3840 × 2160. Jika situs sumber memblokir akses lintas situs, tombol akan membuka gambar di tab baru; konversi otomatis ke JPG mungkin tidak tersedia.</div>
@@ -95,11 +60,51 @@ function render(){
   const ratio=document.createElement('span');ratio.className='ratio';ratio.textContent='16:9 · 1280×720';
   meta.append(skin,ratio);
   const title=document.createElement('p');title.className='fulltitle';title.textContent=item.title;
-  const bioLabel=document.createElement('div');bioLabel.className='bio-label';bioLabel.textContent='BIO / DESKRIPSI SIAP SALIN';
-  const bioText=`UPDATED Script Skin ${item.skin} - No Password | Full Effect Voice Patch Terbaru\n\nLINK ADA DI BIO CHANNEL SILAHKAN DI CEK\n\nLINK ADA DI BIO CHANNEL SILAHKAN DI CEK\n\nLINK ADA DI BIO CHANNEL SILAHKAN DI CEK\n\n#${item.skin.replace(/[^a-zA-Z0-9]/g,'')} #${item.skin.split(/\s+/)[0].replace(/[^a-zA-Z0-9]/g,'')} #ryuzaofficial #channelryuzaofficialasli #scriptskinml #scriptskinmlterbaru`;
-  const bioPreview=document.createElement('div');bioPreview.className='bio-preview';bioPreview.textContent=bioText;
+  const bioLabel=document.createElement('div');bioLabel.className='bio-label';bioLabel.textContent='PILIH GAYA BIO / DESKRIPSI';
+  const bioSelect=document.createElement('select');bioSelect.className='bio-select';
+  const clean=item.skin.replace(/[^a-zA-Z0-9]/g,'');const hero=item.skin.split(/\s+/)[0].replace(/[^a-zA-Z0-9]/g,'');
+  const keywordBase=[
+   `${hero} ${item.skin.replace(/^\S+\s*/, '')} skin script`,
+   `${item.skin} skin script no password`,
+   `${item.skin} skin script no password mediafire`,
+   `${item.skin} skin script mediafire`,
+   `${item.skin} skin script ios`,
+   `${item.skin} skin script full effect`,
+   `script skin ${item.skin} full effect no password`,
+   `script skin ${item.skin} 2026`,
+   `script ${item.skin} skin basic`,
+   `script skin ${item.skin} terbaru`,
+   `download script ml skin ${item.skin}`,
+   `cara pasang script skin ${item.skin}`,
+   `script skin ${item.skin}`,
+   `script ${item.skin} skin no password with full sound effects`,
+   `script ${item.skin} no password download link`,
+   `script skin ${item.skin} terbaru patch`,
+   `script ${item.skin} normal skin no password`,
+   `script ${item.skin} skin full effect voice`,
+   `script skin ${item.skin} new patch`,
+   `script ${item.skin} mobile legends`,
+   `${item.skin} skin script mobile legends bang bang`
+  ];
+  const seoTags=[...new Set(keywordBase.map(t=>t.toLowerCase().replace(/\s+/g,' ').trim()))].join(', ');
+  const hashTags=[...new Set([`#ryuzaofficial`,`#${clean.toLowerCase()}`,`#scriptskin${clean.toLowerCase()}`,`#skinscript${clean.toLowerCase()}`,`#scriptskinml${clean.toLowerCase()}`,`#scriptskinmobilelegends${clean.toLowerCase()}`,`#script${clean.toLowerCase()}`,`#${clean.toLowerCase()}mlbb`,`#scriptskinmlbb${clean.toLowerCase()}`])].join(' ');
+  const bios=[
+   `🔥 ${item.skin.toUpperCase()} SUDAH UPDATE!\n\nUPDATED Script Skin ${item.skin} - No Password\nFull Effect • Voice Patch • Terbaru\n\n📌 LINK ADA DI BIO CHANNEL, SILAHKAN CEK!\n\n#${clean} #ryuzaofficial #scriptskinml`,
+   `✨ SCRIPT SKIN ${item.skin.toUpperCase()}\n\nTampilan makin keren dengan Full Effect dan Voice Patch.\n\n🔗 Link download tersedia di bio channel.\nCek sekarang dan jangan sampai ketinggalan!\n\n#${clean} #${hero} #channelryuzaofficialasli`,
+   `🚀 UPDATE TERBARU: ${item.skin}\n\nUPDATED Script Skin ${item.skin}\n✅ No Password\n✅ Full Effect\n✅ Voice Patch\n\n📲 LINK ADA DI BIO CHANNEL SILAHKAN DI CEK\n\n#ryuzaofficial #scriptskinml #scriptskinmlterbaru`,
+   `💎 ${item.skin} — FULL EFFECT!\n\nBuat tampilan game kamu makin menarik. File dan link tersedia melalui bio channel.\n\n👉 Kunjungi bio channel untuk melihat link download.\n\n#${clean} #ryuzaofficial #mlbb`,
+   `📢 INFO UPDATE SKIN!\n\n${item.skin} kini masuk daftar update Ryuza Official.\n\n🔗 LINK ADA DI BIO CHANNEL SILAHKAN DI CEK!\n\nFollow channel untuk info update berikutnya.\n\n#${clean} #channelryuzaofficialasli #scriptskinml`,
+   `🎬 SCRIPT SKIN ${item.skin.toUpperCase()}\n\nUPDATED Script Skin ${item.skin} - No Password | Full Effect Voice Patch Terbaru\n\n🔗 LINK ADA DI VIDEO! Tonton video sampai selesai dan cek informasi link yang tersedia di dalam video.\n\n#${clean} #ryuzaofficial #scriptskinml`,
+   `📌 LINK DOWNLOAD ${item.skin.toUpperCase()}\n\nLink ada di deskripsi video. Silakan buka bagian deskripsi / selengkapnya untuk melihat link download.\n\nJangan lupa like, komen, dan subscribe @RyuzaOfficialReal-1\n\n#${clean} #ryuzaofficial #scriptskinml`,
+   `💬 MAU DOWNLOAD ${item.skin.toUpperCase()}?\n\nCek komentar yang disematkan (pinned comment) pada video untuk menemukan informasi link.\n\nJika link belum terlihat, buka deskripsi video dan cek bio channel Ryuza Official.\n\n#${clean} #ryuzaofficial #scriptskinml`,
+   `🔎 INFORMASI LINK ${item.skin.toUpperCase()}\n\nLink bisa kamu cek melalui: \n1. Deskripsi video (klik Selengkapnya)\n2. Komentar yang disematkan\n3. Bio channel Ryuza Official\n\nSubscribe ~ @RyuzaOfficialReal-1\n\n#${clean} #ryuzaofficial #scriptskinml`,
+   `Tags (ignore) :\n${seoTags}\n\n${hashTags}\n\nSubscribe ~ @RyuzaOfficialReal-1`
+  ];
+  ['🔥 Promo & update','✨ Deskripsi elegan','🚀 Format fitur','💎 Singkat & menarik','📢 Informasi channel','🎬 Link ada di video','📝 Link di deskripsi','📌 Link di komentar pin','🔎 Semua info link','🏷️ SEO Tags YouTube'].forEach((name,i)=>{const o=document.createElement('option');o.value=i;o.textContent=name;bioSelect.appendChild(o)});
+  const bioPreview=document.createElement('div');bioPreview.className='bio-preview';bioPreview.textContent=bios[0];
+  bioSelect.onchange=()=>bioPreview.textContent=bios[Number(bioSelect.value)];
   const actions=document.createElement('div');actions.className='actions';
-  const copyBio=document.createElement('button');copyBio.textContent='Salin bio';copyBio.onclick=async()=>{try{await navigator.clipboard.writeText(bioText);copyBio.textContent='Bio tersalin ✓';setTimeout(()=>copyBio.textContent='Salin bio',1500)}catch(e){window.prompt('Salin bio ini:',bioText)}};
+  const copyBio=document.createElement('button');copyBio.textContent='Salin bio';copyBio.onclick=async()=>{const bioText=bios[Number(bioSelect.value)];try{await navigator.clipboard.writeText(bioText);copyBio.textContent='Bio tersalin ✓';setTimeout(()=>copyBio.textContent='Salin bio',1500)}catch(e){window.prompt('Salin bio ini:',bioText)}};
   const copy=document.createElement('button');copy.className='secondary';copy.textContent='Salin nama';const copyTitle=item.title||('UPDATED Script Skin '+item.skin+' - No Password | Full Effect Voice Patch Terbaru');copy.onclick=async()=>{try{await navigator.clipboard.writeText(copyTitle);copy.textContent='Judul tersalin ✓';setTimeout(()=>copy.textContent='Salin nama',1400)}catch(e){window.prompt('Salin judul lengkap:',copyTitle)}};
   const download=document.createElement('button');download.className='secondary';download.textContent='Download gambar';download.onclick=async()=>{
     download.disabled=true;download.textContent='Memproses...';
@@ -124,7 +129,7 @@ function render(){
     setTimeout(()=>{download.disabled=false;download.textContent='Download gambar'},1800);
   };
   const open=document.createElement('button');open.className='secondary';open.textContent='Buka gambar ↗';open.onclick=()=>window.open(item.url,'_blank','noopener');
-  actions.append(copyBio,copy,download,open);card.append(preview,meta,title,bioLabel,bioPreview,actions);grid.appendChild(card);
+  actions.append(copyBio,copy,download,open);card.append(preview,meta,title,bioLabel,bioSelect,bioPreview,actions);grid.appendChild(card);
  });
 }
 search.addEventListener('input',render);
@@ -134,49 +139,6 @@ document.getElementById('copyAll').onclick=async()=>{
  catch(e){window.prompt('Salin semua judul:',titles)}
 };
 render();
-
-// Studio editor features
-const $=id=>document.getElementById(id);
-const studioIds=['studioSkin','studioText','studioTemplate','studioResolution','studioFont','studioColor','studioEffect','studioSize','studioPosition','studioMark','studioX','studioY'];
-function fillSkinSelect(){const el=$('studioSkin');const old=el.value;el.innerHTML='';items.forEach((it,i)=>{const o=document.createElement('option');o.value=i;o.textContent=it.skin;el.appendChild(o)});if(old!==''&&items[Number(old)])el.value=old;}
-function studioUpdate(){const i=Number($('studioSkin').value||0),it=items[i];if(!it)return;const preview=$('livePreview'),img=$('liveImage'),title=$('liveTitle'),mark=$('liveWatermark');
- if(img.dataset.src!==it.url){img.src=it.url;img.dataset.src=it.url}
- title.textContent=$('studioText').value||it.skin;title.style.fontFamily=$('studioFont').value+', sans-serif';title.style.color=$('studioColor').value;title.style.fontSize='clamp(18px,'+($('studioSize').value/12)+'vw, '+$('studioSize').value+'px)';title.style.bottom=$('studioPosition').value+'%';title.style.left='5%';img.style.objectPosition=$('studioX').value+'% '+$('studioY').value+'%';mark.textContent=$('studioMark').value;mark.style.display=mark.textContent?'block':'none';
- const t=$('studioTemplate').value,e=$('studioEffect').value;
- const themes={cinematic:{bg:'linear-gradient(135deg,#111827,#030712)',overlay:'linear-gradient(90deg,#050914dd 0%,#05091422 75%),linear-gradient(0deg,#050914dd,transparent 70%)',glow:'#7c9cff',mark:'#111827cc'},neon:{bg:'linear-gradient(135deg,#24104d,#061b2d)',overlay:'linear-gradient(120deg,#17052dcc,#061b2d55),linear-gradient(0deg,#050914cc,transparent 80%)',glow:'#00eaff',mark:'#160d35dd'},gold:{bg:'linear-gradient(135deg,#61430b,#15100a)',overlay:'linear-gradient(120deg,#251600aa,#08080855),linear-gradient(0deg,#080808dd,transparent 75%)',glow:'#ffd36a',mark:'#38250dcc'},minimal:{bg:'#111827',overlay:'linear-gradient(0deg,#050914bb,transparent 65%)',glow:'#ffffff',mark:'#111827cc'},fire:{bg:'linear-gradient(135deg,#5a1608,#190509)',overlay:'linear-gradient(120deg,#54100088,#16030866),linear-gradient(0deg,#160308e8,transparent 75%)',glow:'#ff6b24',mark:'#541000dd'},ice:{bg:'linear-gradient(135deg,#073b59,#071326)',overlay:'linear-gradient(120deg,#057caa66,#07132655),linear-gradient(0deg,#061326dd,transparent 75%)',glow:'#8cecff',mark:'#06334ddd'}};
- const th=themes[t]||themes.cinematic;preview.style.background=th.bg;preview.style.setProperty('--theme-overlay',th.overlay);preview.style.backgroundImage=th.overlay;mark.style.background=th.mark;
- title.style.textShadow=e==='glow'?'0 0 8px '+th.glow+',0 0 24px '+th.glow:e==='outline'?'2px 2px 0 #000,-2px -2px 0 #000,2px -2px 0 #000,-2px 2px 0 #000':e==='shadow'?'0 5px 8px #000':'none';
- preview.style.border=t==='gold'?'2px solid #d6a94d':t==='neon'?'2px solid #00dfff':t==='ice'?'2px solid #8cecff':t==='fire'?'2px solid #ff6b24':'1px solid #34425c';
- try{localStorage.setItem('ryuzaStudioSettings',JSON.stringify(Object.fromEntries(studioIds.map(id=>[id,$(id).value]))));}catch(e){}
-}
-fillSkinSelect();try{const saved=JSON.parse(localStorage.getItem('ryuzaStudioSettings')||'{}');studioIds.forEach(id=>{if(saved[id]!=null&&$(id))$(id).value=saved[id]});}catch(e){}studioIds.forEach(id=>$(id).addEventListener('input',studioUpdate));$('studioSkin').addEventListener('change',()=>{$('studioText').value=items[Number($('studioSkin').value)]?.skin||'';studioUpdate()});$('liveImage').onerror=()=>{$('studioStatus').textContent='Gambar tidak bisa dimuat untuk preview. Coba URL gambar lain.'};studioUpdate();
-function drawThumbnail(){return new Promise((resolve,reject)=>{const it=items[Number($('studioSkin').value||0)],img=new Image();img.crossOrigin='anonymous';img.onload=()=>{try{
- const width=Number($('studioResolution').value||3840),height=Math.round(width*9/16),scaleFactor=width/1280;
- const c=document.createElement('canvas');c.width=width;c.height=height;const x=c.getContext('2d',{alpha:false});
- const scale=Math.max(width/img.width,height/img.height),w=img.width*scale,h=img.height*scale;
- const posX=Number($('studioX').value)/100,posY=Number($('studioY').value)/100;
- const px=(width-w)*posX,py=(height-h)*posY;x.drawImage(img,px,py,w,h);
- const t=$('studioTemplate').value;
- // Template sekarang tidak menimpa foto dengan gradasi gelap; warna asli dipertahankan.
- // Gaya template tetap ditampilkan melalui bingkai/aksen dan efek teks.
- if(t==='neon'||t==='ice'){x.save();x.strokeStyle=t==='ice'?'#8cecff':'#00eaff';x.lineWidth=5*scaleFactor;x.shadowColor=x.strokeStyle;x.shadowBlur=22*scaleFactor;x.strokeRect(28*scaleFactor,28*scaleFactor,width-56*scaleFactor,height-56*scaleFactor);x.restore()}
- if(t==='gold'){x.save();x.strokeStyle='#d6ad57';x.lineWidth=7*scaleFactor;x.strokeRect(30*scaleFactor,30*scaleFactor,width-60*scaleFactor,height-60*scaleFactor);x.restore()}
- if(t==='fire'){x.save();x.strokeStyle='#ff6b24';x.lineWidth=5*scaleFactor;x.shadowColor='#ff3b10';x.shadowBlur=24*scaleFactor;x.strokeRect(25*scaleFactor,25*scaleFactor,width-50*scaleFactor,height-50*scaleFactor);x.restore()}
- const txt=$('studioText').value||it.skin,size=Number($('studioSize').value)*scaleFactor;
- x.save();x.font='900 '+size+'px '+$('studioFont').value;x.textBaseline='bottom';x.textAlign='left';x.lineJoin='round';x.lineWidth= Math.max(5,7*scaleFactor);x.strokeStyle='#050914';x.fillStyle=$('studioColor').value;
- const maxWidth=width*.88;let text=txt;while(x.measureText(text).width>maxWidth&&size>12*scaleFactor){break}
- const textY=height-(Number($('studioPosition').value)/100)*height;
- const effect=$('studioEffect').value;if(effect==='glow'){x.shadowColor= t==='gold'?'#ffd36a':t==='ice'?'#8cecff':t==='fire'?'#ff6b24':t==='neon'?'#00eaff':$('studioColor').value;x.shadowBlur=28*scaleFactor}else if(effect==='shadow'){x.shadowColor='#000';x.shadowBlur=16*scaleFactor;x.shadowOffsetY=7*scaleFactor}
- if(effect==='outline'||t==='gold')x.strokeText(text,65*scaleFactor,textY,maxWidth);
- x.fillText(text,65*scaleFactor,textY,maxWidth);x.restore();
- const watermark=$('studioMark').value;if(watermark){x.save();x.font='800 '+(24*scaleFactor)+'px Arial';const pad=14*scaleFactor,tw=x.measureText(watermark).width;x.fillStyle=t==='gold'?'#38250dcc':'#080d1dcc';x.fillRect(width-tw-pad*2-45*scaleFactor,35*scaleFactor,tw+pad*2,48*scaleFactor);x.fillStyle='#fff';x.textAlign='right';x.textBaseline='middle';x.fillText(watermark,width-45*scaleFactor,59*scaleFactor);x.restore()}
- c.toBlob(b=>b?resolve(b):reject(Error('Gagal membuat JPG')),'image/jpeg',.96)
- }catch(err){reject(err)} };img.onerror=()=>reject(Error('Gambar sumber tidak dapat diakses untuk ekspor JPG. Sumber mungkin membatasi akses lintas situs (CORS).'));img.src=it.url;});}
-$('exportThumb').onclick=async()=>{const b=$('exportThumb');b.disabled=true;b.textContent='Membuat JPG...';try{const blob=await drawThumbnail(),url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;a.download=(items[Number($('studioSkin').value)].skin.replace(/[^\w-]+/g,'_')+'_thumbnail_'+$('studioResolution').value+'px.jpg');document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),3000);$('studioStatus').textContent='Thumbnail '+$('studioResolution').value+'×'+Math.round(Number($('studioResolution').value)*9/16)+' JPG berhasil dibuat.'}catch(e){$('studioStatus').textContent=e.message}finally{b.disabled=false;b.textContent='Download Thumbnail 4K JPG'}};
-$('batchDownload').onclick=async()=>{const btn=$('batchDownload');btn.disabled=true;let ok=0;for(let i=0;i<items.length;i++){try{const r=await fetch(items[i].url,{mode:'cors'});if(!r.ok)continue;const blob=await r.blob();const url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;a.download=items[i].skin.replace(/[^\w-]+/g,'_')+'.jpg';a.click();URL.revokeObjectURL(url);ok++;await new Promise(r=>setTimeout(r,180));}catch(e){}}btn.disabled=false;$('studioStatus').textContent='Batch selesai: '+ok+' dari '+items.length+' gambar dapat diunduh. Sebagian situs mungkin membatasi akses.'};
-function addImported(raw){const rows=raw.split(/\r?\n/).map(x=>x.trim()).filter(Boolean);let n=0;rows.forEach(line=>{const [skin,url,title]=line.split('|').map(x=>x.trim());if(!skin||!url||!/^https?:\/\//i.test(url))return;items.unshift({skin,url,title:title||('UPDATED Script Skin '+skin+' - No Password | Full Effect Voice Patch Terbaru')});n++});fillSkinSelect();render();$('studioSkin').value='0';$('studioText').value=items[0]?.skin||'';studioUpdate();$('studioStatus').textContent=n+' skin berhasil diimport.';}
-$('importSkins').onclick=()=>addImported($('importText').value);$('importFile').onchange=async e=>{const f=e.target.files[0];if(f)addImported(await f.text());e.target.value=''};
-$('resetEditor').onclick=()=>{try{localStorage.removeItem('ryuzaStudioSettings')}catch(e){}$('studioText').value=items[Number($('studioSkin').value)]?.skin||'';$('studioTemplate').value='cinematic';$('studioResolution').value='3840';$('studioFont').value='Arial Black';$('studioColor').value='#ffffff';$('studioEffect').value='glow';$('studioSize').value=42;$('studioPosition').value=9;$('studioMark').value='RYUZA OFFICIAL';$('studioX').value=50;$('studioY').value=50;studioUpdate();};
 
 </script>
 </body>
